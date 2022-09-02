@@ -51,8 +51,9 @@ class Admin_UI implements Hooked {
 					'generate_links_to_plugin_bar'
 				)
 			);
-			add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+			add_action( 'admin_enqueue_scripts', array( $this, 'ainsys_enqueue_scripts' ) );
 			add_action( 'admin_notices', array( $this, 'admin_notices' ) );
+			add_filter( 'option_page_capability_' . 'ainsys-connector', array( $this, 'ainsys_page_capability' ) );
 		}
 		// let's register ajax handlers as it's a part of admin UI. NB: they were a part of Core originally.
 		add_action( 'wp_ajax_remove_ainsys_integration', array( $this, 'remove_ainsys_integration' ) );
@@ -70,13 +71,23 @@ class Admin_UI implements Hooked {
 	 *
 	 */
 	public function add_admin_menu() {
-		add_options_page(
+		add_menu_page(
 			__( 'AINSYS connector integration', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			__( 'AINSYS connector', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			'administrator',
-			__FILE__,
-			[ $this, 'include_setting_page' ]
+			'ainsys-connector',
+			[ $this, 'include_setting_page' ],
+			'dashicons-randomize',
+			55
 		);
+	}
+
+	/**
+	 * Give rights to edit ainsys-connector page
+	 *
+	 */
+	function ainsys_page_capability( $capability ) {
+		return 'administrator';
 	}
 
 	/**
@@ -96,11 +107,7 @@ class Admin_UI implements Hooked {
 	 * @return mixed
 	 */
 	public function generate_links_to_plugin_bar( $links ) {
-		$settings_url = esc_url( add_query_arg(
-			'page',
-			plugin_basename( __FILE__ ),
-			get_admin_url() . 'options-general.php'
-		) );
+		$settings_url = esc_url( add_query_arg( array( 'page' => 'ainsys-connector' ), get_admin_url() . 'options-general.php' ) );
 
 		$settings_link = '<a href="' . $settings_url . '">' . __( 'Settings' ) . '</a>';
 		$plugin_link   = '<a target="_blank" href="https://app.ainsys.com/en/settings/workspaces">AINSYS dashboard</a>';
@@ -116,11 +123,11 @@ class Admin_UI implements Hooked {
 	 *
 	 * @return void
 	 */
-	public function admin_enqueue_scripts() {
+	public function ainsys_enqueue_scripts() {
 
 		wp_enqueue_script( 'ainsys_connector_admin_handle', plugins_url( 'assets/js/ainsys_connector_admin.js', AINSYS_CONNECTOR_PLUGIN ), array( 'jquery' ), '2.0.0', true );
 
-		if ( false !== strpos( $_GET["page"] ?? '', 'ainsys-connector-master' ) ) {
+		if ( false !== strpos( $_GET["page"] ?? '', 'ainsys-connector' ) ) {
 			//wp_enqueue_script('jquery-ui-sortable');
 			wp_enqueue_style( 'ainsys_connector_style_handle', plugins_url( "assets/css/ainsys_connector_style.css", AINSYS_CONNECTOR_PLUGIN ) );
 			wp_enqueue_style( 'font-awesome_style_handle', "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" );
@@ -130,8 +137,6 @@ class Admin_UI implements Hooked {
 				'ajax_url' => admin_url( 'admin-ajax.php' ),
 				'nonce'    => wp_create_nonce( self::$nonce_title ),
 			) );
-
-
 		}
 
 		return;

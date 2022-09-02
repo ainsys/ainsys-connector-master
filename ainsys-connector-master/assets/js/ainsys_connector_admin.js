@@ -116,7 +116,7 @@ jQuery(function($){
     });
 
     //////// Ajax toggle loging controll, set log until time  ////////
-    $('#setting_section_log').on('click', '.loging_controll', function (e){
+    $('#setting_section_log').on('click', '.ainsys-log-control', function (e){
         e.preventDefault();
 
         if ( $(this).hasClass("disabled") ){
@@ -161,6 +161,31 @@ jQuery(function($){
             // }
         })
     });
+
+	$('#setting_section_log').on('click', '.ainsys-responce-short', function (e){
+		const fullResponse = $( this ).siblings( '.ainsys-responce-full' ).html();
+		$( 'body' ).append('<div class="ainsys-overlay"><div class="ainsys-popup"><div class="ainsys-popup-body"><div class="ainsys-popup-response">' + fullResponse + '</div></div><div class="ainsys-popup-btns"><span class="btn btn-primary ainsys-popup-copy">Copy to Clipboard</span><span class="btn btn-tertiary ainsys-popup-close">Close</span></div></div></div>');
+		const respHeight = $( '.ainsys-popup' ).height() - $( '.ainsys-popup-btns' ).outerHeight() - 40;
+		$( '.ainsys-popup-response' ).css( 'height', respHeight );
+
+	} );
+	$( window ).on( 'resize', function(){
+		if ( $( '.ainsys-popup-response' ).length > 0 ) {
+			const respHeight = $( '.ainsys-popup' ).height() - $( '.ainsys-popup-btns' ).outerHeight() - 40;
+			$( '.ainsys-popup-response' ).css( 'height', respHeight );
+		}
+	} );
+	$( document ).on('click', '.ainsys-popup-close', function (e) {
+		$( '.ainsys-overlay' ).remove();
+	} );
+
+	$( document ).on('click', '.ainsys-popup-copy', function (e) {
+		var $temp = $( '<input>' );
+  		$( 'body' ).append( $temp );
+		$temp.val( $( '.ainsys-popup-response' ).text() ).select();
+		document.execCommand('copy');
+		$temp.remove();
+	} );
 
     //////// Ajax remove ainsys integration ////////
     $('#setting_section_general').on('click', '#remove_ainsys_integration', function (e){

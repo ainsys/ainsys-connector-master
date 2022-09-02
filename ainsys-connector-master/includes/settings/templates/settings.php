@@ -223,45 +223,40 @@ try {
 		<?php
 		$start = $admin_ui->settings::get_option( 'do_log_transactions' ) ? ' disabled' : '';
 		$stop  = $admin_ui->settings::get_option( 'do_log_transactions' ) ? '' : ' disabled';
-
-		$controls  = '<div class="controls">';
-		$controls .= '<a id="start_loging" class="button button-primary loging_controll' . $start . '">' . __( 'Start loging', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a>';
-		$controls .= '<select id="start_loging_timeinterval" class="' . $start . '" name="loging_timeinterval">
-                            <option value="1">' . __( '1 hour', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</option>
-                            <option value="5">' . __( '5 hours', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</option>
-                            <option value="12">' . __( '12 hours', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</option>
-                            <option value="24">' . __( '24 hours', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</option>
-                            <option value="-1" selected="selected">' . __( 'unlimited', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</option>
-                    </select>';
-		$controls .= '<a id="stop_loging" class="button button-primary loging_controll' . $stop . '">' . __( 'Stop loging', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a>';
-		$controls .= '<a id="reload_log" class="button button-primary">' . __( 'Reload', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a>';
-		$controls .= '<a id="clear_log" class="button button-primary">' . __( 'Clear log', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a>
-                    </div>';
-
-		echo '<div class="log_block">' . $controls . $admin_ui->logger::generate_log_html() . '</div>';
-
 		?>
+		<div class="ainsys-log-block">
+			<div class="ainsys-log-status">
+				<span class="ainsys-log-status-title">Log Status: </span>
+				<?php if ( $admin_ui->settings::get_option( 'do_log_transactions' ) ) { ?>
+					<span class="ainsys-log-status-ok"><i class="fa fa-check-circle-o" aria-hidden="true"></i> Working</span>
+				<?php } else { ?>
+					<span class="ainsys-log-status-no"><i class="fa fa-times-circle-o" aria-hidden="true"></i> Not Working</span>
+				<?php } ?>
+			</div>
+			<div class="ainsys-log-controls">
+				<a id="start_loging" class="btn btn-primary ainsys-log-control<?php echo esc_attr( $start ); ?>"><?php _e( 'Start loging', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
+				<select id="start_loging_timeinterval" class="<?php echo esc_attr( $start ); ?>" name="loging_timeinterval">
+					<option value="1"><?php _e( '1 hour', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></option>
+					<option value="5"><?php _e( '5 hours', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></option>
+					<option value="12"><?php _e( '12 hours', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></option>
+					<option value="24"><?php _e( '24 hours', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></option>
+					<option value="-1" selected="selected"><?php _e( 'unlimited', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></option>
+				</select>
+				<a id="stop_loging" class="btn btn-primary ainsys-log-control<?php echo esc_attr( $stop ); ?>"><?php _e( 'Stop loging', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
+				<a id="reload_log" class="btn btn-primary"><?php _e( 'Reload', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
+				<a id="clear_log" class="btn btn-primary"><?php _e( 'Clear log', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
+			</div>
+			<?php echo $admin_ui->logger::generate_log_html(); ?> 
+		</div>
 	</div>
 
 	<div id="setting_entities_section" class="tab-target">
 		<?php echo $admin_ui->generate_entities_html(); ?>
 
-		<p>  
-		<?php
-			_e( 'Detailed', AINSYS_CONNECTOR_TEXTDOMAIN )
-		?>
-			<a
-				href="https://gitlab.ainsys.com/dev06/ainsys_connector">
-				<?php
-				_e( ' API integration', AINSYS_CONNECTOR_TEXTDOMAIN )
-				?>
-				</a> 
-				<?php
-				_e( ' documentation.', AINSYS_CONNECTOR_TEXTDOMAIN )
-				?>
-			</p>
+		<p><?php _e( 'Detailed', AINSYS_CONNECTOR_TEXTDOMAIN ); ?> <a href="https://github.com/ainsys/ainsys-wp-connector"> <?php _e( ' API integration', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a> <?php _e( ' documentation.', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></p>
 	</div>
 </div>
+
 <script>
 	jQuery( document ).ready( function ( $ ) {
 		$( '#full-uninstall-checkbox' ).on( 'click', function () {

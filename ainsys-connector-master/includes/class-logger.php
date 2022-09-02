@@ -7,7 +7,7 @@ use Ainsys\Connector\Master\Settings\Settings;
 class Logger implements Hooked {
 
 	public static $do_log_transactions = false;
-	private static $log_table_name = 'ainsys_log';
+	private static $log_table_name     = 'ainsys_log';
 
 	/**
 	 * @var Settings
@@ -20,7 +20,6 @@ class Logger implements Hooked {
 	}
 
 	public function init_hooks() {
-
 	}
 
 	/**
@@ -29,28 +28,46 @@ class Logger implements Hooked {
 	 * @param int $object_id
 	 * @param string $request_action
 	 * @param string $request_data
-	 * @param string $serrver_responce
+	 * @param string $server_responce
 	 * @param int $incoming_call
 	 *
 	 * @return string
 	 */
-	public static function save_log_information( $object_id, $request_action, $request_data, $serrver_responce = '', $incoming_call = 0 ) {
+	public static function save_log_information( $object_id, $request_action, $request_data, $server_responce = '', $incoming_call = 0 ) {
 		global $wpdb;
 
 		if ( ! self::$do_log_transactions ) {
 			return false;
 		}
 
-		$result = $wpdb->insert( $wpdb->prefix . self::$log_table_name,
+		$result = $wpdb->insert(
+			$wpdb->prefix . self::$log_table_name,
 			array(
-				'object_id'        => $object_id,
-				'request_action'   => $request_action,
-				'request_data'     => $request_data,
-				'serrver_responce' => $serrver_responce,
-				'incoming_call'    => $incoming_call
+				'object_id'       => $object_id,
+				'request_action'  => $request_action,
+				'request_data'    => $request_data,
+				'server_responce' => $server_responce,
+				'incoming_call'   => $incoming_call,
 			)
 		);
 
+		return $result;
+	}
+
+	/**
+	 * Render json as HTML.
+	 *
+	 * @return string
+	 */
+	private static function ainsys_render_json1( $json, $result = '' ) { //TODO
+
+		foreach ( $json as $key => $val ) {
+			if ( is_string( $val ) || null === $val ) {
+				$result .= '<div class="ainsys-json-inner">' . $key . ' : ' . $val . '</div>';
+			} else {
+				$result .= '{<div class="ainsys-json-outer"> ' . $key . ' : ' . ainsys_render_json( $val ) . '</div>}<br>';
+			}
+		}
 		return $result;
 	}
 
@@ -60,14 +77,24 @@ class Logger implements Hooked {
 	 * @return string
 	 */
 	public static function generate_log_html( $where = '' ) {
+		function ainsys_render_json( $json, $result = '' ) {
 
+			foreach ( $json as $key => $val ) {
+				if ( is_string( $val ) || null === $val ) {
+					$result .= '<div class="ainsys-json-inner">' . $key . ' : ' . $val . '</div>';
+				} else {
+					$result .= '{<div class="ainsys-json-outer"> ' . $key . ' : ' . ainsys_render_json( $val ) . '</div>}<br>';
+				}
+			}
+			return $result;
+		}
 		global $wpdb;
 
-		$log_html        = '<div id="connection_log"><table class="form-table">';
+		$log_html        = '<div id="connection_log"><table class="ainsys-log-table">';
 		$log_html_body   = '';
 		$log_html_header = '';
-		$query           = "SELECT * 
-        FROM " . $wpdb->prefix . self::$log_table_name . $where;
+		$query           = 'SELECT * 
+        FROM ' . $wpdb->prefix . self::$log_table_name . $where;
 		$output          = $wpdb->get_results( $query, ARRAY_A );
 
 		if ( empty( $output ) ) {
@@ -75,26 +102,27 @@ class Logger implements Hooked {
 		}
 
 		foreach ( $output as $item ) {
-			$log_html_body .= '<tr valign="top">';
-			$header_full   = empty( $log_html_header ) ? true : false;
+			$log_html_body .= '<tr>';
+			$header_full    = empty( $log_html_header ) ? true : false;
 			foreach ( $item as $name => $value ) {
 				$log_html_header .= $header_full ? '<th>' . strtoupper( str_replace( '_', ' ', $name ) ) . '</th>' : '';
-				$log_html_body   .= '<td class="' . $name . '">';
-				if ( $name === 'incoming_call' ) {
-					$value = (int) $value === 0 ? 'No' : 'Yes';
+
+				$log_html_body .= '<td class="' . $name . '">';
+				if ( 'incoming_call' === $name ) {
+					$value = 0 === (int) $value ? 'No' : 'Yes';
 				}
-				if ( $name === 'request_data' ) {
+				if ( 'request_data' === $name ) {
 					$value = maybe_unserialize( $value );
-					if ( empty( $value["request_data"] ) ) {
-						$log_html_body .= $value ? '<div class="gray_header">' . __( 'empty', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</div>' : $value;
+					if ( empty( $value['request_data'] ) ) {
+						$log_html_body .= $value ? __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN ) : $value;
 						continue;
 					}
 					if ( is_array( $value ) ) {
-						if ( count( $value["request_data"] ) > 2 ) {
-							$log_html_body .= '<div class="request_data_contaner"> <a class="button expand_data_contaner">more</a>';
+						if ( count( $value['request_data'] ) > 2 ) {
+							$log_html_body .= '<div class="request_data_container"> <a class="button expand_data_contaner">more</a>';
 						}
-						foreach ( $value["request_data"] as $title => $param ) {
-							if ( $title === "products" && ! empty( $param ) ) {
+						foreach ( $value['request_data'] as $title => $param ) {
+							if ( 'products' === $title && ! empty( $param ) ) {
 								foreach ( $param as $prod_id => $product ) {
 									$log_html_body .= '</br> <strong>Prod# ' . $prod_id . '</strong>';
 									foreach ( $product as $param_title => $poduct_param ) {
@@ -110,6 +138,17 @@ class Logger implements Hooked {
 						}
 						$log_html_body .= '</div>';
 					}
+				}
+				if ( 'server_responce' === $name ) {
+					$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( $value, 0, 80 ) . ' ... </div>';
+
+					$value = json_decode( maybe_unserialize( $value ) );
+
+					$log_html_body .= '<div class="ainsys-responce-full">';
+					if ( json_last_error() === JSON_ERROR_NONE ) {
+						$log_html_body .= ainsys_render_json( $value );
+					}
+					$log_html_body .= '</div>';
 				} else {
 					$log_html_body .= $value;
 				}
@@ -117,7 +156,7 @@ class Logger implements Hooked {
 			}
 			$log_html_body .= '</tr>';
 		}
-		$log_html .= '<thead><tr>' . $log_html_header . '</tr></thead>' . $log_html_body . '</table> </div>';
+		$log_html .= '<thead><tr>' . $log_html_header . '</tr></thead><tbody>' . $log_html_body . '</tbody></table> </div>';
 
 		return $log_html;
 	}
@@ -128,7 +167,7 @@ class Logger implements Hooked {
 	 */
 	public function truncate_log_table() {
 		global $wpdb;
-		$sql = "TRUNCATE TABLE " . $wpdb->prefix . self::$log_table_name;
+		$sql = 'TRUNCATE TABLE ' . $wpdb->prefix . self::$log_table_name;
 		$wpdb->query( $sql );
 
 	}
@@ -155,8 +194,12 @@ class Logger implements Hooked {
 
 	public function uninstall() {
 		global $wpdb;
-		$wpdb->query( sprintf( "DROP TABLE IF EXISTS %s",
-			$wpdb->prefix . self::$log_table_name ) );
+		$wpdb->query(
+			sprintf(
+				'DROP TABLE IF EXISTS %s',
+				$wpdb->prefix . self::$log_table_name
+			)
+		);
 	}
 
 	/**
@@ -187,7 +230,7 @@ class Logger implements Hooked {
                 `object_id` bigint NOT NULL,
                 `request_action` varchar(100) NOT NULL,
                 `request_data` text DEFAULT NULL,
-                `serrver_responce` text DEFAULT NULL,
+                `server_responce` text DEFAULT NULL,
                 `incoming_call` smallint NOT NULL,
                 `creation_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 PRIMARY KEY  (log_id),

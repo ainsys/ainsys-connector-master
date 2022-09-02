@@ -16,7 +16,7 @@ class Admin_UI implements Hooked {
 	 *
 	 * @var array
 	 */
-	static $notices = [];
+	static $notices = array();
 
 	static $nonce_title = 'ansys_admin_menu_nonce';
 
@@ -45,10 +45,11 @@ class Admin_UI implements Hooked {
 	public function init_hooks() {
 		if ( is_admin() ) {
 			add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
-			add_filter( 'plugin_action_links_ainsys-connector-master/plugin.php',
+			add_filter(
+				'plugin_action_links_ainsys-connector-master/plugin.php',
 				array(
 					$this,
-					'generate_links_to_plugin_bar'
+					'generate_links_to_plugin_bar',
 				)
 			);
 			add_action( 'admin_enqueue_scripts', array( $this, 'ainsys_enqueue_scripts' ) );
@@ -76,7 +77,7 @@ class Admin_UI implements Hooked {
 			__( 'AINSYS connector', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			'administrator',
 			'ainsys-connector',
-			[ $this, 'include_setting_page' ],
+			array( $this, 'include_setting_page' ),
 			'dashicons-randomize',
 			55
 		);
@@ -127,16 +128,20 @@ class Admin_UI implements Hooked {
 
 		wp_enqueue_script( 'ainsys_connector_admin_handle', plugins_url( 'assets/js/ainsys_connector_admin.js', AINSYS_CONNECTOR_PLUGIN ), array( 'jquery' ), '2.0.0', true );
 
-		if ( false !== strpos( $_GET["page"] ?? '', 'ainsys-connector' ) ) {
+		if ( false !== strpos( $_GET['page'] ?? '', 'ainsys-connector' ) ) {
 			//wp_enqueue_script('jquery-ui-sortable');
-			wp_enqueue_style( 'ainsys_connector_style_handle', plugins_url( "assets/css/ainsys_connector_style.css", AINSYS_CONNECTOR_PLUGIN ) );
-			wp_enqueue_style( 'font-awesome_style_handle', "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" );
+			wp_enqueue_style( 'ainsys_connector_style_handle', plugins_url( 'assets/css/ainsys_connector_style.css', AINSYS_CONNECTOR_PLUGIN ) );
+			wp_enqueue_style( 'font-awesome_style_handle', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css' );
 
 			wp_enqueue_script( 'ainsys_connector_admin_handle', plugins_url( 'assets/js/ainsys_connector_admin.js', AINSYS_CONNECTOR_PLUGIN ), array( 'jquery' ), '2.0.0', true );
-			wp_localize_script( 'ainsys_connector_admin_handle', 'ainsys_connector_params', array(
-				'ajax_url' => admin_url( 'admin-ajax.php' ),
-				'nonce'    => wp_create_nonce( self::$nonce_title ),
-			) );
+			wp_localize_script(
+				'ainsys_connector_admin_handle',
+				'ainsys_connector_params',
+				array(
+					'ajax_url' => admin_url( 'admin-ajax.php' ),
+					'nonce'    => wp_create_nonce( self::$nonce_title ),
+				)
+			);
 		}
 
 		return;
@@ -154,7 +159,7 @@ class Admin_UI implements Hooked {
 			//new connector
 			$response = '';
 			try {
-				$response = $this->core->curl_exec_func( [ 'hook_url' => $this->settings::get_option( 'ansys_api_key' ) ] );
+				$response = $this->core->curl_exec_func( array( 'hook_url' => $this->settings::get_option( 'ansys_api_key' ) ) );
 			} catch ( \Exception $exception ) {
 
 			}
@@ -165,33 +170,33 @@ class Admin_UI implements Hooked {
 
 			// old connector
 			//          $connectors = ainsys_settings::get_option('connectors');
-//            if (empty($connectors)){
-//                $server_url = empty(ainsys_settings::get_option('server')) ? 'https://user-api.ainsys.com/' : ainsys_settings::get_option('server');
-//                $workspace = empty(ainsys_settings::get_option('workspace')) ? 14 : ainsys_settings::get_option('workspace');
-//                $url = $server_url . 'api/v0/workspace-management/workspaces/' . $workspace . '/connectors/';
-//                $sys_id = empty((int)ainsys_settings::get_option('sys_id')) ? 3 : (int)ainsys_settings::get_option('sys_id');
-//                $post_fields = array(
-//                    "name" => 'string',
-//                    "system" => $sys_id,
-//                    "workspace" => 14,
-//                    "created_by" => 0);
-//                $connectors_responce = self::curl_exec_func( $post_fields, $url );
-//                $connectors_array = !empty($connectors_responce) ? json_decode($connectors_responce) : '';
-//                if ( !empty($connectors_array) && isset($connectors_array->id) ){
-//                    ainsys_settings::set_option('connectors', $connectors_array->id);
-//                    $url = $server_url . 'api/v0/workspace-management/workspaces/'. $workspace . '/connectors/'. $connectors_array->id . '/handshake-url/';
-//                    $url_responce = self::curl_exec_func('', $url );
-//                    $url_array = !empty($url_responce) ? json_decode($url_responce) : '';
-//                    if ( !empty($url_array) && isset($url_array->url) ){
-//                        ainsys_settings::set_option('handshake_url', $url_array->url);
-//                        $webhook_call = self::curl_exec_func( ['webhook_url' => ainsys_settings::get_option('hook_url')], $url_array->url );
-//                        $webhook_array = !empty($webhook_call) ? json_decode($webhook_call) : '';
-//                        if (! empty($webhook_call) && isset($webhook_array->webhook_url)){
-//                            ainsys_settings::set_option('webhook_url', $webhook_array->webhook_url);
-//                        }
-//                    }
-//                }
-//            }
+			//            if (empty($connectors)){
+			//                $server_url = empty(ainsys_settings::get_option('server')) ? 'https://user-api.ainsys.com/' : ainsys_settings::get_option('server');
+			//                $workspace = empty(ainsys_settings::get_option('workspace')) ? 14 : ainsys_settings::get_option('workspace');
+			//                $url = $server_url . 'api/v0/workspace-management/workspaces/' . $workspace . '/connectors/';
+			//                $sys_id = empty((int)ainsys_settings::get_option('sys_id')) ? 3 : (int)ainsys_settings::get_option('sys_id');
+			//                $post_fields = array(
+			//                    "name" => 'string',
+			//                    "system" => $sys_id,
+			//                    "workspace" => 14,
+			//                    "created_by" => 0);
+			//                $connectors_responce = self::curl_exec_func( $post_fields, $url );
+			//                $connectors_array = !empty($connectors_responce) ? json_decode($connectors_responce) : '';
+			//                if ( !empty($connectors_array) && isset($connectors_array->id) ){
+			//                    ainsys_settings::set_option('connectors', $connectors_array->id);
+			//                    $url = $server_url . 'api/v0/workspace-management/workspaces/'. $workspace . '/connectors/'. $connectors_array->id . '/handshake-url/';
+			//                    $url_responce = self::curl_exec_func('', $url );
+			//                    $url_array = !empty($url_responce) ? json_decode($url_responce) : '';
+			//                    if ( !empty($url_array) && isset($url_array->url) ){
+			//                        ainsys_settings::set_option('handshake_url', $url_array->url);
+			//                        $webhook_call = self::curl_exec_func( ['webhook_url' => ainsys_settings::get_option('hook_url')], $url_array->url );
+			//                        $webhook_array = !empty($webhook_call) ? json_decode($webhook_call) : '';
+			//                        if (! empty($webhook_call) && isset($webhook_array->webhook_url)){
+			//                            ainsys_settings::set_option('webhook_url', $webhook_array->webhook_url);
+			//                        }
+			//                    }
+			//                }
+			//            }
 		}
 	}
 
@@ -209,10 +214,10 @@ class Admin_UI implements Hooked {
 	}
 
 	public function add_admin_notice( $message, $status = 'success' ) {
-		self::$notices[] = [
+		self::$notices[] = array(
 			'message' => $message,
-			'status'  => $status
-		];
+			'status'  => $status,
+		);
 	}
 
 
@@ -230,22 +235,22 @@ class Admin_UI implements Hooked {
 		$webhook_url = $this->settings::get_option( 'ansys_api_key' );
 
 		// TODO check commented out code -  it's legacy copied as is.
-//		if ( ! empty( $webhook_url ) && ! empty( get_option( 'ainsys-webhook_url' ) ) ) {
-//			return array( 'status' => 'success' );
-//		}
-//
-//		$request_to_ainsys = wp_remote_post( $webhook_url, [
-//			'sslverify' => false,
-//			'body'      => [
-//				'webhook_url' => get_option( 'ansys_connector_woocommerce_hook_url' )
-//			]
-//		] );
+		//      if ( ! empty( $webhook_url ) && ! empty( get_option( 'ainsys-webhook_url' ) ) ) {
+		//          return array( 'status' => 'success' );
+		//      }
+		//
+		//      $request_to_ainsys = wp_remote_post( $webhook_url, [
+		//          'sslverify' => false,
+		//          'body'      => [
+		//              'webhook_url' => get_option( 'ansys_connector_woocommerce_hook_url' )
+		//          ]
+		//      ] );
 
-//		if ( is_wp_error( $request_to_ainsys ) ) {
-//			return array( 'status' => 'none' );
-//		}
+		//      if ( is_wp_error( $request_to_ainsys ) ) {
+		//          return array( 'status' => 'none' );
+		//      }
 
-//		$parsed_response = json_decode( $request_to_ainsys['body'] );
+		//      $parsed_response = json_decode( $request_to_ainsys['body'] );
 
 		if ( $webhook_url ) {
 			$this->add_admin_notice( 'Соединение с сервером Ainsys установлено. Webhook_url получен.' );
@@ -265,7 +270,7 @@ class Admin_UI implements Hooked {
 	 * @return
 	 */
 	public function remove_ainsys_integration() {
-		if ( isset( $_POST["action"] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
+		if ( isset( $_POST['action'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
 			$this->settings::set_option( 'connectors', '' );
 			$this->settings::set_option( 'ansys_api_key', '' );
 			$this->settings::set_option( 'handshake_url', '' );
@@ -284,10 +289,10 @@ class Admin_UI implements Hooked {
 	 *
 	 */
 	public function save_entities_settings() {
-		if ( isset( $_POST["action"] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
+		if ( isset( $_POST['action'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
 			$fields      = $_POST;
-			$entiti      = isset( $_POST["entiti"] ) ? $_POST["entiti"] : '';
-			$seting_name = $_POST["seting_name"] ? $_POST["seting_name"] : '';
+			$entiti      = isset( $_POST['entiti'] ) ? $_POST['entiti'] : '';
+			$seting_name = $_POST['seting_name'] ? $_POST['seting_name'] : '';
 			if ( ! $entiti && ! $seting_name ) {
 				echo false;
 				die();
@@ -299,21 +304,23 @@ class Admin_UI implements Hooked {
 			$entiti_saved_settings = $this->settings::get_saved_entity_settings_from_db( ' WHERE entiti="' . $entiti . '" setting_key="saved_field" AND setting_name="' . $seting_name . '"' );
 			$response              = '';
 			if ( empty( $entiti_saved_settings ) ) {
-				$response      = $wpdb->insert( $wpdb->prefix . Settings::$ainsys_entities_settings_table,
+				$response      = $wpdb->insert(
+					$wpdb->prefix . Settings::$ainsys_entities_settings_table,
 					array(
 						'entiti'       => $entiti,
 						'setting_name' => $seting_name,
 						'setting_key'  => 'saved_field',
-						'value'        => serialize( $fields )
+						'value'        => serialize( $fields ),
 					)
 				);
 				$field_data_id = $wpdb->insert_id;
 			} else {
-				$response      = $wpdb->update( $wpdb->prefix . $this->settings::$ainsys_entities_settings_table,
+				$response      = $wpdb->update(
+					$wpdb->prefix . $this->settings::$ainsys_entities_settings_table,
 					array( 'value' => serialize( $fields ) ),
-					array( 'id' => $entiti_saved_settings["id"] )
+					array( 'id' => $entiti_saved_settings['id'] )
 				);
-				$field_data_id = $entiti_saved_settings["id"];
+				$field_data_id = $entiti_saved_settings['id'];
 			}
 
 			$request_action = 'field/' . $entiti . '/' . $seting_name;
@@ -321,11 +328,11 @@ class Admin_UI implements Hooked {
 			$fields = apply_filters( 'ainsys_update_entiti_fields', $fields );
 
 			$request_data = array(
-				'entity'  => [
+				'entity'  => array(
 					'id' => $field_data_id,
-				],
+				),
 				'action'  => $request_action,
-				'payload' => $fields
+				'payload' => $fields,
 			);
 
 			try {
@@ -345,15 +352,15 @@ class Admin_UI implements Hooked {
 
 	public function sanitise_fields_to_save( $fields ) {
 		// clear empty fields
-//        foreach ($fields as $field => $val){
-//            if (empty($val))
-//                unset($fields[$field]);
-//        }
-		unset( $fields["action"], $fields["entiti"], $fields["nonce"], $fields["seting_name"], $fields["id"] );
+		//        foreach ($fields as $field => $val){
+		//            if (empty($val))
+		//                unset($fields[$field]);
+		//        }
+		unset( $fields['action'], $fields['entiti'], $fields['nonce'], $fields['seting_name'], $fields['id'] );
 
 		/// exclude 'constant' variables
 		foreach ( $this->settings::get_entities_settings() as $item => $setting ) {
-			if ( isset( $fields[ $item ] ) && $setting["type"] === 'constant' ) {
+			if ( isset( $fields[ $item ] ) && 'constant' === $setting['type'] ) {
 				unset( $fields[ $item ] );
 			}
 		}
@@ -366,7 +373,7 @@ class Admin_UI implements Hooked {
 	 *
 	 */
 	public function reload_log_html() {
-		if ( isset( $_POST["action"] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
+		if ( isset( $_POST['action'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
 			echo $this->logger->generate_log_html();
 		}
 		die();
@@ -377,12 +384,12 @@ class Admin_UI implements Hooked {
 	 *
 	 */
 	public function toggle_logging() {
-		if ( isset( $_POST["command"] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
+		if ( isset( $_POST['command'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
 			/// Set time till log will be saved, 0 if infinity
-			if ( isset( $_POST["time"] ) ) {
+			if ( isset( $_POST['time'] ) ) {
 
-				$current_date_time = date( "Y-m-d H:i:s" );
-				$time              = intval( $_POST["time"] ?? 0 );
+				$current_date_time = gmdate( 'Y-m-d H:i:s' );
+				$time              = intval( $_POST['time'] ?? 0 );
 				$end_time          = $time;
 				if ( $time > 0 ) {
 					$end_time = strtotime( $current_date_time . '+' . $time . ' hours' );
@@ -390,12 +397,12 @@ class Admin_UI implements Hooked {
 				$this->settings::set_option( 'log_until_certain_time', $end_time );
 
 			}
-			if ( $_POST['command'] === 'start_loging' ) {
+			if ( 'start_loging' === $_POST['command'] ) {
 				$this->settings::set_option( 'do_log_transactions', 1 );
 			} else {
 				$this->settings::set_option( 'do_log_transactions', 0 );
 			}
-			echo $_POST['command'] === 'start_loging' ? '#stop_loging' : '#start_loging';
+			echo 'start_loging' === $_POST['command'] ? '#stop_loging' : '#start_loging';
 		}
 		die();
 	}
@@ -405,7 +412,7 @@ class Admin_UI implements Hooked {
 	 *
 	 */
 	public function clear_log() {
-		if ( isset( $_POST["action"] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
+		if ( isset( $_POST['action'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
 			$this->logger->truncate_log_table();
 			echo $this->logger->generate_log_html();
 		}
@@ -422,14 +429,18 @@ class Admin_UI implements Hooked {
 	 */
 	public function generate_entities_html() {
 
-		$entities_html = $collapsed = $collapsed_text = $first_active = $inner_fields_header = '';
+		$entities_html       = '';
+		$collapsed           = '';
+		$collapsed_text      = '';
+		$first_active        = '';
+		$inner_fields_header = '';
 
 		$entities_list = $this->settings::get_entities();
 
 		$properties = $this->settings::get_entities_settings();
 
 		foreach ( $properties as $item => $settings ) {
-			$checker_property    = $settings['type'] === 'bool' || $item === 'api' ? 'small_property' : '';
+			$checker_property     = ( 'bool' === $settings['type'] || 'api' === $item ) ? 'small_property' : '';
 			$inner_fields_header .= '<div class="properties_field_title ' . $checker_property . '">' . $settings['nice_name'] . '</div>';
 		}
 
@@ -452,52 +463,42 @@ class Admin_UI implements Hooked {
 			if ( ! empty( $section_fields ) ) {
 				$collapsed      = $collapsed ? ' ' : ' active';
 				$collapsed_text = $collapsed_text ? 'expand' : 'collapse';
-				$entities_html  .= '<div class="entiti_data ' . $entiti . '_data' . $collapsed . '"> ';
+				$entities_html .= '<div class="entiti_data ' . $entiti . '_data' . $collapsed . '"> ';
 
-				$entities_html .= '<div class="entiti_block_header"><div class="entiti_title">' . $title . '</div>'
-				                  . $inner_fields_header . '<a class="button expand_entiti_contaner">'
-				                  . $collapsed_text . '</a></div>';
+				$entities_html .= '<div class="entiti_block_header"><div class="entiti_title">' . $title . '</div>' . $inner_fields_header . '<a class="button expand_entiti_contaner">' . $collapsed_text . '</a></div>';
 				foreach ( $section_fields as $field_slug => $field_content ) {
 					$first_active          = $first_active ? ' ' : ' active';
-					$field_name            = empty( $field_content["nice_name"] ) ? $field_slug : $field_content["nice_name"];
+					$field_name            = empty( $field_content['nice_name'] ) ? $field_slug : $field_content['nice_name'];
 					$entiti_saved_settings = array_merge( $field_content, $this->settings::get_saved_entity_settings_from_db( ' WHERE entiti="' . $entiti . '" AND setting_name="' . $field_slug . '"' ) );
 
-					if ( ! empty( $field_content["children"] ) ) {
+					if ( ! empty( $field_content['children'] ) ) {
 
 						$data_fields = 'data-seting_name="' . esc_html( $field_slug ) . '" data-entiti="' . esc_html( $entiti ) . '"';
 						foreach ( $properties as $name => $prop_val ) {
-							$prop_val_out = $name === 'id' ? $field_slug : $this->get_property( $name, $prop_val, $entiti_saved_settings );
-							$data_fields  .= 'data-' . $name . '="' . esc_html( $prop_val_out ) . '" ';
+							$prop_val_out = 'id' === $name ? $field_slug : $this->get_property( $name, $prop_val, $entiti_saved_settings );
+							$data_fields .= 'data-' . $name . '="' . esc_html( $prop_val_out ) . '" ';
 						}
-						$entities_html .= '<div id="' . $field_slug . '" class="entities_field multiple_filds ' . $first_active . '" ' .
-						                  $data_fields . '><div class="entities_field_header"><i class="fa fa-sort-desc" aria-hidden="true"></i>' . $field_name . '</div>'
-						                  . $this->generate_inner_fields( $properties, $entiti_saved_settings, $field_slug ) .
-						                  '<i class="fa fa-floppy-o"></i><div class="loader_dual_ring"></div></div>';
+						$entities_html .= '<div id="' . $field_slug . '" class="entities_field multiple_filds ' . $first_active . '" ' . $data_fields . '><div class="entities_field_header"><i class="fa fa-sort-desc" aria-hidden="true"></i>' . $field_name . '</div>' . $this->generate_inner_fields( $properties, $entiti_saved_settings, $field_slug ) . '<i class="fa fa-floppy-o"></i><div class="loader_dual_ring"></div></div>';
 
-						foreach ( $field_content["children"] as $inner_field_slug => $inner_field_content ) {
-							$field_name            = empty( $inner_field_content["description"] ) ? $inner_field_slug : $inner_field_content["discription"];
+						foreach ( $field_content['children'] as $inner_field_slug => $inner_field_content ) {
+							$field_name            = empty( $inner_field_content['description'] ) ? $inner_field_slug : $inner_field_content['discription'];
 							$field_slug_inner      = $field_slug . '_' . $inner_field_slug;
 							$entiti_saved_settings = array_merge( $field_content, $this->settings::get_saved_entity_settings_from_db( ' WHERE entiti="' . $entiti . '" AND setting_name="' . $field_slug_inner . '"' ) );
 
 							$data_fields = 'data-seting_name="' . esc_html( $field_slug ) . '" data-entiti="' . esc_html( $entiti ) . '"';
 							foreach ( $properties as $name => $prop_val ) {
-								$prop_val_out = $name === 'id' ? $field_slug_inner : $this->get_property( $name, $prop_val, $entiti_saved_settings );
-								$data_fields  .= 'data-' . $name . '="' . esc_html( $prop_val_out ) . '" ';
+								$prop_val_out = 'id' === $name ? $field_slug_inner : $this->get_property( $name, $prop_val, $entiti_saved_settings );
+								$data_fields .= 'data-' . $name . '="' . esc_html( $prop_val_out ) . '" ';
 							}
-							$entities_html .= '<div id="' . $entiti . '_' . $inner_field_slug . '" class="entities_field multiple_filds_children ' . $first_active . '" ' .
-							                  $data_fields . '><div class="entities_field_header"><i class="fa fa-angle-right" aria-hidden="true"></i>' . $field_name . '</div>'
-							                  . $this->generate_inner_fields( $properties, $entiti_saved_settings, $field_slug ) .
-							                  '<i class="fa fa-floppy-o"></i><div class="loader_dual_ring"></div></div>';
+							$entities_html .= '<div id="' . $entiti . '_' . $inner_field_slug . '" class="entities_field multiple_filds_children ' . $first_active . '" ' . $data_fields . '><div class="entities_field_header"><i class="fa fa-angle-right" aria-hidden="true"></i>' . $field_name . '</div>' . $this->generate_inner_fields( $properties, $entiti_saved_settings, $field_slug ) . '<i class="fa fa-floppy-o"></i><div class="loader_dual_ring"></div></div>';
 						}
 					} else {
 						$data_fields = 'data-seting_name="' . esc_html( $field_slug ) . '" data-entiti="' . esc_html( $entiti ) . '"';
 						foreach ( $properties as $name => $prop_val ) {
 							$prop_val_out = $this->get_property( $name, $prop_val, $entiti_saved_settings );
-							$data_fields  .= 'data-' . $name . '="' . esc_html( $prop_val_out ) . '" ';
+							$data_fields .= 'data-' . $name . '="' . esc_html( $prop_val_out ) . '" ';
 						}
-						$entities_html .= '<div id="' . $field_slug . '" class="entities_field ' . $first_active . '" ' . $data_fields . '><div class="entities_field_header">' . $field_name . '</div>'
-						                  . $this->generate_inner_fields( $properties, $entiti_saved_settings, $field_slug ) .
-						                  '<i class="fa fa-floppy-o"></i><div class="loader_dual_ring"></div></div>';
+						$entities_html .= '<div id="' . $field_slug . '" class="entities_field ' . $first_active . '" ' . $data_fields . '><div class="entities_field_header">' . $field_name . '</div>' . $this->generate_inner_fields( $properties, $entiti_saved_settings, $field_slug ) . '<i class="fa fa-floppy-o"></i><div class="loader_dual_ring"></div></div>';
 					}
 				}
 				/// close //// div class="entiti_data"
@@ -507,9 +508,7 @@ class Admin_UI implements Hooked {
 			$entities_html .= '</div>';
 		}
 
-		return '<div class="entitis_table">
-                ' . $entities_html .
-		       '</div>';
+		return '<div class="entitis_table">' . $entities_html . '</div>';
 
 	}
 
@@ -520,7 +519,7 @@ class Admin_UI implements Hooked {
 	 */
 	public function get_property( $name, $prop_val, $entiti_saved_settings ) {
 		if ( is_array( $prop_val['default'] ) ) {
-			return isset( $entiti_saved_settings[ strtolower( $name ) ] ) ? $entiti_saved_settings[ strtolower( $name ) ] : array_search( '1', $prop_val['default'] );
+			return isset( $entiti_saved_settings[ strtolower( $name ) ] ) ? $entiti_saved_settings[ strtolower( $name ) ] : array_search( '1', $prop_val['default'], true );
 		}
 
 		return isset( $entiti_saved_settings[ strtolower( $name ) ] ) ?
@@ -540,40 +539,40 @@ class Admin_UI implements Hooked {
 		}
 
 		foreach ( $properties as $item => $settings ) {
-			$checker_property = $settings['type'] === 'bool' || $item === 'api' ? 'small_property' : '';
-			$inner_fields     .= '<div class="properties_field ' . $checker_property . '">';
-			$field_value      = $item === 'id' ? $field_slug : $this->get_property( $item, $settings, $entiti_saved_settings );
+			$checker_property = 'bool' === $settings['type'] || 'api' === $item ? 'small_property' : '';
+			$inner_fields    .= '<div class="properties_field ' . $checker_property . '">';
+			$field_value      = 'id' === $item ? $field_slug : $this->get_property( $item, $settings, $entiti_saved_settings );
 			switch ( $settings['type'] ) {
 				case 'constant':
-					$field_value  = $field_value ? $field_value : '<i>' . __( 'empty', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</i>';
-					$inner_fields .= $item === 'api' ? '<div class="entiti_settings_value constant ' . $field_value . '"></div>' : '<div class="entiti_settings_value constant">' . $field_value . '</div>';
+					$field_value   = $field_value ? $field_value : '<i>' . __( 'empty', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</i>';
+					$inner_fields .= 'api' === $item ? '<div class="entiti_settings_value constant ' . $field_value . '"></div>' : '<div class="entiti_settings_value constant">' . $field_value . '</div>';
 					break;
 				case 'bool':
-					$checked      = (int) $field_value ? 'checked="" value="1"' : ' value="0"';
-					$checked_text = (int) $field_value ? __( 'On', AINSYS_CONNECTOR_TEXTDOMAIN ) : __( 'Off', AINSYS_CONNECTOR_TEXTDOMAIN );
+					$checked       = (int) $field_value ? 'checked="" value="1"' : ' value="0"';
+					$checked_text  = (int) $field_value ? __( 'On', AINSYS_CONNECTOR_TEXTDOMAIN ) : __( 'Off', AINSYS_CONNECTOR_TEXTDOMAIN );
 					$inner_fields .= '<input type="checkbox"  class="editor_mode entiti_settings_value " id="' . $item . '" ' . $checked . '/> ';
 					$inner_fields .= '<div class="entiti_settings_value">' . $checked_text . '</div> ';
 					break;
 				case 'int':
 					$inner_fields .= '<input size="10" type="text"  class="editor_mode entiti_settings_value" id="' . $item . '" value="' . $field_value . '"/> ';
-					$field_value  = $field_value ? $field_value : '<i>' . __( 'empty', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</i>';
+					$field_value   = $field_value ? $field_value : '<i>' . __( 'empty', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</i>';
 					$inner_fields .= '<div class="entiti_settings_value">' . $field_value . '</div>';
 					break;
 				case 'select':
 					$inner_fields .= '<select id="' . $item . '" class="editor_mode entiti_settings_value" name="' . $item . '">';
-					$state_text   = '';
-					foreach ( $settings["default"] as $option => $state ) {
-						$selected     = $option === $field_value ? 'selected="selected"' : '';
-						$state_text   = $option === $field_value ? $option : $state_text;
+					$state_text    = '';
+					foreach ( $settings['default'] as $option => $state ) {
+						$selected      = $option === $field_value ? 'selected="selected"' : '';
+						$state_text    = $option === $field_value ? $option : $state_text;
 						$inner_fields .= '<option value="' . $option . '" ' . $selected . '>' . $option . '</option>';
 					}
 					$inner_fields .= '</select>';
 					$inner_fields .= '<div class="entiti_settings_value">' . $field_value . '</div>';
 					break;
 				default:
-					$field_length = $item === 'description' ? 20 : 8;
+					$field_length  = 'description' === $item ? 20 : 8;
 					$inner_fields .= '<input size="' . $field_length . '" type="text" class="editor_mode entiti_settings_value" id="' . $item . '" value="' . $field_value . '"/>';
-					$field_value  = $field_value ? $field_value : '<i>' . __( 'empty', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</i>';
+					$field_value   = $field_value ? $field_value : '<i>' . __( 'empty', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</i>';
 					$inner_fields .= '<div class="entiti_settings_value">' . $field_value . '</div>';
 			}
 			/// close //// div class="properties_field"

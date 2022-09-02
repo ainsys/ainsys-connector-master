@@ -11,6 +11,22 @@
 	padding: 0;
 	text-align: center;
 }
+.wrap.ainsys_settings_wrap h2 {
+	margin: 0 0 2rem;
+	padding: 0;
+	font-size: 1.125rem;
+	font-weight: 600;
+	line-height: 1.45;
+	text-align: center;
+	color: #101828;
+}
+.wrap.ainsys_settings_wrap h3 {
+	font-size: 1rem;
+	font-weight: 600;
+	line-height: 1.25;
+	text-align: left;
+	color: #101828;
+}
 .ainsys_settings_wrap .btn {
 	display: inline-block;
 	min-width: 12rem;
@@ -62,7 +78,7 @@
     display: none;
     position: relative;
 	overflow: hidden;
-	padding: 3.75rem 2.25rem;
+	padding: 3.75rem 2.25rem 0.5rem;
 }
 
 .ainsys_settings_wrap .tab-target.tab-target-active{
@@ -94,15 +110,6 @@
 .ainsys-settings-block--status {
 	flex: 0 0 calc( 40% - 4rem );
 	width: calc( 40% - 4rem );
-}
-.ainsys-settings-block h2 {
-	margin: 0 0 2rem;
-	padding: 0;
-	font-size: 1.125rem;
-	font-weight: 600;
-	line-height: 1.45;
-	text-align: center;
-	color: #101828;
 }
 .aisys-form-group {
 	margin: 0 0 1rem;
@@ -149,9 +156,9 @@
     height: 1.3125rem;
     width: 1.3125rem;
 }
-.aisys-form-input input[type=checkbox]:focus {
-	outline: none;
-	box-shadow: none;
+.aisys-form-input input:focus {
+	outline: none !important;
+	box-shadow: none !important;
 }
 .ainsys-status-items {
 	margin: 0;
@@ -181,6 +188,47 @@
 }
 .ainsys-status-title + span {
 	width: 5.5rem;
+}
+.ainsys-status-ok {
+	color: #37b34a;
+}
+.ainsys-status-error {
+	color: #d5031e;
+}
+
+/* Ainsys Tabs - subtabs*/
+.ainsys-nav-tab {
+	display: inline-block;
+	margin: 0 1rem 0.5rem 0;
+	padding: 0.625rem 1rem;
+	border: 1px solid #e2e2e2;
+	border-radius: 0.5rem;
+	font-size: 0.875rem;
+	font-weight: 500;
+	line-height: 1.3;
+	text-decoration: none;
+	color: #667085;
+}
+.ainsys-nav-tab:hover,
+.ainsys-nav-tab:active,
+.ainsys-nav-tab:focus {
+	border-color: #e2e2e2;
+	color: #667085;
+	outline: none;
+	box-shadow: none;
+}
+.ainsys-nav-tab-active,
+.ainsys-nav-tab-active:hover,
+.ainsys-nav-tab-active:focus,
+.ainsys-nav-tab-active:active {
+	border-color: #ab47bc;
+	color: #ab47bc;
+}
+.ainsys-tab-target {
+	display: none;
+}
+.ainsys-tab-target-active {
+	display: block;
 }
 
 /* Logs */

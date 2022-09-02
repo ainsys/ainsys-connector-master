@@ -174,10 +174,13 @@ class Settings implements Hooked {
 		delete_option( self::get_setting_name( 'backup_email' ) );
 		delete_option( self::get_setting_name( 'do_log_transactions' ) );
 		delete_option( self::get_setting_name( 'log_until_certain_time' ) );
-		delete_option( self::get_setting_name( 'display_debug' ) );
 		delete_option( self::get_setting_name( 'full_uninstall' ) );
 		delete_option( self::get_plugin_name() );
 		delete_option( self::get_plugin_name() . '_db_version' );
+		delete_option( self::get_plugin_name() . 'connector_id' );
+		delete_option( self::get_plugin_name() . 'client_full_name' );
+		delete_option( self::get_plugin_name() . 'client_company_name' );
+		delete_option( self::get_plugin_name() . 'client_tin' );
 
 		delete_option( self::get_setting_name( 'debug_log' ) );
 
@@ -248,8 +251,11 @@ class Settings implements Hooked {
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'backup_email' ) );
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'do_log_transactions' ), [ 'default' => 1 ] );
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'log_until_certain_time' ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'display_debug' ), [ 'default' => 0 ] );
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'full_uninstall' ), [ 'default' => 0 ] );
+		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'connector_id' ) );
+		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'client_full_name' ) );
+		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'client_company_name' ) );
+		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'client_tin' ) );
 
 		/*  DEBUG   */
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'debug_log' ) );

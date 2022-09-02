@@ -582,30 +582,4 @@ class Admin_UI implements Hooked {
 		return $inner_fields;
 	}
 
-
-	/**
-	 * Generate debug log HTML.
-	 *
-	 * @return string
-	 */
-	public function generate_debug_log() {
-
-		if ( ! (int) $this->settings::get_option( 'display_debug' ) ) {
-			return;
-		}
-
-		$html = '
-        <div style="color: grey; padding-top: 20px">
-        !!Debug info!!
-            <ul>
-                <li>' . 'connector #' . $this->settings::get_option( 'connectors' ) . '</li>
-                <li>' . 'handshake_url - ' . $this->settings::get_option( 'handshake_url' ) . '</li>
-                <li>' . 'webhook_url - ' . $this->settings::get_option( 'webhook_url' ) . '</li>
-                <li>' . 'debug_log - ' . $this->settings::get_option( 'debug_log' ) . '</li>
-            </ul>
-        </div>';
-
-		return $html;
-	}
-	//#endregion
 }

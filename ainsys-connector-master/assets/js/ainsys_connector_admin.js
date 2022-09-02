@@ -173,7 +173,7 @@ jQuery(function($){
         });
     });
 
-    //////// Expand/collapse data contaner ////////
+    //////// Expand/collapse data container ////////
     $('#setting_section_log').on('click', '.expand_data_contaner', function (e){
         $(this).parent().toggleClass('expand_tab');
 
@@ -217,4 +217,15 @@ jQuery(function($){
         new_ref = new_ref + 'setting_tab=' + targ;
         $('.ainsys_settings_wrap input[name="_wp_http_referer"]').val(new_ref);
     });
+	$('.ainsys-tabs').on('click', '.ainsys-nav-tab', function(event){
+
+        event.preventDefault();
+
+        const targ = $(this).data('target');
+
+        $( this).closest('.ainsys-tabs').find('.ainsys-nav-tab').removeClass('ainsys-nav-tab-active');
+		$( this).closest('.ainsys-tabs').find('.ainsys-tab-target').removeClass('ainsys-tab-target-active');
+        $(this).addClass('ainsys-nav-tab-active');
+        $('#'+targ).addClass('ainsys-tab-target-active');
+	});
 });

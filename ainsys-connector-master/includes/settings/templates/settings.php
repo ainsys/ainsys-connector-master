@@ -20,21 +20,9 @@ try {
 	<h1><img src="<?php echo AINSYS_CONNECTOR_URL; ?>/assets/img/logo.svg" alt="Ainsys logo" class="ainsys-logo"></h1>
 
 	<div class="nav-tab-wrapper ainsys-nav-tab-wrapper">
-		<a class="nav-tab nav-tab-active" href="#setting_section_general" data-target="setting_section_general">
-		<?php
-			_e( 'General', AINSYS_CONNECTOR_TEXTDOMAIN )
-		?>
-			</a>
-		<a class="nav-tab" href="#setting_section_log" data-target="setting_section_log">
-		<?php
-			_e( 'Transfer log', AINSYS_CONNECTOR_TEXTDOMAIN )
-		?>
-			</a>
-		<a class="nav-tab" href="#setting_entities_section" data-target="setting_entities_section">
-		<?php
-			_e( 'Entities export settings', AINSYS_CONNECTOR_TEXTDOMAIN )
-		?>
-			</a>
+		<a class="nav-tab nav-tab-active" href="#setting_section_general" data-target="setting_section_general"><?php _e( 'General', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
+		<a class="nav-tab" href="#setting_section_log" data-target="setting_section_log"><?php _e( 'Transfer log', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
+		<a class="nav-tab" href="#setting_entities_section" data-target="setting_entities_section"><?php _e( 'Entities export settings', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
 	</div>
 
 	<div id="setting_section_general" class="tab-target nav-tab-active tab-target-active">
@@ -45,53 +33,97 @@ try {
 				<form method="post" action="options.php">
 					<?php settings_fields( $admin_ui->settings::get_option_name( 'group' ) ); ?>
 					<div class="aisys-form-group">
-						<label class="aisys-form-label">
+						<label for="ansys-api-key" class="aisys-form-label">
 							<?php _e( 'AINSYS handshake url for the connector. You can find it in your ', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
 							<a href="https://app.ainsys.com/en/settings/workspaces" target="_blank">
 								<?php _e( 'dashboard', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
 							</a>.
 						</label>
 						<div class="aisys-form-input">
-							<input type="text" size="50" name="<?php echo esc_html( $admin_ui->settings::get_option_name( 'ansys_api_key' ) ); ?>" placeholder="XXXXXXXXXXXXXXXXXXXXX" value="<?php echo esc_html( $admin_ui->settings::get_option( 'ansys_api_key' ) ); ?>"/>
+							<input id="ansys-api-key" type="text" size="50" name="<?php echo esc_html( $admin_ui->settings::get_option_name( 'ansys_api_key' ) ); ?>" placeholder="XXXXXXXXXXXXXXXXXXXXX" value="<?php echo esc_html( $admin_ui->settings::get_option( 'ansys_api_key' ) ); ?>"/>
 						</div>
 					</div>
 					<div class="aisys-form-group">
-						<label class="aisys-form-label">
+						<label for="hook-url" class="aisys-form-label">
 							<?php _e( 'Server hook_url', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
 						</label>
 						<div class="aisys-form-input">
-							<input type="text" size="50" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'hook_url' ) ); ?>" value="<?php echo esc_attr( $admin_ui->settings::get_option( 'hook_url' ) ); ?>" disabled/>
+							<input id="hook-url" type="text" size="50" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'hook_url' ) ); ?>" value="<?php echo esc_attr( $admin_ui->settings::get_option( 'hook_url' ) ); ?>" disabled/>
 						</div>
 					</div>
 					<div class="aisys-form-group">
-						<label class="aisys-form-label">
-							<?php _e( 'Резервный e-mail', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+						<label for="backup-email" class="aisys-form-label">
+							<?php _e( 'Additional e-mail', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
 							<span><?php _e( 'Used for error reports', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></span>
 						</label>
 						<div class="aisys-form-input">
-							<input type="text" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'backup_email' ) ); ?>" placeholder="backup@email.com" value="<?php echo esc_attr( $admin_ui->settings::get_backup_email() ); ?>"/>
+							<input id="backup-email" type="text" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'backup_email' ) ); ?>" placeholder="backup@email.com" value="<?php echo esc_attr( $admin_ui->settings::get_backup_email() ); ?>"/>
 						</div>
 					</div>
 					<div class="aisys-form-group aisys-form-group-checkbox">
 						<div class="aisys-form-input">
-							<input id="full_uninstall_checkbox" type="checkbox" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'full_uninstall' ) ); ?>" value="<?php esc_attr( $admin_ui->settings::get_option( 'full_uninstall' ) ); ?>" <?php checked( 1, esc_html( $admin_ui->settings::get_option( 'full_uninstall' ) ), true ); ?> />
+							<input id="full-uninstall-checkbox" type="checkbox" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'full_uninstall' ) ); ?>" value="<?php echo esc_attr( $admin_ui->settings::get_option( 'full_uninstall' ) ); ?>" <?php checked( 1, esc_html( $admin_ui->settings::get_option( 'full_uninstall' ) ), true ); ?> />
 						</div>
-						<label class="aisys-form-label">
+						<label for="full-uninstall-checkbox" class="aisys-form-label">
 							<?php _e( 'Purge all stored data during deactivation ', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
 							<div class="aisys-form-label-note"><?php _e( 'NB: if you delete the plugin from WordPress admin panel it will clear data regardless of this checkbox', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></div>
 						</label>
 					</div>
-					<div class="aisys-form-group aisys-form-group-checkbox">
-						<div class="aisys-form-input">
-							<input id="display_debug" type="checkbox" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'display_debug' ) ); ?>" value="<?php esc_attr( $admin_ui->settings::get_option( 'display_debug' ) ); ?>" <?php checked( 1, esc_html( $admin_ui->settings::get_option( 'display_debug' ) ), true ); ?> />
-						</div>
-						<label class="aisys-form-label">
-							<?php _e( 'Display debug information', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+					<div class="aisys-form-group">
+						<label for="connector-id" class="aisys-form-label">
+							<?php _e( 'Connector Id', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
 						</label>
+						<div class="aisys-form-input">
+							<input id="connector-id" type="text" size="50" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'connector_id' ) ); ?>" value="<?php echo esc_attr( $admin_ui->settings::get_option( 'connector_id' ) ); ?>" />
+						</div>
+					</div>
+
+					<div class="aisys-form-group-title"><h3><?php _e( 'Your Data', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></h3></div>
+					<div class="ainsys-tabs">
+						<div class="ainsys-tabs-nav">
+							<a class="ainsys-nav-tab ainsys-nav-tab-active" href="#setting_section_individual" data-target="setting_section_individual"><?php _e( 'Individual', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
+							<a class="ainsys-nav-tab" href="#setting_section_organization" data-target="setting_section_organization"><?php _e( 'Legal Entity', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
+						</div>
+						<div class="ainsys-tabs-target">
+							<div id="setting_section_individual" class="ainsys-tab-target ainsys-tab-target-active">
+								<div class="aisys-form-group">
+									<label for="client-full-name" class="aisys-form-label">
+										<?php _e( 'Full Name', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+									</label>
+									<div class="aisys-form-input">
+										<input id="client-full-name" type="text" size="50" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'client_full_name' ) ); ?>" value="<?php echo esc_attr( $admin_ui->settings::get_option( 'client_full_name' ) ); ?>" />
+									</div>
+								</div>
+							</div>
+							<div id="setting_section_organization" class="ainsys-tab-target">
+								<div class="aisys-form-group">
+									<label for="client-company-name" class="aisys-form-label">
+										<?php _e( 'Company Name', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+									</label>
+									<div class="aisys-form-input">
+										<input id="client-company-name" type="text" size="50" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'client_company_name' ) ); ?>" value="<?php echo esc_attr( $admin_ui->settings::get_option( 'client_company_name' ) ); ?>" />
+									</div>
+								</div>
+								<div class="aisys-form-group">
+									<label for="client_tin" class="aisys-form-label">
+										<?php _e( 'TIN', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+									</label>
+									<div class="aisys-form-input">
+										<input id="client_tin" type="text" size="50" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'client_tin' ) ); ?>" value="<?php echo esc_attr( $admin_ui->settings::get_option( 'client_tin' ) ); ?>" />
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 
 					<div class="submit">
-						<input type="submit" class="btn btn-primary" value="<?php _e( 'Save', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>"/>
+						<input type="submit" class="btn btn-primary" value="<?php
+							if ( ! empty( $status ) && 'success' === $status['status'] ) {
+								_e( 'Save', AINSYS_CONNECTOR_TEXTDOMAIN );
+							} else {
+								_e( 'Connect', AINSYS_CONNECTOR_TEXTDOMAIN );
+							}
+							?>"/>
 						<?php if ( ! empty( $status ) && 'success' === $status['status'] ) { ?>
 							<a id="remove_ainsys_integration" class="btn btn-secondary"><?php _e( 'Disconect integration', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
 						<?php } ?>
@@ -122,13 +154,13 @@ try {
 						<?php
 						if ( ! empty( $status ) && 'success' === $status['status'] ) :
 							?>
-							<span style="color: #37b34a;">
+							<span class="ainsys-status-ok">
 								<i class="fa fa-check-circle-o" aria-hidden="true"></i> <?php _e( 'Working', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
 							</span>
 							<?php
 						else :
 							?>
-							<span style="color: #d5031e;">
+							<span class="ainsys-status-error">
 								<i class="fa fa-times-circle-o" aria-hidden="true"></i> <?php _e( 'No AINSYS integration', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
 							</span>
 							<?php
@@ -140,11 +172,11 @@ try {
 						<li>
 							<span class="ainsys-status-title"><?php echo esc_html( $status_item['title'] ); ?></span>
 							<?php if ( $status_item['active'] ) : ?>
-								<span style="color: #37b34a;">
+								<span class="ainsys-status-ok">
 									<i class="fa fa-check-circle-o" aria-hidden="true"></i> <?php _e( 'Enabled', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
 								</span>
 							<?php else : ?>
-								<span style="color: #d5031e;">
+								<span class="ainsys-status-error">
 									<i class="fa fa-times-circle-o" aria-hidden="true"></i> <?php _e( 'Disabled', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
 								</span>
 							<?php endif; ?>
@@ -156,9 +188,9 @@ try {
 						<?php
 						if ( version_compare( PHP_VERSION, '7.2.0' ) > 0 ) :
 							?>
-							<span style="color: #37b34a;"><i class="fa fa-check-circle-o" aria-hidden="true"></i> PHP <?php echo esc_html( PHP_VERSION ); ?></span>
+							<span class="ainsys-status-ok"><i class="fa fa-check-circle-o" aria-hidden="true"></i> PHP <?php echo esc_html( PHP_VERSION ); ?></span>
 						<?php else : ?>
-							<span style="color: #d5031e;">
+							<span class="ainsys-status-error">
 								<i class="fa fa-times-circle-o" aria-hidden="true"></i> <?php _e( 'Bad PHP version ', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>(
 								<?php echo esc_html( PHP_VERSION ); ?>
 								).
@@ -171,11 +203,11 @@ try {
 						<?php
 						if ( ! empty( $admin_ui->settings::get_backup_email() ) && filter_var( $admin_ui->settings::get_backup_email(), FILTER_VALIDATE_EMAIL ) ) :
 							?>
-							<span style="color: #37b34a;">
+							<span class="ainsys-status-ok">
 								<i class="fa fa-check-circle-o" aria-hidden="true"></i> <?php _e( 'Valid', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
 							</span>
 						<?php else : ?>
-							<span style="color: #d5031e;">
+							<span class="ainsys-status-error">
 								<i class="fa fa-times-circle-o" aria-hidden="true"></i> <?php _e( 'Invalid', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
 							</span>
 						<?php endif; ?>
@@ -232,18 +264,10 @@ try {
 </div>
 <script>
 	jQuery( document ).ready( function ( $ ) {
-		$( '#full_uninstall_checkbox' ).on( 'click', function () {
+		$( '#full-uninstall-checkbox' ).on( 'click', function () {
 			let val = $( this ).val() == 1 ? 0 : 1
 			$( this ).attr( 'value', val )
 			$( this ).prop( 'checked', val )
-		} )
-		$( '#display_debug' ).on( 'click', function () {
-			let val = $( this ).val() == 1 ? 0 : 1
-			$( this ).attr( 'value', val )
-			$( this ).prop( 'checked', val )
-		} )
+		} );
 	} )
 </script>
-
-<!--        !!Debug  BLOCK !!           -->
-<?php echo $admin_ui->generate_debug_log(); ?>

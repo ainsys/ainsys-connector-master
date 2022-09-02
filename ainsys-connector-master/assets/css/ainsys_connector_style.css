@@ -1,64 +1,189 @@
 /*========= Settings panel ===========*/
-
-.ainsys_status_panel {
-    background-color: #fff;
-    max-width: 620px;
-    border-radius: 6px;
-    border: 2px solid #ccc;
-
-}
-
-.ainsys_status_panel  h2 {
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 1rem;
-}
-
-.ainsys_status_panel__content {
-    padding: .5rem 1rem;
-}
-
 .ainsys-logo {
-    margin-bottom: 2rem;
-    opacity: 0;
-    transition: .5s all linear;
+	opacity: 0;
+	transition: .5s all linear;
 }
-
 .ainsys_settings_wrap {
-    padding: 1rem;
+    padding: 1rem 0.25rem;
+}
+.wrap.ainsys_settings_wrap h1 {
+	margin: 0 0 4.375rem;
+	padding: 0;
+	text-align: center;
+}
+.ainsys_settings_wrap .btn {
+	display: inline-block;
+	min-width: 12rem;
+    margin: 0 2rem 0 0;
+    padding: 0.625rem 2rem;
+    border: none;
+    -webkit-appearance: none;
+	appearance: none;
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+    font-size: 0.875rem;
+	font-weight: 500;
+    text-decoration: none;
+	text-align: center;
+    line-height: 1.4;
+	color: #fff;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.ainsys_settings_wrap .btn-primary {
+	background: #37b34a;
+}
+.ainsys_settings_wrap .btn-secondary {
+	background: #d5031e;
 }
 
-.ainsys_settings_wrap .nav-tab:focus{
+/* Tabs */
+.nav-tab-wrapper.ainsys-nav-tab-wrapper {
+	margin: 0;
+	padding: 0 1.875rem;
+	border-bottom: 2px solid #e2e2e2;
+}
+.ainsys-nav-tab-wrapper .nav-tab {
+	margin: 0 0.625rem -1px;
+	padding: 0.625rem 2.25rem;
+	background-color: #e2e2e2;
+	border-radius: 0.5rem 0.5rem 0 0;
+	border: none;
+}
+.ainsys-nav-tab-wrapper .nav-tab:focus{
     box-shadow: none;
 }
-
-.ainsys_settings_wrap .nav-tab.nav-tab-active{
-    background-color: #fff;
+.ainsys-nav-tab-wrapper .nav-tab.nav-tab-active{
+    background-color: #ab47bc;
+	color: #fff;
 }
 
 .ainsys_settings_wrap .tab-target{
     display: none;
     position: relative;
+	overflow: hidden;
+	padding: 3.75rem 2.25rem;
 }
 
 .ainsys_settings_wrap .tab-target.tab-target-active{
     display: flex;
 }
-
-.ainsys_settings_wrap #setting_section_emails input[type="text"]{
-    min-width: 270px;
-}
-
-.form-table .ainsys_settings_subtitle th{
-    font-size: 16px;
-    color: #2873AF;
-}
-
 @media only screen and (max-width: 791px){
     .ainsys_settings_wrap .tab-target.tab-target-active{
         display: block;
     }
 }
+.ainsys-settings-blocks {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	margin-left: -2rem;
+	margin-right: -2rem;
+}
+.ainsys-settings-block {
+	margin: 0 2rem 4rem;
+	padding: 1.25rem;
+	background: #f4f4f4;
+	border-radius: 1rem;
+	box-sizing: border-box;
+}
+.ainsys-settings-block--connection {
+	flex: 0 0 calc( 60% - 4rem );
+	width: calc( 60% - 4rem );
+}
+.ainsys-settings-block--status {
+	flex: 0 0 calc( 40% - 4rem );
+	width: calc( 40% - 4rem );
+}
+.ainsys-settings-block h2 {
+	margin: 0 0 2rem;
+	padding: 0;
+	font-size: 1.125rem;
+	font-weight: 600;
+	line-height: 1.45;
+	text-align: center;
+	color: #101828;
+}
+.aisys-form-group {
+	margin: 0 0 1rem;
+}
+.aisys-form-group-checkbox {
+	display: flex;
+	align-items: center;
+}
+.aisys-form-label {
+	display: block;
+	margin: 0 0 0.5rem;
+	font-size: 0.875rem;
+	font-weight: 500;
+	line-height: 1.45;
+}
+.aisys-form-group-checkbox .aisys-form-label {
+	margin: 0;
+}
+.aisys-form-label-note {
+	font-size: 0.75rem;
+	font-weight: 400;
+	color: #666;
+}
+.aisys-form-label a,
+.aisys-form-label a:hover {
+	color: #ab47bc;
+}
+.aisys-form-input input[type='text'] {
+	width: 86%;
+	padding: 0.625rem 1rem;
+	background: #e2e2e2;
+	border: none;
+	border-radius: 0.5rem;
+	line-height: 1;
+}
+.aisys-form-input input[type='checkbox'] {
+	margin-right: 1rem;
+	background: #e2e2e2;
+	border: none;
+}
+.aisys-form-input input[type=checkbox]:checked::before {
+    content: url(data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2020%2020%27%3E%3Cpath%20d%3D%27M14.83%204.89l1.34.94-5.81%208.38H9.02L5.78%209.67l1.34-1.25%202.57%202.4z%27%20fill%3D%27%23ab47bc%27%2F%3E%3C%2Fsvg%3E);
+    margin: -0.1875rem 0 0 -0.25rem;
+    height: 1.3125rem;
+    width: 1.3125rem;
+}
+.aisys-form-input input[type=checkbox]:focus {
+	outline: none;
+	box-shadow: none;
+}
+.ainsys-status-items {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.ainsys-status-items li {
+	display: flex;
+	justify-content: space-between;
+	margin: 0.875rem 0;
+	padding: 0;
+	font-size: 0.875rem;
+	line-height: 1.4;
+}
+.ainsys-status-items li.ainsys-li-underline {
+	margin-bottom: 0;
+	padding-bottom: 1.375rem;
+	border-bottom: 2px solid #D0D5DD;
+}
+.ainsys-status-items li.ainsys-li-overline {
+	margin-top: 0;
+	padding-top: 1.375rem;
+	border-top: 2px solid #D0D5DD;
+}
+.ainsys-status-title {
+	font-weight: 500;
+}
+.ainsys-status-title + span {
+	width: 5.5rem;
+}
 
+/* Logs */
 #setting_section_log .log_block{
     display: flex;
     flex-direction: column;
@@ -288,7 +413,7 @@
 }
 
 .entities_block .active .entiti_settings_value.wordpress:after{
-    background:url('/wp-content/plugins/ainsys-connector/css/wp_icon.gif');
+    background:url('./wp_icon.gif');
     content: '';
     background-size:cover;
     position:absolute;
@@ -296,7 +421,7 @@
     height:30px;
 }
 .entities_block .active .entiti_settings_value.woocommerce:after{
-    background:url('/wp-content/plugins/ainsys-connector/css/woo_icon.gif');
+    background:url('./woo_icon.gif');
     content: '';
     background-size:cover;
     position:absolute;
@@ -304,7 +429,7 @@
     height:30px;
 }
 .entities_block .active .entiti_settings_value.ACF:after{
-    background:url('/wp-content/plugins/ainsys-connector/css/acf_icon.gif');
+    background:url('./acf_icon.gif');
     content: '';
     background-size:cover;
     position:absolute;
@@ -312,7 +437,7 @@
     height:30px;
 }
 .entities_block .active .entiti_settings_value.mixed:after{
-    background:url('/wp-content/plugins/ainsys-connector/css/mixed_icon.gif');
+    background:url('./mixed_icon.gif');
     content: '';
     background-size:cover;
     position:absolute;

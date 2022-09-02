@@ -7,16 +7,7 @@
 
 namespace Ainsys\Connector\Master;
 
-/**
- * Class must have these fields:
- *      protected static $instance = null; - because Is_Singleton used.
- *      public static $version;
- *      protected static $plugin_file_name_path = __FILE__;
- */
 trait Plugin_Common {
-
-	use Is_Singleton;
-
 
 	/**
 	 * @var array  which contains all components instances to be used.
@@ -52,17 +43,48 @@ trait Plugin_Common {
 	public $plugin_dir_url;
 
 	/**
+	 * @var string
+	 */
+	public $text_domain_path;
+
+	/**
+	 * @var string
+	 */
+	public $text_domain;
+
+	/**
 	 * Inits plugin's metadata for class based plugin.
 	 *
 	 * @param string $plugin_file_path Path of plugin's file.
 	 */
-	private function init_plugin_metadata( $plugin_file_path ) {
+	private function init_plugin_metadata( $plugin_file_path = '' ) {
+
+		if ( empty( $plugin_file_path ) ) {
+			// let's resolve it by naming conventions.
+			$namespace_parts = explode( '\\', static::class );
+			array_pop( $namespace_parts );// remove last one as it's class name.
+			$plugin_file_path = WP_PLUGIN_DIR
+			                    . DIRECTORY_SEPARATOR
+			                    . strtolower( str_replace( '_', '-', implode( '-', $namespace_parts ) ) )
+			                    . DIRECTORY_SEPARATOR
+			                    . 'plugin.php';
+		}
 
 		$this->plugin_file_name_path = $plugin_file_path;
 		$this->plugin_dir_path       = plugin_dir_path( $this->plugin_file_name_path );
 		$this->plugin_dir_url        = plugin_dir_url( $this->plugin_file_name_path );
-		$plugin_data                 = get_file_data( $this->plugin_file_name_path, array( 'Version' => 'Version' ), 'plugin' );
-		$this->version               = $plugin_data['Version'] ?? '1.0';
+		$plugin_data                 = get_file_data( $this->plugin_file_name_path,
+			array(
+				'Version'     => 'Version',
+				'Text Domain' => 'Text Domain',
+				'Domain Path' => 'Domain Path',
+			),
+			'plugin'
+		);
+
+		$this->version          = $plugin_data['Version'] ?? '1.0';
+		$this->text_domain_path = $plugin_data['Domain Path'] ?? '/languages';
+		$this->text_domain      = $plugin_data['Text Domain'] ?? '';
 
 	}
 
@@ -81,23 +103,14 @@ trait Plugin_Common {
 	}
 
 	/**
-	 * Singleton instance getter.
-	 * It requires __FILE__ path of plugin passed in upon initial instantiation.
-	 * If you need to get already initialized at plugins loaded stage instance, just ommit this param, it will be ignored anyway.
+	 * Is plugin active
 	 *
-	 * @param string $plugin_file_path File path of plugin.
+	 * @param string $plugin
 	 *
-	 * @return static
+	 * @return bool
 	 */
-	public static function get_instance( $plugin_file_path = '' ) {
-		if ( is_null( static::$instance ) ) {
-			if ( empty( $plugin_file_path ) ) {
-				_doing_it_wrong( esc_attr( static::class ), 'Class ' . esc_attr( static::class ) . ' should be instantiated through get_instance( __FILE__ )', 1 );
-			}
-			static::$instance = new static( $plugin_file_path );
-		}
-
-		return static::$instance;
+	public function is_plugin_active( $plugin ) {
+		return in_array( $plugin, (array) get_option( 'active_plugins', array() ) );
 	}
 
 }

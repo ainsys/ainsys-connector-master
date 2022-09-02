@@ -107,7 +107,7 @@ msgid "No AINSYS integration"
 msgstr ""
 
 #: includes/View.php:77
-msgid "WordPress WooCommerce activated -"
+msgid "WordPress WooCommerce activated"
 msgstr ""
 
 #: includes/View.php:79

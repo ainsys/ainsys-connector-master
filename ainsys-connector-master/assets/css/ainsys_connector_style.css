@@ -71,6 +71,7 @@
 	padding: 0.625rem 1rem;
     background: #e2e2e2;
 	color: #666;
+	cursor: default;
 }
 /* Tabs */
 .nav-tab-wrapper.ainsys-nav-tab-wrapper {
@@ -276,11 +277,27 @@
 	box-shadow: none;
 	outline: none;
 }
+.ainsys-log-time {
+	display: none;
+}
 .ainsys-log-status {
 	margin: 0 0 1.3rem;
 	font-size: 0.875rem;
 	font-weight: 500;
 	line-height: 1.45;
+}
+.ainsys-log-status.ainsys-loading {
+	opacity: 0.5;
+}
+.ainsys-status-loading {
+	display: none;
+}
+.ainsys-log-status.ainsys-loading .ainsys-status-loading {
+	display: inline;
+}
+.ainsys-log-status.ainsys-loading .ainsys-log-status-ok,
+.ainsys-log-status.ainsys-loading .ainsys-log-status-no {
+	display: none !important;
 }
 .ainsys-log-status i {
 	font-size: 1.2rem;

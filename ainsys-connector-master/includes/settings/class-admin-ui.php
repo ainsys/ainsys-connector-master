@@ -380,29 +380,42 @@ class Admin_UI implements Hooked {
 	}
 
 	/**
-	 * Toggle logging on/of. Set up time till log will be saved if $_POST["time"] specified
+	 * Toggle logging on/off. Set up time till log will be saved if $_POST["time"] specified
 	 *
 	 */
 	public function toggle_logging() {
 		if ( isset( $_POST['command'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
-			/// Set time till log will be saved, 0 if infinity
+
+			$logging_time = 0;
 			if ( isset( $_POST['time'] ) ) {
 
-				$current_date_time = gmdate( 'Y-m-d H:i:s' );
-				$time              = intval( $_POST['time'] ?? 0 );
-				$end_time          = $time;
+				$current_time = time();
+				$time         = floatval( $_POST['time'] ?? 0 ); //intval( $_POST['time'] ?? 0 );
+				$end_time     = $time;
 				if ( $time > 0 ) {
-					$end_time = strtotime( $current_date_time . '+' . $time . ' hours' );
+					$end_time = $current_time + $time * 60 * 60;
 				}
 				$this->settings::set_option( 'log_until_certain_time', $end_time );
-
+				$this->settings::set_option( 'log_select_value', $time );
+				$logging_time = $end_time;
 			}
+
+			$logging_since = '';
 			if ( 'start_loging' === $_POST['command'] ) {
 				$this->settings::set_option( 'do_log_transactions', 1 );
+				$this->settings::set_option( 'log_transactions_since', htmlspecialchars( strip_tags( $_POST['startat'] ) ) );
+				$logging_since = $this->settings::get_option( 'log_transactions_since' );
 			} else {
 				$this->settings::set_option( 'do_log_transactions', 0 );
+				$this->settings::set_option( 'log_transactions_since', '' );
+				$this->settings::set_option( 'log_select_value', -1 );
+				$logging_since = '';
 			}
-			echo 'start_loging' === $_POST['command'] ? '#stop_loging' : '#start_loging';
+			$result = array(
+				'logging_time'  => $logging_time,
+				'logging_since' => $logging_since,
+			);
+			echo json_encode( $result );
 		}
 		die();
 	}
@@ -419,9 +432,6 @@ class Admin_UI implements Hooked {
 		die();
 	}
 
-	//#endregion
-
-	//#region HTML generation logic based on ainsys_html class.
 	/**
 	 * Generate entities HTML placeholder.
 	 *

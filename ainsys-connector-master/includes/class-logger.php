@@ -59,13 +59,13 @@ class Logger implements Hooked {
 	 *
 	 * @return string
 	 */
-	private static function ainsys_render_json1( $json, $result = '' ) { //TODO
+	private static function ainsys_render_json( $json, $result = '' ) {
 
 		foreach ( $json as $key => $val ) {
 			if ( is_string( $val ) || null === $val ) {
 				$result .= '<div class="ainsys-json-inner">' . $key . ' : ' . $val . '</div>';
 			} else {
-				$result .= '{<div class="ainsys-json-outer"> ' . $key . ' : ' . ainsys_render_json( $val ) . '</div>}<br>';
+				$result .= '{<div class="ainsys-json-outer"> ' . $key . ' : ' . self::ainsys_render_json( $val ) . '</div>}<br>';
 			}
 		}
 		return $result;
@@ -77,17 +77,6 @@ class Logger implements Hooked {
 	 * @return string
 	 */
 	public static function generate_log_html( $where = '' ) {
-		function ainsys_render_json( $json, $result = '' ) {
-
-			foreach ( $json as $key => $val ) {
-				if ( is_string( $val ) || null === $val ) {
-					$result .= '<div class="ainsys-json-inner">' . $key . ' : ' . $val . '</div>';
-				} else {
-					$result .= '{<div class="ainsys-json-outer"> ' . $key . ' : ' . ainsys_render_json( $val ) . '</div>}<br>';
-				}
-			}
-			return $result;
-		}
 		global $wpdb;
 
 		$log_html        = '<div id="connection_log"><table class="ainsys-log-table">';
@@ -146,7 +135,7 @@ class Logger implements Hooked {
 
 					$log_html_body .= '<div class="ainsys-responce-full">';
 					if ( json_last_error() === JSON_ERROR_NONE ) {
-						$log_html_body .= ainsys_render_json( $value );
+						$log_html_body .= self::ainsys_render_json( $value );
 					}
 					$log_html_body .= '</div>';
 				} else {

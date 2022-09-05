@@ -51,10 +51,9 @@ class Settings implements Hooked {
 			self::set_option( 'do_log_transactions', 1 );
 		} else {
 			self::set_option( 'do_log_transactions', 0 );
-			self::set_option( 'log_until_certain_time', 0 );
+			self::set_option( 'log_until_certain_time', -1 );
 		}
 	}
-	///////////////////////////////////////
 
 	/**
 	 * Get options value by name
@@ -173,7 +172,9 @@ class Settings implements Hooked {
 		delete_option( self::get_setting_name( 'hook_url' ) );
 		delete_option( self::get_setting_name( 'backup_email' ) );
 		delete_option( self::get_setting_name( 'do_log_transactions' ) );
+		delete_option( self::get_setting_name( 'log_transactions_since' ) );
 		delete_option( self::get_setting_name( 'log_until_certain_time' ) );
+		delete_option( self::get_setting_name( 'log_select_value' ) );
 		delete_option( self::get_setting_name( 'full_uninstall' ) );
 		delete_option( self::get_plugin_name() );
 		delete_option( self::get_plugin_name() . '_db_version' );
@@ -250,7 +251,9 @@ class Settings implements Hooked {
 		] );
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'backup_email' ) );
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'do_log_transactions' ), [ 'default' => 1 ] );
+		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'log_transactions_since' ) );
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'log_until_certain_time' ) );
+		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'log_select_value' ), [ 'default' => -1 ] );
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'full_uninstall' ), [ 'default' => 0 ] );
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'connector_id' ) );
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'client_full_name' ) );

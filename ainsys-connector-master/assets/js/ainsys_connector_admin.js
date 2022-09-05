@@ -1,106 +1,56 @@
 // ////////////////////////////////////
 jQuery(function($){
 
-    let auto_update = false;
-
-    $('.entities_field .properties_field').on('change', '.entiti_settings_value', function () {
-        if (!auto_update) {
-            let setting_id = '#' + $(this).parent().parent().attr('id');
-            let new_value = $(this).val();
-
-            if ( $(this).attr("type") == 'checkbox' ){
-                new_value = $(this).val() == 1 ? 'On' : 'Off';
-            }
-
-            $( setting_id + ' i').addClass('active');
-            $( setting_id ).attr('data-' + $(this).attr("id"), $(this).val()).data($(this).attr("id"), $(this).val());
-            if ( $(this).attr("id") == 'api' ){
-                $(this).parent().find('div').attr('class', '');
-                $(this).parent().find('div').addClass('entiti_settings_value').addClass(new_value);
-            } else {
-                $(this).parent().find('div').html( new_value );
-            }
-            //$('#save_entiti_properties').attr('disable', false);
-        }
-    })
-
     setTimeout(() => {
         $('.ainsys-logo').css('opacity', 1)
     }, 500)
 
+    $('.ainsys_settings_wrap').on('click', '.nav-tab', function(event){
 
-    $('.entities_field .properties_field input').on('click', function () {
-        if ( $(this).attr("type") == 'checkbox' ){
-            let val = $(this).val() == 1 ? 0 : 1;
-            $(this).attr('value', val);
+        event.preventDefault();
+
+        var targ = $(this).data('target');
+
+        $('.nav-tab').removeClass('nav-tab-active');
+        $('.tab-target').removeClass('tab-target-active');
+        $(this).addClass('nav-tab-active');
+        $('#'+targ).addClass('tab-target-active');
+
+        var ref = $('.ainsys_settings_wrap input[name="_wp_http_referer"]').val();
+        var new_ref = ref;
+        var query_string = {};
+        var url_vars = ref.split("?");
+        if (url_vars.length > 1){
+            new_ref = url_vars[0] + '?';
+            var url_pairs = url_vars[1].split("&");
+            for (var i=0;i<url_pairs.length;i++){
+
+                var pair = url_pairs[i].split("=");
+
+                if (pair[0] != 'setting_tab'){
+                    new_ref = new_ref + url_pairs[i] + '&';
+                }
+            }
+        } else {
+            new_ref = new_ref + '?';
         }
+        new_ref = new_ref + 'setting_tab=' + targ;
+        $('.ainsys_settings_wrap input[name="_wp_http_referer"]').val(new_ref);
     });
+	$('.ainsys-tabs').on('click', '.ainsys-nav-tab', function(event){
 
-    //////// Ajax clear log ////////
-    $('#setting_entities_section .entities_field').on('click', '.fa.active', function (e){
+        event.preventDefault();
 
-        let setting_id = '#' + $(this).parent().attr('id');
-        $(setting_id).toggleClass('loading');
-        let data = {
-            action: "save_entiti_settings",
-            nonce: ainsys_connector_params.nonce,
-        };
-        // let temp = $(setting_id).data();
+        const targ = $(this).data('target');
 
-        $.each($(setting_id).data(), function(key,value) {
-            data[key] = value;
-        })
+        $( this).closest('.ainsys-tabs').find('.ainsys-nav-tab').removeClass('ainsys-nav-tab-active');
+		$( this).closest('.ainsys-tabs').find('.ainsys-tab-target').removeClass('ainsys-tab-target-active');
+        $(this).addClass('ainsys-nav-tab-active');
+        $('#'+targ).addClass('ainsys-tab-target-active');
+	});
 
-        jQuery.post(ainsys_connector_params.ajax_url, data, function (value) {
-            if(value){
-                //console.log($(setting_id + ' .fa'));
-                $(setting_id + ' .fa').removeClass('active');
-                $(setting_id + ' #id').val(value);
-                $(setting_id + ' #id').parent().find('div').html(value);
-            }
-            $(setting_id).toggleClass('loading');
-        });
-    });
-
-    ////////  ////////
-    $('#setting_entities_section').on('click', ' .entities_field', function (e){
-        $('.entities_field.active').each(function(){
-            $(this).removeClass('active');
-        })
-
-        let obj_id = $(this).attr("id");
-        $('.properties_data #setting_name').html($(this).data('seting_name'));
-        $('.properties_data #setting_name').attr('data-seting_name', $(this).data('seting_name')).attr('data-entiti', $(this).data('entiti'));
-
-        auto_update = true;
-        $.each($(this).data(), function(key,value) {
-            let input_obj = $('.properties_data .properties_field #' + key );
-            let input_type = $('.properties_data .properties_field #' + key ).attr("type");
-            if (input_obj.is("select")) input_type = 'select';
-            switch (input_type){
-                case 'text':
-                    $(input_obj).val(value);
-                    break;
-                case 'checkbox':
-                    $(input_obj).attr('value', value);
-                    $(input_obj).prop('checked', Boolean(value));
-                    break;
-                case 'select':
-                    $(input_obj).val(value).change();
-                default:
-                    $(input_obj).val(value);
-                    break;
-            }
-        });
-        auto_update = false;
-        $(this).addClass('active');
-    });
-    //////// expand entiti tab ////////
-    $('#setting_entities_section').on('click', ' .expand_entiti_contaner', function (e){
-        $(this).parent().parent().toggleClass('active');
-        var text = $(this).text() == 'expand' ? 'collapse' : 'expand';
-        $(this).text(text);
-    });
+    /////////////////////////////////
+    ////////////   Log tab   ///////
 
     //////// Ajax clear log ////////
     $('#setting_section_log').on('click', '#clear_log', function (e){
@@ -115,31 +65,76 @@ jQuery(function($){
         });
     });
 
-    //////// Ajax toggle loging controll, set log until time  ////////
-    $('#setting_section_log').on('click', '.ainsys-log-control', function (e){
+	//////// Ajax start/stop loging  ////////
+	function checkToDisableLogging() {
+		
+		let timerId;
+		const endTime = parseInt( $( '.ainsys-log-time' ).text() );
+		const now = Date.now() / 1000;
+		const nowTime = now.toFixed();
+		const timeLeft = endTime - nowTime;
+
+		if ( endTime > 0 ) {
+			if ( timeLeft > 0 ) {
+				timerId = setTimeout( checkToDisableLogging, 1000 );
+			} else {
+				clearTimeout( timerId );
+				$( '#stop_loging' ).trigger( 'click' );
+			}
+		}
+	}
+	$( document ).ready( function() {
+		checkToDisableLogging();
+	} );
+
+
+    //////// Ajax start/stop loging btns  ////////
+    $( '#setting_section_log' ).on( 'click', '.ainsys-log-control', function(e) {
         e.preventDefault();
 
-        if ( $(this).hasClass("disabled") ){
+        if ( $(this).hasClass( 'disabled' ) ){
             return;
         }
-        var time = $( "#start_loging_timeinterval" ).val()
-        var id = $(this).prop('id');
-        $(this).addClass("disabled");
-        var data = {
-            action: "toggle_logging",
+        const id = $( this ).attr( 'id' );
+        const time = $( '#start_loging_timeinterval' ).val();
+		const date = new Date(); // new Date().toLocaleString();
+		const min = date.getMinutes() >= 10 ? date.getMinutes() : '0' + date.getMinutes();
+		const sec = date.getSeconds() >= 10 ? date.getSeconds() : '0' + date.getSeconds();
+		const startAt = date.getDate().toString() + '.' + ( date.getMonth() + 1 ).toString() + '.' + date.getFullYear().toString() + ' ' + date.getHours() + ':' + min + ':' + sec;
+
+		$( '.ainsys-log-status' ).addClass( 'ainsys-loading' );
+
+		$( '.ainsys-log-control' ).addClass( 'disabled' );
+		$('#start_loging_timeinterval').addClass( 'disabled' ).prop( 'disabled', true );
+
+		var data = {
+            action: 'toggle_logging',
             command: id,
             time: time,
+			startat: startAt,
             nonce: ainsys_connector_params.nonce
         };
-        jQuery.post(ainsys_connector_params.ajax_url, data, function (value) {
-            $(value).removeClass("disabled");
-            if (value == '#stop_loging') {
-                $('#start_loging_timeinterval').addClass("disabled");
+        jQuery.post(ainsys_connector_params.ajax_url, data, function ( response ) {
+			$( '.ainsys-log-status' ).removeClass( 'ainsys-loading' );
+			const result = JSON.parse( response );
+
+			if ( result.logging_since ) {
+				$( '#stop_loging' ).removeClass( 'disabled' );
+                $( '#start_loging_timeinterval' ).addClass( 'disabled' ).prop( 'disabled', true );
+				$( '.ainsys-log-time' ).text( result.logging_time );
+				$( '.ainsys-log-status-ok' ).show();
+				$( '.ainsys-log-status-no' ).hide();
+				$( '.ainsys-log-since' ).text( result.logging_since );
+				checkToDisableLogging();
             } else {
-                $('#start_loging_timeinterval').removeClass("disabled");
+				$( '#start_loging' ).removeClass( 'disabled' );
+				$( '#start_loging_timeinterval' ).removeClass( 'disabled' ).prop( 'disabled', false ).val( -1 );
+				$( '.ainsys-log-time' ).text( '-1' );
+				$( '.ainsys-log-status-ok' ).hide();
+				$( '.ainsys-log-status-no' ).show();
             }
-        });
-    });
+        } );
+    } );
 
     ////////  Ajax reload log HTML ////////
     $('#setting_section_log').on('click', '#reload_log', function (e){
@@ -210,47 +205,100 @@ jQuery(function($){
     /////////////////////////////////
     ////////////Settings tabs///////
 
-    $('.ainsys_settings_wrap').on('click', '.nav-tab', function(event){
+    let auto_update = false;
 
-        event.preventDefault();
+    $('.entities_field .properties_field').on('change', '.entiti_settings_value', function () {
+        if (!auto_update) {
+            let setting_id = '#' + $(this).parent().parent().attr('id');
+            let new_value = $(this).val();
 
-        var targ = $(this).data('target');
-
-        $('.nav-tab').removeClass('nav-tab-active');
-        $('.tab-target').removeClass('tab-target-active');
-        $(this).addClass('nav-tab-active');
-        $('#'+targ).addClass('tab-target-active');
-
-        var ref = $('.ainsys_settings_wrap input[name="_wp_http_referer"]').val();
-        var new_ref = ref;
-        var query_string = {};
-        var url_vars = ref.split("?");
-        if (url_vars.length > 1){
-            new_ref = url_vars[0] + '?';
-            var url_pairs = url_vars[1].split("&");
-            for (var i=0;i<url_pairs.length;i++){
-
-                var pair = url_pairs[i].split("=");
-
-                if (pair[0] != 'setting_tab'){
-                    new_ref = new_ref + url_pairs[i] + '&';
-                }
+            if ( $(this).attr("type") == 'checkbox' ){
+                new_value = $(this).val() == 1 ? 'On' : 'Off';
             }
-        } else {
-            new_ref = new_ref + '?';
+
+            $( setting_id + ' i').addClass('active');
+            $( setting_id ).attr('data-' + $(this).attr("id"), $(this).val()).data($(this).attr("id"), $(this).val());
+            if ( $(this).attr("id") == 'api' ){
+                $(this).parent().find('div').attr('class', '');
+                $(this).parent().find('div').addClass('entiti_settings_value').addClass(new_value);
+            } else {
+                $(this).parent().find('div').html( new_value );
+            }
+            //$('#save_entiti_properties').attr('disable', false);
         }
-        new_ref = new_ref + 'setting_tab=' + targ;
-        $('.ainsys_settings_wrap input[name="_wp_http_referer"]').val(new_ref);
+    })
+
+    $('.entities_field .properties_field input').on('click', function () {
+        if ( $(this).attr("type") == 'checkbox' ){
+            let val = $(this).val() == 1 ? 0 : 1;
+            $(this).attr('value', val);
+        }
     });
-	$('.ainsys-tabs').on('click', '.ainsys-nav-tab', function(event){
 
-        event.preventDefault();
+    //////// Ajax clear log ////////
+    $('#setting_entities_section .entities_field').on('click', '.fa.active', function (e){
 
-        const targ = $(this).data('target');
+        let setting_id = '#' + $(this).parent().attr('id');
+        $(setting_id).toggleClass('loading');
+        let data = {
+            action: "save_entiti_settings",
+            nonce: ainsys_connector_params.nonce,
+        };
+        // let temp = $(setting_id).data();
 
-        $( this).closest('.ainsys-tabs').find('.ainsys-nav-tab').removeClass('ainsys-nav-tab-active');
-		$( this).closest('.ainsys-tabs').find('.ainsys-tab-target').removeClass('ainsys-tab-target-active');
-        $(this).addClass('ainsys-nav-tab-active');
-        $('#'+targ).addClass('ainsys-tab-target-active');
-	});
+        $.each($(setting_id).data(), function(key,value) {
+            data[key] = value;
+        })
+
+        jQuery.post(ainsys_connector_params.ajax_url, data, function (value) {
+            if(value){
+                //console.log($(setting_id + ' .fa'));
+                $(setting_id + ' .fa').removeClass('active');
+                $(setting_id + ' #id').val(value);
+                $(setting_id + ' #id').parent().find('div').html(value);
+            }
+            $(setting_id).toggleClass('loading');
+        });
+    });
+
+    ////////  ////////
+    $('#setting_entities_section').on('click', ' .entities_field', function (e){
+        $('.entities_field.active').each(function(){
+            $(this).removeClass('active');
+        })
+
+        let obj_id = $(this).attr("id");
+        $('.properties_data #setting_name').html($(this).data('seting_name'));
+        $('.properties_data #setting_name').attr('data-seting_name', $(this).data('seting_name')).attr('data-entiti', $(this).data('entiti'));
+
+        auto_update = true;
+        $.each($(this).data(), function(key,value) {
+            let input_obj = $('.properties_data .properties_field #' + key );
+            let input_type = $('.properties_data .properties_field #' + key ).attr("type");
+            if (input_obj.is("select")) input_type = 'select';
+            switch (input_type){
+                case 'text':
+                    $(input_obj).val(value);
+                    break;
+                case 'checkbox':
+                    $(input_obj).attr('value', value);
+                    $(input_obj).prop('checked', Boolean(value));
+                    break;
+                case 'select':
+                    $(input_obj).val(value).change();
+                default:
+                    $(input_obj).val(value);
+                    break;
+            }
+        });
+        auto_update = false;
+        $(this).addClass('active');
+    });
+ 
+	//////// expand entity tab ////////
+    $('#setting_entities_section').on('click', ' .expand_entiti_contaner', function (e){
+        $(this).parent().parent().toggleClass('active');
+        var text = $(this).text() == 'expand' ? 'collapse' : 'expand';
+        $(this).text(text);
+    });
 });

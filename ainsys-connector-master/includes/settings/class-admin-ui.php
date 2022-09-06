@@ -64,6 +64,7 @@ class Admin_UI implements Hooked {
 		add_action( 'wp_ajax_reload_log_html', array( $this, 'reload_log_html' ) );
 		add_action( 'wp_ajax_toggle_logging', array( $this, 'toggle_logging' ) );
 		add_action( 'wp_ajax_clear_log', array( $this, 'clear_log' ) );
+		add_action( 'wp_ajax_test_entity_connection', array( $this, 'test_entity_connection' ) );
 
 	}
 
@@ -380,6 +381,97 @@ class Admin_UI implements Hooked {
 	}
 
 	/**
+	 * Test connection
+	 *
+	 */
+	public function test_entity_connection() {
+		if ( isset( $_POST['entity'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
+
+			$make_request = false;
+
+			$entity = strip_tags( $_POST['entity'] );
+
+			if ( 'user' === $entity ) {
+				$fields = wp_get_current_user();
+				$make_request = true;
+			}
+			if ( 'comments' === $entity ) {
+				$args = array(
+					'status' => 'approve',
+				);
+				$comments = get_comments( $args );
+				if ( ! empty( $comments ) ) {
+					foreach ( $comments as $comment ) {
+						$fields = $comment;
+						break;
+					}
+					$make_request = true;
+				}
+			}
+			if ( 'order' === $entity ) {
+				$args = array(
+					'limit' => 1,
+				);
+				$orders = wc_get_orders( $args );
+				if ( ! empty( $orders ) ) {
+					foreach ( $orders as $order ) {
+						$fields = $order;
+						break;
+					}
+					$make_request = true;
+				}
+			}
+			if ( 'product' === $entity ) {
+				$args = array(
+					'limit' => 1,
+				);
+				$products = wc_get_products( $args );
+				if ( ! empty( $products ) ) {
+					foreach ( $products as $product ) {
+						$fields = $product;
+						break;
+					}
+					$make_request = true;
+				}
+			}
+
+			if ( $make_request ) {
+				$request_action = 'UPDATE';
+
+				$request_data = array(
+					'entity'  => array(
+						'id'   => $fields->get_id(),
+						'name' => $entity,
+					),
+					'action'  => $request_action,
+					'payload' => $fields,
+				);
+
+				try {
+					$server_response = $this->core->curl_exec_func( $request_data );
+				} catch ( \Exception $e ) {
+					$server_response = 'Error: ' . $e->getMessage();
+				}
+				$result = array(
+					'short_request'  => mb_substr( serialize( $request_data ), 0, 80 ),
+					'short_responce' => mb_substr( $server_response, 0, 80 ),
+					'full_request'   => $this->logger::ainsys_render_json( $request_data ),
+					'full_responce'  => 0 === strpos( 'Error: ', $server_response ) ? $server_response : $this->logger::ainsys_render_json( json_decode( $server_response ) ),
+				);
+			} else {
+				$result = array(
+					'short_request'  => __( 'No entities found', AINSYS_CONNECTOR_TEXTDOMAIN ),
+					'short_responce' => '',
+					'full_request'   => '',
+					'full_responce'  => '',
+				);
+			}
+			echo json_encode( $result );
+		}
+		die();
+	}
+
+	/**
 	 * Toggle logging on/off. Set up time till log will be saved if $_POST["time"] specified
 	 *
 	 */
@@ -433,6 +525,30 @@ class Admin_UI implements Hooked {
 	}
 
 	/**
+	 * Generate test data HTML.
+	 *
+	 * @return string
+	 */
+	public function generate_test_html() {
+
+		$test_html        = '<div id="connection_test"><table class="ainsys-table">';
+		$test_html_header = '<th>' . __( 'Entity', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>' . __( 'Object ID', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>' . __( 'Outgoing JSON', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>' . __( 'SERVER RESPONCE', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>Test</th>';
+		$test_html_body   = '';
+
+		$entities_list = $this->settings::get_entities();
+		$wp_entities   = array( 'user', 'comments', 'order', 'product' );
+
+		foreach ( $entities_list as $entity => $title ) {
+			if ( in_array( $entity, $wp_entities ) ) {
+				$test_html_body .= '<tr><td class="ainsys_td_left">' . $title . '</td><td>Object ID</td><td class="ainsys_td_left ainsys-test-json"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_left ainsys-test-responce"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_btn"><a href="" class="btn btn-primary ainsys-test" data-entity-name="' . $entity . '">' . __( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a></td></tr>';
+			}
+		}
+
+		$test_html .= '<thead><tr>' . $test_html_header . '</tr></thead><tbody>' . $test_html_body . '</tbody></table> </div>';
+		return $test_html;
+	}
+
+	/**
 	 * Generate entities HTML placeholder.
 	 *
 	 * @return string
@@ -475,7 +591,7 @@ class Admin_UI implements Hooked {
 				$collapsed_text = $collapsed_text ? 'expand' : 'collapse';
 				$entities_html .= '<div class="entiti_data ' . $entiti . '_data' . $collapsed . '"> ';
 
-				$entities_html .= '<div class="entiti_block_header"><div class="entiti_title">' . $title . '</div>' . $inner_fields_header . '<a class="button expand_entiti_contaner">' . $collapsed_text . '</a></div>';
+				$entities_html .= '<div class="entiti_block_header"><div class="entiti_title">' . $title . '</div>' . $inner_fields_header . '<a class="button expand_entiti_container">' . $collapsed_text . '</a></div>';
 				foreach ( $section_fields as $field_slug => $field_content ) {
 					$first_active          = $first_active ? ' ' : ' active';
 					$field_name            = empty( $field_content['nice_name'] ) ? $field_slug : $field_content['nice_name'];

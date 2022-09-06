@@ -87,6 +87,46 @@ jQuery(function($){
 		checkToDisableLogging();
 	} );
 
+    //////// Ajax test btns ////////
+    $( '#setting_section_test' ).on( 'click', '.ainsys-test', function(e) {
+        e.preventDefault();
+
+        if ( $(this).hasClass( 'ainsys-loading' ) ){
+            return;
+        }
+        const entity = $( this ).data( 'entity-name' );
+		const requestTdShort = $( this ).closest( 'tr' ).find( '.ainsys-test-json' ).find( '.ainsys-responce-short' );
+		const requestTdFull = $( this ).closest( 'tr' ).find( '.ainsys-test-json' ).find( '.ainsys-responce-full' );
+		const responceTdShort = $( this ).closest( 'tr' ).find( '.ainsys-test-responce' ).find( '.ainsys-responce-short' );
+		const responceTdFull = $( this ).closest( 'tr' ).find( '.ainsys-test-responce' ).find( '.ainsys-responce-full' );
+
+		$( this ).addClass( 'ainsys-loading' );
+
+		var data = {
+            action: 'test_entity_connection',
+            entity: entity,
+            nonce: ainsys_connector_params.nonce
+        };
+
+		$.ajax( {
+            url: ainsys_connector_params.ajax_url,
+            type: 'POST',
+            data: data,
+            success: function (response) {
+				$( '.ainsys-test' ).removeClass( 'ainsys-loading' );
+				const result = JSON.parse( response );
+				requestTdShort.text( result.short_request );
+				responceTdShort.text( result.short_responce );
+				requestTdFull.html( result.full_request );
+				responceTdFull.html( result.full_responce );
+			},
+            error: function () {
+				$( '.ainsys-test' ).removeClass( 'ainsys-loading' );
+				requestTdShort.text( 'Error!' );
+				responceTdShort.text( 'Error!' );
+            }
+        } );
+    } );
 
     //////// Ajax start/stop loging btns  ////////
     $( '#setting_section_log' ).on( 'click', '.ainsys-log-control', function(e) {
@@ -157,7 +197,7 @@ jQuery(function($){
         })
     });
 
-	$('#setting_section_log').on('click', '.ainsys-responce-short', function (e){
+	$('.ainsys_settings_wrap').on('click', '.ainsys-responce-short', function (e){
 		const fullResponse = $( this ).siblings( '.ainsys-responce-full' ).html();
 		$( 'body' ).append('<div class="ainsys-overlay"><div class="ainsys-popup"><div class="ainsys-popup-body"><div class="ainsys-popup-response">' + fullResponse + '</div></div><div class="ainsys-popup-btns"><span class="btn btn-primary ainsys-popup-copy">Copy to Clipboard</span><span class="btn btn-tertiary ainsys-popup-close">Close</span></div></div></div>');
 		const respHeight = $( '.ainsys-popup' ).height() - $( '.ainsys-popup-btns' ).outerHeight() - 40;
@@ -194,7 +234,7 @@ jQuery(function($){
     });
 
     //////// Expand/collapse data container ////////
-    $('#setting_section_log').on('click', '.expand_data_contaner', function (e){
+    $('#setting_section_log').on('click', '.expand_data_container', function (e){
         $(this).parent().toggleClass('expand_tab');
 
         var text = $(this).text() == 'less' ? 'more' : 'less';
@@ -296,7 +336,7 @@ jQuery(function($){
     });
  
 	//////// expand entity tab ////////
-    $('#setting_entities_section').on('click', ' .expand_entiti_contaner', function (e){
+    $('#setting_entities_section').on('click', ' .expand_entiti_container', function (e){
         $(this).parent().parent().toggleClass('active');
         var text = $(this).text() == 'expand' ? 'collapse' : 'expand';
         $(this).text(text);

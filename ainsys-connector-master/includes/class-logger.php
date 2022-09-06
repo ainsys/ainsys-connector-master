@@ -59,11 +59,12 @@ class Logger implements Hooked {
 	 *
 	 * @return string
 	 */
-	private static function ainsys_render_json( $json, $result = '' ) {
+	public static function ainsys_render_json( $json, $result = '' ) {
 
 		foreach ( $json as $key => $val ) {
-			if ( is_string( $val ) || null === $val ) {
-				$result .= '<div class="ainsys-json-inner">' . $key . ' : ' . $val . '</div>';
+			//if ( is_string( $val ) || null === $val ) {
+			if ( ! is_object( $val ) && ! is_array( $val ) ) {
+					$result .= '<div class="ainsys-json-inner">' . $key . ' : ' . $val . '</div>';
 			} else {
 				$result .= '{<div class="ainsys-json-outer"> ' . $key . ' : ' . self::ainsys_render_json( $val ) . '</div>}<br>';
 			}
@@ -79,7 +80,7 @@ class Logger implements Hooked {
 	public static function generate_log_html( $where = '' ) {
 		global $wpdb;
 
-		$log_html        = '<div id="connection_log"><table class="ainsys-log-table">';
+		$log_html        = '<div id="connection_log"><table class="ainsys-table">';
 		$log_html_body   = '';
 		$log_html_header = '';
 		$query           = 'SELECT * 
@@ -108,7 +109,7 @@ class Logger implements Hooked {
 					}
 					if ( is_array( $value ) ) {
 						if ( count( $value['request_data'] ) > 2 ) {
-							$log_html_body .= '<div class="request_data_container"> <a class="button expand_data_contaner">more</a>';
+							$log_html_body .= '<div class="request_data_container"> <a class="button expand_data_container">more</a>';
 						}
 						foreach ( $value['request_data'] as $title => $param ) {
 							if ( 'products' === $title && ! empty( $param ) ) {

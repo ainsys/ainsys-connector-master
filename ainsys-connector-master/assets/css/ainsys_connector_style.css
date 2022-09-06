@@ -40,6 +40,7 @@
 	appearance: none;
     border-radius: 0.5rem;
     box-sizing: border-box;
+	transition: all 0.3s ease-out;
     font-size: 0.875rem;
 	font-weight: 500;
     text-decoration: none;
@@ -311,38 +312,65 @@
 .ainsys-log-status-no {
 	color: #d5031e;
 }
-#setting_section_log .ainsys-log-table {
+.ainsys_settings_wrap .ainsys-table {
 	border-collapse: collapse;
+	width: 100%;
 }
-#setting_section_log .ainsys-log-table tr {
+.ainsys_settings_wrap .ainsys-table tr {
     border-bottom: solid 2px #e2e2e2;
 }
-#setting_section_log .ainsys-log-table thead th {
+.ainsys_settings_wrap .ainsys-table thead th {
     padding: 0 1.5rem 1.375rem;
     font-size: 0.875rem;
 	font-weight: 500;
 	color: #101828;
 	white-space: nowrap;
 }
-#setting_section_log .ainsys-log-table thead tr th:first-of-type {
+.ainsys_settings_wrap .ainsys-table thead tr th:first-of-type {
 	padding-left: 1.375rem;
 }
-#setting_section_log .ainsys-log-table td {
+.ainsys_settings_wrap .ainsys-table td {
     padding: 1.25rem 1.5rem;
 	text-align: center;
 	vertical-align: middle;
 }
-#setting_section_log .ainsys-log-table td.log_id {
+.ainsys_settings_wrap .ainsys-table td.log_id {
 	padding-left: 1.375rem;
 }
-#setting_section_log .ainsys-log-table td.server_responce {
+.ainsys_settings_wrap .ainsys-table td.ainsys_td_left,
+.ainsys_settings_wrap .ainsys-table td.server_responce {
 	text-align: left;
 }
-#setting_section_log .ainsys-responce-short {
+.ainsys_settings_wrap .ainsys-responce-short {
 	cursor: pointer;
 }
-#setting_section_log .ainsys-responce-full {
+.ainsys_settings_wrap .ainsys-responce-full {
 	display: none;
+}
+.ainsys_settings_wrap .ainsys-table .ainsys_td_btn {
+	width: 7rem;
+	padding-right: 0;
+	text-align: right;
+}
+.toplevel_page_ainsys-connector .ainsys_td_btn .btn {
+	min-width: 0;
+	margin: 0;
+}
+.toplevel_page_ainsys-connector .btn.ainsys-loading {
+	position: relative;
+	padding-right: 3rem;
+}
+.toplevel_page_ainsys-connector .btn.ainsys-loading:after {
+	content: '';
+	display: block;
+	position: absolute;
+	top: 50%;
+	right: 0.5rem;
+	width: 2rem;
+	height: 2rem;
+	margin: -1rem 0 0;
+	background: url( ../img/spinner.svg ) no-repeat center;
+	background-size: contain;
 }
 #setting_section_log .request_data_container{
     height: 39px;
@@ -351,7 +379,7 @@
 #setting_section_log .request_data_container.expand_tab {
     height: auto;
 }
-#setting_section_log .expand_data_contaner{
+#setting_section_log .expand_data_container{
     position: relative;
     float: right;
     width: 70px;
@@ -407,6 +435,11 @@
 .ainsys-json-inner {
 	padding-left: 1rem;
 	font-size: 0.874rem;
+}
+
+/* Test */
+.ainsys-test-block {
+	width: 100%;
 }
 
 /* Entities Settings */
@@ -565,11 +598,11 @@
     background-color: white;
 }
 
-#setting_entities_section .expand_entiti_contaner.button {
+#setting_entities_section .expand_entiti_container.button {
     height: 30px;
 }
 
-#setting_entities_section .expand_entiti_contaner {
+#setting_entities_section .expand_entiti_container {
     position: relative;
     float: right;
     width: 85px;

@@ -60,28 +60,36 @@ class Plugin implements Hooked {
 			// add hooks.
 			add_filter( 'ainsys_get_entities_list', array( $this, 'add_entity_to_list' ), 10, 1 );
 			add_filter( 'ainsys_get_entity_fields_handlers', array( $this, 'add_fields_getters_for_entities' ), 10, 1 );
-			add_filter( 'ainsys_default_apis_for_entities',
-				array( $this, 'add_default_api_for_entities_option' ),
-				10, 1
-			);
+			add_filter( 'ainsys_default_apis_for_entities', array( $this, 'add_default_api_for_entities_option' ), 10, 1 );
+			add_filter( 'ainsys_test_table', array( $this, 'ainsys_test_table' ), 10, 1 );
 
 			add_action( 'woocommerce_checkout_order_processed', array( $this, 'new_order_processed' ) );
 			add_action( 'woocommerce_order_status_changed', array( $this, 'send_order_status_update_to_ainsys' ) );
 			add_action( 'woocommerce_update_product', array( $this, 'send_update_product_to_ainsys' ), 10, 2 );
+			add_action( 'wp_ajax_test_woo_connection', array( $this, 'test_woo_connection' ) );
 
 			foreach ( $this->components as $component ) {
 				if ( $component instanceof Hooked ) {
 					$component->init_hooks();
 				}
 			}
+			if ( is_admin() ) {
+				add_action( 'admin_enqueue_scripts', array( $this, 'ainsys_woo_enqueue_scripts' ) );
+			}
 		}
+	}
+
+	public function ainsys_woo_enqueue_scripts() {
+
+		wp_enqueue_script( 'ainsys_connector_admin_woo_handle', plugins_url( 'ainsys-connector-woocommerce/assets/js/ainsys_connector_woo_admin.js' ), array( 'jquery' ), '4.0.0', true );
+
 	}
 
 	public function add_status_of_component( $status_items = array() ) {
 
 		$status_items['woocommerce'] = array(
 			'title'  => __( 'WooCommerce', AINSYS_CONNECTOR_TEXTDOMAIN ),
-			'active' => $this->is_woocommerce_active()
+			'active' => $this->is_woocommerce_active(),
 		);
 
 		return $status_items;
@@ -104,7 +112,6 @@ class Plugin implements Hooked {
 			}
 		}
 
-
 		return $entities_list;
 	}
 
@@ -122,6 +129,108 @@ class Plugin implements Hooked {
 		return $default_apis;
 	}
 
+	// TODO nonce from admin-ui
+	public function test_woo_connection() {
+		if ( isset( $_POST['entity'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], 'ansys_admin_menu_nonce' ) ) {
+
+			$make_request = false;
+
+			$entity = strip_tags( $_POST['entity'] );
+
+			if ( 'product' === $entity ) {
+				$args     = array(
+					'limit' => 1,
+				);
+				$products = wc_get_products( $args );
+				if ( ! empty( $products ) ) {
+					foreach ( $products as $product ) {
+						$fields     = $product;
+						$product_id = $product->get_id();
+						break;
+					}
+
+					$make_request         = true;
+					$test_result          = $this->send_update_product_to_ainsys( $product_id, $fields, true );
+					$test_result_request  = $test_result['request']; // array
+					$test_result_response = $test_result['response']; // string
+				}
+			}
+
+			if ( 'order' === $entity ) {
+				$args   = array(
+					'limit' => 1,
+				);
+				$orders = wc_get_orders( $args );
+				if ( ! empty( $orders ) ) {
+					foreach ( $orders as $order ) {
+						$fields   = (array) $order;
+						$order_id = $order->get_id();
+						break;
+					}
+
+					//$make_request         = true; TODO
+					//$test_result          = $this->send_update_order_to_ainsys( $order_id, $fields, true );
+					//$test_result_request  = $test_result['request']; // array
+					//$test_result_response = $test_result['response']; // string
+				}
+			}
+
+			if ( 'coupons' === $entity ) {
+				$args = array(
+					'posts_per_page' => 1,
+					'post_type'      => 'shop_coupon',
+					'post_status'    => 'publish',
+				);
+
+				$coupons = get_posts( $args );
+				if ( ! empty( $coupons ) ) {
+					foreach ( $coupons as $coupon ) {
+						$fields    = (array) $coupon;
+						$coupon_id = $coupon->ID;
+						break;
+					}
+
+					//$make_request         = true; TODO
+					//$test_result          = $this->send_update_coupon_to_ainsys( $coupon_id, $fields, true );
+					//$test_result_request  = $test_result['request']; // array
+					//$test_result_response = $test_result['response']; // string
+				}
+			}
+
+			if ( $make_request ) {
+
+				$result = array(
+					'short_request'  => mb_substr( serialize( $test_result_request ), 0, 80 ) . ' ... ',
+					'short_responce' => mb_substr( $test_result_response, 0, 80 ) . ' ... ',
+					'full_request'   => $this->logger::ainsys_render_json( $test_result_request ),
+					'full_responce'  => 0 === strpos( 'Error: ', $test_result_response ) ? $test_result_response : $this->logger::ainsys_render_json( json_decode( $test_result_response ) ),
+				);
+			} else {
+				$result = array(
+					'short_request'  => __( 'No entities found', AINSYS_CONNECTOR_TEXTDOMAIN ),
+					'short_responce' => '',
+					'full_request'   => '',
+					'full_responce'  => '',
+				);
+			}
+			echo json_encode( $result );
+		}
+		die();
+	}
+
+	public function ainsys_test_table( $html ) {
+		$html .= '<tr><td class="ainsys_td_left">Product / fields</td><td class="ainsys_td_left ainsys-test-json"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_left ainsys-test-responce"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_btn"><a href="" class="btn btn-primary ainsys-woo-test" data-entity-name="product">' . __( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a></td></tr>';
+
+		$html .= '<tr><td class="ainsys_td_left">Order / fields</td><td class="ainsys_td_left ainsys-test-json"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_left ainsys-test-responce"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_btn"><a href="" class="btn btn-primary ainsys-woo-test" data-entity-name="order">' . __( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a></td></tr>';
+
+		if ( function_exists( 'wc_coupons_enabled' ) ) {
+			if ( wc_coupons_enabled() ) {
+				$html .= '<tr><td class="ainsys_td_left">Coupons / fields</td><td class="ainsys_td_left ainsys-test-json"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_left ainsys-test-responce"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_btn"><a href="" class="btn btn-primary ainsys-woo-test" data-entity-name="coupons">' . __( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a></td></tr>';
+			}
+		}
+
+		return $html;
+	}
 
 	/**
 	 * We send a new order to AINSYS
@@ -153,7 +262,7 @@ class Plugin implements Hooked {
 		if ( isset( $data['line_items'] ) && ! empty( $data['line_items'] ) ) {
 			$products = $this->prepare_products( $data['line_items'] );
 		} else {
-			$products = [];
+			$products = array();
 		}
 
 		$fields_filtered = apply_filters( 'ainsys_new_order_fields', $fields, $order );
@@ -161,12 +270,12 @@ class Plugin implements Hooked {
 		$this->sanitize_aditional_order_fields( array_diff( $fields_filtered, $fields ), $data['id'] );
 
 		$order_data = array(
-			'entity'  => [
+			'entity'  => array(
 				'id'   => $order_id,
-				'name' => 'order'
-			],
+				'name' => 'order',
+			),
 			'action'  => $request_action,
-			'payload' => array_merge( $fields_filtered, $utm_data, [ 'products' => $products ] )
+			'payload' => array_merge( $fields_filtered, $utm_data, array( 'products' => $products ) ),
 		);
 
 		try {
@@ -203,8 +312,8 @@ class Plugin implements Hooked {
 			'request_action' => $request_action,
 			'request_data'   => array(
 				'status'   => strtoupper( trim( $status ) ),
-				'hostname' => $host
-			)
+				'hostname' => $host,
+			),
 		);
 
 		try {
@@ -226,23 +335,19 @@ class Plugin implements Hooked {
 	 *
 	 * @return
 	 */
-	public function send_update_product_to_ainsys( $product_id, $product ) {
+	public function send_update_product_to_ainsys( $product_id, $product, $test = false ) {
 		$request_action = 'UPDATE';
 
 		$fields = apply_filters( 'ainsys_update_product_fields', $this->prepare_single_product( $product ), $product );
 
 		$request_data = array(
-			'entity'  => [
+			'entity'  => array(
 				'id'   => $product_id,
-				'name' => 'product'
-			],
+				'name' => 'product',
+			),
 			'action'  => $request_action,
-			'payload' => $fields
+			'payload' => $fields,
 		);
-		$message='';
-		foreach ($fields as $key => $value) {
-			$message .= $key . '=>' . $value . ', ';
-		}
 
 		try {
 			$server_response = $this->core->curl_exec_func( $request_data );
@@ -252,7 +357,15 @@ class Plugin implements Hooked {
 
 		$this->logger->save_log_information( $product_id, $request_action, serialize( $request_data ), serialize( $server_response ), 0 );
 
-		return;
+		if ( $test ) {
+			$result = array(
+				'request'  => $request_data,
+				'response' => $server_response,
+			);
+			return $result;
+		} else {
+			return;
+		}
 	}
 
 	/**
@@ -262,10 +375,10 @@ class Plugin implements Hooked {
 	 *
 	 * @return array
 	 */
-	private function prepare_fields( $data = [] ) {
+	private function prepare_fields( $data = array() ) {
 		$all_fields = WC()->checkout->get_checkout_fields();
 
-		$prepare_data = [];
+		$prepare_data = array();
 		if ( ! empty( $data['id'] ) ) {
 			$prepare_data['id'] = $data['id'];
 		}
@@ -294,8 +407,7 @@ class Plugin implements Hooked {
 			$prepare_data['customer_note'] = $data['customer_note'];
 		}
 
-
-		$prepare_data['date'] = date( "Y-m-d H:i:s" );
+		$prepare_data['date'] = date( 'Y-m-d H:i:s' );
 
 		// get applaed cupons
 		$coupons = WC()->cart->get_coupons();
@@ -311,13 +423,13 @@ class Plugin implements Hooked {
 				if ( ! empty( $billing_value ) ) {
 					$prepare_data[ 'billing_' . $billing_key ] = $billing_value;
 				}
-				unset( $all_fields["billing"][ 'billing_' . $billing_key ] );
+				unset( $all_fields['billing'][ 'billing_' . $billing_key ] );
 			}
 		}
 
 		/// search for custom fields
-		if ( ! empty( $all_fields["billing"] ) ) {
-			$prepare_data = array_merge( $prepare_data, $this->sanitize_aditional_order_fields( $all_fields["billing"], $data['id'] ) );
+		if ( ! empty( $all_fields['billing'] ) ) {
+			$prepare_data = array_merge( $prepare_data, $this->sanitize_aditional_order_fields( $all_fields['billing'], $data['id'] ) );
 		}
 
 		//shipping
@@ -326,12 +438,12 @@ class Plugin implements Hooked {
 				if ( ! empty( $shipping_value ) ) {
 					$prepare_data[ 'shipping_' . $shipping_key ] = $shipping_value;
 				}
-				unset( $all_fields["shipping"][ 'shipping_' . $shipping_key ] );
+				unset( $all_fields['shipping'][ 'shipping_' . $shipping_key ] );
 			}
 		}
 		/// search for custom fields
-		if ( ! empty( $all_fields["shipping"] ) ) {
-			$prepare_data = array_merge( $prepare_data, $this->sanitize_aditional_order_fields( $all_fields["shipping"], $data['id'] ) );
+		if ( ! empty( $all_fields['shipping'] ) ) {
+			$prepare_data = array_merge( $prepare_data, $this->sanitize_aditional_order_fields( $all_fields['shipping'], $data['id'] ) );
 		}
 
 		return $prepare_data;
@@ -343,7 +455,7 @@ class Plugin implements Hooked {
 	 * @return array
 	 */
 	private function get_utm_fields() {
-		$data = [];
+		$data = array();
 		if ( ! empty( $this->UTM_handler::get_referer_url() ) ) {
 			$data['REFERER'] = $this->UTM_handler::get_referer_url();
 		}
@@ -370,8 +482,8 @@ class Plugin implements Hooked {
 	 *
 	 * @return array
 	 */
-	private function prepare_products( $products = [] ) {
-		$prepare_data = [];
+	private function prepare_products( $products = array() ) {
+		$prepare_data = array();
 		if ( empty( $products ) ) {
 			return $prepare_data;
 		}
@@ -392,7 +504,7 @@ class Plugin implements Hooked {
 			}
 
 			//If discounted
-			if ( $price != $regular_price ) {
+			if ( $price !== $regular_price ) {
 				$prepare_data[ $item_id ]['discount_type_id'] = 1;
 				$prepare_data[ $item_id ]['discount_sum']     = $regular_price - $price;
 			}
@@ -468,7 +580,7 @@ class Plugin implements Hooked {
 			//'attributes'         => $this->get_attributes( $product ),
 			//'downloads'          => $this->get_downloads( $product ),
 			'download_limit'     => $product->get_download_limit(),
-			'download_expiry'    => $product->get_download_expiry()
+			'download_expiry'    => $product->get_download_expiry(),
 			//'download_type'      => 'standard',
 			//'purchase_note'      => apply_filters( 'the_content', $product->get_purchase_note() )
 			//'total_sales'        => $product->get_total_sales(),
@@ -486,7 +598,7 @@ class Plugin implements Hooked {
 	 */
 	private function sanitize_aditional_order_fields( $aditional_fields, $order_id ) {
 		global $wpdb;
-		$prepare_data = [];
+		$prepare_data = array();
 		foreach ( $aditional_fields as $field_name => $fields ) {
 			$field_value = get_post_meta( $order_id, '_' . $field_name, true );
 			if ( ! empty( $field_value ) ) {
@@ -497,12 +609,13 @@ class Plugin implements Hooked {
 				$entity_saved_settings = $this->settings::get_saved_entity_settings_from_db( ' WHERE entity="order" AND setting_key="extra_field" AND setting_name="' . $field_name . '"' );
 				$response              = '';
 				if ( empty( $entity_saved_settings ) ) {
-					$response      = $wpdb->insert( $wpdb->prefix . $this->settings::$ainsys_entities_settings_table,
+					$response      = $wpdb->insert(
+						$wpdb->prefix . $this->settings::$ainsys_entities_settings_table,
 						array(
 							'entity'       => 'order',
 							'setting_name' => $field_name,
 							'setting_key'  => 'extra_field',
-							'value'        => serialize( $fields )
+							'value'        => serialize( $fields ),
 						)
 					);
 					$field_data_id = $wpdb->insert_id;
@@ -510,9 +623,10 @@ class Plugin implements Hooked {
 					/// Save new field to log
 					$this->logger->save_log_information( $field_data_id, $field_name, 'order_cstom_field_saved', '', 0 );
 				} else {
-					$response = $wpdb->update( $wpdb->prefix . $this->settings::$ainsys_entities_settings_table,
+					$response = $wpdb->update(
+						$wpdb->prefix . $this->settings::$ainsys_entities_settings_table,
 						array( 'value' => serialize( $fields ) ),
-						array( 'id' => $entity_saved_settings["id"] )
+						array( 'id' => $entity_saved_settings['id'] )
 					);
 				}
 			}
@@ -524,74 +638,74 @@ class Plugin implements Hooked {
 
 	public function get_coupons_fields() {
 		return array(
-			'code'                        => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			'discount_type'               => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			'amount'                      => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			'date_expires'                => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			'individual_use'              => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			'product_ids'                 => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			'excluded_product_ids'        => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			'usage_limit'                 => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			'usage_limit_per_user'        => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			'limit_usage_to_x_items'      => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			'free_shipping'               => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			'product_categories'          => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			'excluded_product_categories' => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			'exclude_sale_items'          => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			'minimum_amount'              => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			'maximum_amount'              => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			'email_restrictions'          => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
+			'code'                        => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'discount_type'               => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'amount'                      => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'date_expires'                => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'individual_use'              => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'product_ids'                 => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'excluded_product_ids'        => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'usage_limit'                 => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'usage_limit_per_user'        => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'limit_usage_to_x_items'      => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'free_shipping'               => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'product_categories'          => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'excluded_product_categories' => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'exclude_sale_items'          => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'minimum_amount'              => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'maximum_amount'              => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'email_restrictions'          => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
 		);
 	}
 
@@ -602,198 +716,198 @@ class Plugin implements Hooked {
 	 */
 	public function get_product_fields() {
 		return array(
-			"title"              => [
-				"nice_name"   => __( 'Title', AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"         => "woocommerce",
-				"description" => "Product title"
-			],
-			"id"                 => [
-				"nice_name" => __( '{ID}', AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"created_at"         => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"updated_at"         => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"type"               => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"status"             => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"downloadable"       => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"virtual"            => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"permalink"          => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"sku"                => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"price"              => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"regular_price"      => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"sale_price"         => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"price_html"         => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"taxable"            => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"tax_status"         => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"tax_class"          => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"managing_stock"     => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"stock_quantity"     => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"in_stock"           => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"backorders_allowed" => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"backordered"        => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"sold_individually"  => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"purchaseable"       => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"featured"           => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"visible"            => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"catalog_visibility" => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"on_sale"            => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"weight"             => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"dimensions"         => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"shipping_required"  => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"shipping_taxable"   => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"shipping_class"     => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"shipping_class_id"  => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"nice_name"          => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"short_nice_name"    => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"reviews_allowed"    => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"average_rating"     => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"rating_count"       => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"related_ids"        => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"upsell_ids"         => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"cross_sell_ids"     => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"categories"         => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"tags"               => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
+			'title'              => array(
+				'nice_name'   => __( 'Title', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'api'         => 'woocommerce',
+				'description' => 'Product title',
+			),
+			'id'                 => array(
+				'nice_name' => __( '{ID}', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'api'       => 'woocommerce',
+			),
+			'created_at'         => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'updated_at'         => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'type'               => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'status'             => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'downloadable'       => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'virtual'            => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'permalink'          => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'sku'                => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'price'              => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'regular_price'      => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'sale_price'         => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'price_html'         => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'taxable'            => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'tax_status'         => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'tax_class'          => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'managing_stock'     => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'stock_quantity'     => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'in_stock'           => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'backorders_allowed' => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'backordered'        => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'sold_individually'  => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'purchaseable'       => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'featured'           => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'visible'            => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'catalog_visibility' => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'on_sale'            => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'weight'             => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'dimensions'         => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'shipping_required'  => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'shipping_taxable'   => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'shipping_class'     => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'shipping_class_id'  => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'nice_name'          => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'short_nice_name'    => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'reviews_allowed'    => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'average_rating'     => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'rating_count'       => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'related_ids'        => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'upsell_ids'         => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'cross_sell_ids'     => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'categories'         => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'tags'               => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
 			//"images"
-			"featured_src"       => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
+			'featured_src'       => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
 			//"attributes"
 			//"downloads"
-			"download_limit"     => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"download_expiry"    => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
+			'download_limit'     => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'download_expiry'    => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
 			//"download_type"
 			//"purchase_note"
 			//"total_sales"
@@ -806,72 +920,72 @@ class Plugin implements Hooked {
 	 * @return array
 	 */
 	public function get_order_fields() {
-		$prepared_fields = [
-			"id"                   => [
-				"nice_name" => __( '{ID}', AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"currency"             => [
-				"nice_name" => __( 'Currency', AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"customer_id"          => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"payment_method_title" => [
-				"nice_name" => __( "Payment", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"date"                 => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"referer"              => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"hostname"             => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"user_ip"              => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			],
-			"products"             => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "woocommerce"
-			]
-		];
+		$prepared_fields = array(
+			'id'                   => array(
+				'nice_name' => __( '{ID}', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'api'       => 'woocommerce',
+			),
+			'currency'             => array(
+				'nice_name' => __( 'Currency', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'api'       => 'woocommerce',
+			),
+			'customer_id'          => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'payment_method_title' => array(
+				'nice_name' => __( 'Payment', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'api'       => 'woocommerce',
+			),
+			'date'                 => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'referer'              => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'hostname'             => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'user_ip'              => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+			'products'             => array(
+				'nice_name' => '',
+				'api'       => 'woocommerce',
+			),
+		);
 
 		$order_fields = WC()->checkout->get_checkout_fields();
 
 		foreach ( $order_fields as $category => $fields ) {
 			if ( is_array( $fields ) ) {
 				foreach ( $fields as $field_slug => $settings ) {
-					$prepared_fields[ $field_slug ] = [
-						"nice_name"   => $settings["label"] ?? '',
-						"description" => $settings["label"] ?? '',
-						"api"         => "woocommerce",
-						"required"    => isset( $settings["required"] ) && $settings["required"] ? 1 : 0,
-						"sample"      => isset( $settings["placeholder"] ) ? $settings["placeholder"] : ''
-					];
+					$prepared_fields[ $field_slug ] = array(
+						'nice_name'   => $settings['label'] ?? '',
+						'description' => $settings['label'] ?? '',
+						'api'         => 'woocommerce',
+						'required'    => isset( $settings['required'] ) && $settings['required'] ? 1 : 0,
+						'sample'      => isset( $settings['placeholder'] ) ? $settings['placeholder'] : '',
+					);
 				}
 			} else {
-				$prepared_fields[ $category ] = [
-					"api" => "woocommerce",
-				];
+				$prepared_fields[ $category ] = array(
+					'api' => 'woocommerce',
+				);
 			}
 		}
 
 		$order_saved_settings = $this->settings::get_saved_entity_settings_from_db( ' WHERE entity="order" AND setting_key="extra_field"', false );
-		$order_extra_fields   = [];
+		$order_extra_fields   = array();
 		if ( ! empty( $order_saved_settings ) ) {
 			foreach ( $order_saved_settings as $saved_setting ) {
 				//preg_match('/(?<cat>\S+)_/', $saved_setting["setting_name"], $matches);
-				$order_extra_fields[ $saved_setting["setting_name"] ]        = maybe_unserialize( $saved_setting["value"] );
-				$order_extra_fields[ $saved_setting["setting_name"] ]['api'] = 'mixed';
+				$order_extra_fields[ $saved_setting['setting_name'] ]        = maybe_unserialize( $saved_setting['value'] );
+				$order_extra_fields[ $saved_setting['setting_name'] ]['api'] = 'mixed';
 			}
 		}
 		$prepared_fields = array_merge(
@@ -881,6 +995,5 @@ class Plugin implements Hooked {
 
 		return $prepared_fields;
 	}
-
 
 }

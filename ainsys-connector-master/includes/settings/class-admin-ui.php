@@ -140,14 +140,14 @@ class Admin_UI implements Hooked {
 	 */
 	public function ainsys_enqueue_scripts() {
 
-		wp_enqueue_script( 'ainsys_connector_admin_handle', plugins_url( 'assets/js/ainsys_connector_admin.js', AINSYS_CONNECTOR_PLUGIN ), array( 'jquery' ), '2.0.0', true );
+		wp_enqueue_script( 'ainsys_connector_admin_handle', plugins_url( 'assets/js/ainsys_connector_admin.js', AINSYS_CONNECTOR_PLUGIN ), array( 'jquery' ), '4.0.0', true );
 
 		if ( false !== strpos( $_GET['page'] ?? '', 'ainsys-connector' ) ) {
 			//wp_enqueue_script('jquery-ui-sortable');
 			wp_enqueue_style( 'ainsys_connector_style_handle', plugins_url( 'assets/css/ainsys_connector_style.css', AINSYS_CONNECTOR_PLUGIN ) );
 			wp_enqueue_style( 'font-awesome_style_handle', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css' );
 
-			wp_enqueue_script( 'ainsys_connector_admin_handle', plugins_url( 'assets/js/ainsys_connector_admin.js', AINSYS_CONNECTOR_PLUGIN ), array( 'jquery' ), '2.0.0', true );
+			wp_enqueue_script( 'ainsys_connector_admin_handle', plugins_url( 'assets/js/ainsys_connector_admin.js', AINSYS_CONNECTOR_PLUGIN ), array( 'jquery' ), '4.0.0', true );
 			wp_localize_script(
 				'ainsys_connector_admin_handle',
 				'ainsys_connector_params',
@@ -394,6 +394,59 @@ class Admin_UI implements Hooked {
 	}
 
 	/**
+	 * Toggle logging on/off. Set up time till log will be saved if $_POST["time"] specified
+	 *
+	 */
+	public function toggle_logging() {
+		if ( isset( $_POST['command'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
+
+			$logging_time = 0;
+			if ( isset( $_POST['time'] ) ) {
+
+				$current_time = time();
+				$time         = floatval( $_POST['time'] ?? 0 ); //intval( $_POST['time'] ?? 0 );
+				$end_time     = $time;
+				if ( $time > 0 ) {
+					$end_time = $current_time + $time * 60 * 60;
+				}
+				$this->settings::set_option( 'log_until_certain_time', $end_time );
+				$this->settings::set_option( 'log_select_value', $time );
+				$logging_time = $end_time;
+			}
+
+			$logging_since = '';
+			if ( 'start_loging' === $_POST['command'] ) {
+				$this->settings::set_option( 'do_log_transactions', 1 );
+				$this->settings::set_option( 'log_transactions_since', htmlspecialchars( strip_tags( $_POST['startat'] ) ) );
+				$logging_since = $this->settings::get_option( 'log_transactions_since' );
+			} else {
+				$this->settings::set_option( 'do_log_transactions', 0 );
+				$this->settings::set_option( 'log_transactions_since', '' );
+				$this->settings::set_option( 'log_select_value', -1 );
+				$logging_since = '';
+			}
+			$result = array(
+				'logging_time'  => $logging_time,
+				'logging_since' => $logging_since,
+			);
+			echo json_encode( $result );
+		}
+		die();
+	}
+
+	/**
+	 * Clear log DB
+	 *
+	 */
+	public function clear_log() {
+		if ( isset( $_POST['action'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
+			$this->logger->truncate_log_table();
+			echo $this->logger->generate_log_html();
+		}
+		die();
+	}
+
+	/**
 	 * Test connection
 	 *
 	 */
@@ -453,59 +506,6 @@ class Admin_UI implements Hooked {
 	}
 
 	/**
-	 * Toggle logging on/off. Set up time till log will be saved if $_POST["time"] specified
-	 *
-	 */
-	public function toggle_logging() {
-		if ( isset( $_POST['command'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
-
-			$logging_time = 0;
-			if ( isset( $_POST['time'] ) ) {
-
-				$current_time = time();
-				$time         = floatval( $_POST['time'] ?? 0 ); //intval( $_POST['time'] ?? 0 );
-				$end_time     = $time;
-				if ( $time > 0 ) {
-					$end_time = $current_time + $time * 60 * 60;
-				}
-				$this->settings::set_option( 'log_until_certain_time', $end_time );
-				$this->settings::set_option( 'log_select_value', $time );
-				$logging_time = $end_time;
-			}
-
-			$logging_since = '';
-			if ( 'start_loging' === $_POST['command'] ) {
-				$this->settings::set_option( 'do_log_transactions', 1 );
-				$this->settings::set_option( 'log_transactions_since', htmlspecialchars( strip_tags( $_POST['startat'] ) ) );
-				$logging_since = $this->settings::get_option( 'log_transactions_since' );
-			} else {
-				$this->settings::set_option( 'do_log_transactions', 0 );
-				$this->settings::set_option( 'log_transactions_since', '' );
-				$this->settings::set_option( 'log_select_value', -1 );
-				$logging_since = '';
-			}
-			$result = array(
-				'logging_time'  => $logging_time,
-				'logging_since' => $logging_since,
-			);
-			echo json_encode( $result );
-		}
-		die();
-	}
-
-	/**
-	 * Clear log DB
-	 *
-	 */
-	public function clear_log() {
-		if ( isset( $_POST['action'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
-			$this->logger->truncate_log_table();
-			echo $this->logger->generate_log_html();
-		}
-		die();
-	}
-
-	/**
 	 * Generate test data HTML.
 	 *
 	 * @return string
@@ -524,6 +524,8 @@ class Admin_UI implements Hooked {
 				$test_html_body .= '<tr><td class="ainsys_td_left">' . $title . '</td><td class="ainsys_td_left ainsys-test-json"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_left ainsys-test-responce"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_btn"><a href="" class="btn btn-primary ainsys-test" data-entity-name="' . $entity . '">' . __( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a></td></tr>';
 			}
 		}
+
+		$test_html_body = apply_filters( 'ainsys_test_table', $test_html_body );
 
 		$test_html .= '<thead><tr>' . $test_html_header . '</tr></thead><tbody>' . $test_html_body . '</tbody></table> </div>';
 		return $test_html;

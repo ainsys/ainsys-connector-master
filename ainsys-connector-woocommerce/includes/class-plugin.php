@@ -7,6 +7,7 @@ use Ainsys\Connector\Master\Hooked;
 use Ainsys\Connector\Master\Logger;
 use Ainsys\Connector\Master\Plugin_Common;
 use Ainsys\Connector\Master\Settings\Settings;
+use Ainsys\Connector\Master\Settings\Admin_UI;
 use Ainsys\Connector\Master\UTM_Handler;
 use Ainsys\Connector\Woocommerce\Webhooks\Handle_Order;
 use Ainsys\Connector\Woocommerce\Webhooks\Handle_Product;
@@ -35,12 +36,18 @@ class Plugin implements Hooked {
 	 */
 	private $settings;
 
+	/**
+	 * @var Admin_UI
+	 */
+	private $admin_ui;
 
-	public function __construct( Core $core, Logger $logger, UTM_Handler $UTM_handler, Settings $settings ) {
+
+	public function __construct( Core $core, Logger $logger, UTM_Handler $UTM_handler, Settings $settings, Admin_UI $admin_ui ) {
 		$this->core        = $core;
 		$this->logger      = $logger;
 		$this->UTM_handler = $UTM_handler;
 		$this->settings    = $settings;
+		$this->admin_ui    = $admin_ui;
 
 		$this->init_plugin_metadata();
 
@@ -64,8 +71,9 @@ class Plugin implements Hooked {
 			add_filter( 'ainsys_test_table', array( $this, 'ainsys_test_table' ), 10, 1 );
 
 			add_action( 'woocommerce_checkout_order_processed', array( $this, 'new_order_processed' ) );
+			add_action( 'post_updated', array( $this, 'ainsys_update_order' ), 10, 4 );
 			add_action( 'woocommerce_order_status_changed', array( $this, 'send_order_status_update_to_ainsys' ) );
-			add_action( 'woocommerce_update_product', array( $this, 'send_update_product_to_ainsys' ), 10, 2 );
+			add_action( 'woocommerce_update_product', array( $this, 'send_update_product_to_ainsys' ), 10, 3 );
 			add_action( 'wp_ajax_test_woo_connection', array( $this, 'test_woo_connection' ) );
 
 			foreach ( $this->components as $component ) {
@@ -129,9 +137,47 @@ class Plugin implements Hooked {
 		return $default_apis;
 	}
 
+	public function ainsys_update_order( $order_id, $order_new, $order_old, $test = false ) {
+
+		if ( 'shop_order' === get_post_type( $order_id ) ) {
+
+			$request_action = 'UPDATE';
+
+			$fields = (array) $order_new;
+
+			$request_data = array(
+				'entity'  => array(
+					'id'   => $order_id,
+					'name' => 'order',
+				),
+				'action'  => $request_action,
+				'payload' => $fields,
+			);
+
+			try {
+				$server_response = $this->core->curl_exec_func( $request_data );
+			} catch ( \Exception $e ) {
+				$server_response = 'Error: ' . $e->getMessage();
+			}
+
+			$this->logger->save_log_information( $order_id, $request_action, serialize( $request_data ), serialize( $server_response ), 0 );
+
+			if ( $test ) {
+				$result = array(
+					'request'  => $request_data,
+					'response' => $server_response,
+				);
+				return $result;
+			} else {
+				return;
+			}
+		}
+		return;
+	}
+
 	// TODO nonce from admin-ui
 	public function test_woo_connection() {
-		if ( isset( $_POST['entity'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], 'ansys_admin_menu_nonce' ) ) {
+		if ( isset( $_POST['entity'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], $this->admin_ui::$nonce_title ) ) {
 
 			$make_request = false;
 
@@ -163,15 +209,15 @@ class Plugin implements Hooked {
 				$orders = wc_get_orders( $args );
 				if ( ! empty( $orders ) ) {
 					foreach ( $orders as $order ) {
-						$fields   = (array) $order;
+						$fields   = $order;
 						$order_id = $order->get_id();
 						break;
 					}
 
-					//$make_request         = true; TODO
-					//$test_result          = $this->send_update_order_to_ainsys( $order_id, $fields, true );
-					//$test_result_request  = $test_result['request']; // array
-					//$test_result_response = $test_result['response']; // string
+					$make_request         = true;
+					$test_result          = $this->ainsys_update_order( $order_id, $fields, $fields, true );
+					$test_result_request  = $test_result['request']; // array
+					$test_result_response = $test_result['response']; // string
 				}
 			}
 

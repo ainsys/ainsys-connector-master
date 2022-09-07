@@ -19,7 +19,7 @@ class Admin_UI implements Hooked {
 	 */
 	static $notices = array();
 
-	static $nonce_title = 'ansys_admin_menu_nonce';
+	public static $nonce_title = 'ansys_admin_menu_nonce';
 
 	/**
 	 * @var Settings

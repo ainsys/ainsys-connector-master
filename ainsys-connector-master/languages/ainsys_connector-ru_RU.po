@@ -271,7 +271,7 @@ msgstr ""
 
 #: includes/ainsys_settings.php:737
 #, fuzzy
-#| msgid "Entitis / fields"
+#| msgid "Entities / fields"
 msgid "User entity / fields"
 msgstr "Сущности / поля"
 

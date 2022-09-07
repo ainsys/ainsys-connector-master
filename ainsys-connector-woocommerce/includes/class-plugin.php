@@ -494,12 +494,12 @@ class Plugin implements Hooked {
 				$prepare_data[ $field_name ] = $field_value;
 
 				/// Saving Order field to DB
-				$entity_saved_settings = $this->settings::get_saved_entity_settings_from_db( ' WHERE entiti="order" AND setting_key="extra_field" AND setting_name="' . $field_name . '"' );
+				$entity_saved_settings = $this->settings::get_saved_entity_settings_from_db( ' WHERE entity="order" AND setting_key="extra_field" AND setting_name="' . $field_name . '"' );
 				$response              = '';
 				if ( empty( $entity_saved_settings ) ) {
 					$response      = $wpdb->insert( $wpdb->prefix . $this->settings::$ainsys_entities_settings_table,
 						array(
-							'entiti'       => 'order',
+							'entity'       => 'order',
 							'setting_name' => $field_name,
 							'setting_key'  => 'extra_field',
 							'value'        => serialize( $fields )
@@ -865,7 +865,7 @@ class Plugin implements Hooked {
 			}
 		}
 
-		$order_saved_settings = $this->settings::get_saved_entity_settings_from_db( ' WHERE entiti="order" AND setting_key="extra_field"', false );
+		$order_saved_settings = $this->settings::get_saved_entity_settings_from_db( ' WHERE entity="order" AND setting_key="extra_field"', false );
 		$order_extra_fields   = [];
 		if ( ! empty( $order_saved_settings ) ) {
 			foreach ( $order_saved_settings as $saved_setting ) {

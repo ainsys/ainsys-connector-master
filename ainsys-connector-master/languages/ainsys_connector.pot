@@ -232,7 +232,7 @@ msgid "Settings"
 msgstr ""
 
 #: includes/ainsys_settings.php:472
-msgid "Entitis / fields"
+msgid "Entities / fields"
 msgstr ""
 
 #: includes/ainsys_settings.php:475

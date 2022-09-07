@@ -15,7 +15,7 @@ use Ainsys\Connector\Master\Webhook_Listener;
 class Settings implements Hooked {
 
 	// AINSYS log table name.
-	static $ainsys_entities_settings_table = 'ainsys_entitis_settings';
+	static $ainsys_entities_settings_table = 'ainsys_entitys_settings';
 
 	/**
 	 * Connect to wp hooks.
@@ -134,11 +134,11 @@ class Settings implements Hooked {
 		 * indexes first causes too much load on some servers/larger DB.
 		 */
 
-		$table_entitis_settings = $wpdb->prefix . self::$ainsys_entities_settings_table;
+		$table_entitys_settings = $wpdb->prefix . self::$ainsys_entities_settings_table;
 
-		$tables = "CREATE TABLE {$table_entitis_settings} (
+		$tables = "CREATE TABLE {$table_entitys_settings} (
                 `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-                `entiti` text DEFAULT NULL,
+                `entity` text DEFAULT NULL,
                 `setting_name` text DEFAULT NULL,
                 `setting_key` text DEFAULT NULL,
                 `value` text DEFAULT NULL,
@@ -297,7 +297,7 @@ class Settings implements Hooked {
 
 	/**
 	 * Generate list of settings for entity field with default values
-	 * $entiti param used for altering settins depending on entity
+	 * $entity param used for altering settins depending on entity
 	 *
 	 * @param string $entity
 	 *
@@ -369,7 +369,7 @@ class Settings implements Hooked {
 	//#region Refactored
 
 	/**
-	 * Get entiti field settings from DB.
+	 * Get entity field settings from DB.
 	 *
 	 * @param string $where
 	 * @param bool $single

@@ -72,7 +72,7 @@ class Admin_UI implements Hooked {
 		// let's register ajax handlers as it's a part of admin UI. NB: they were a part of Core originally.
 		add_action( 'wp_ajax_remove_ainsys_integration', array( $this, 'remove_ainsys_integration' ) );
 
-		add_action( 'wp_ajax_save_entiti_settings', array( $this, 'save_entities_settings' ) );
+		add_action( 'wp_ajax_save_entity_settings', array( $this, 'save_entities_settings' ) );
 
 		add_action( 'wp_ajax_reload_log_html', array( $this, 'reload_log_html' ) );
 		add_action( 'wp_ajax_toggle_logging', array( $this, 'toggle_logging' ) );
@@ -305,9 +305,9 @@ class Admin_UI implements Hooked {
 	public function save_entities_settings() {
 		if ( isset( $_POST['action'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
 			$fields      = $_POST;
-			$entiti      = isset( $_POST['entiti'] ) ? $_POST['entiti'] : '';
+			$entity      = isset( $_POST['entity'] ) ? $_POST['entity'] : '';
 			$seting_name = $_POST['seting_name'] ? $_POST['seting_name'] : '';
-			if ( ! $entiti && ! $seting_name ) {
+			if ( ! $entity && ! $seting_name ) {
 				echo false;
 				die();
 			}
@@ -315,13 +315,13 @@ class Admin_UI implements Hooked {
 			$fields = $this->sanitise_fields_to_save( $fields );
 
 			global $wpdb;
-			$entiti_saved_settings = $this->settings::get_saved_entity_settings_from_db( ' WHERE entiti="' . $entiti . '" setting_key="saved_field" AND setting_name="' . $seting_name . '"' );
+			$entity_saved_settings = $this->settings::get_saved_entity_settings_from_db( ' WHERE entity="' . $entity . '" setting_key="saved_field" AND setting_name="' . $seting_name . '"' );
 			$response              = '';
-			if ( empty( $entiti_saved_settings ) ) {
+			if ( empty( $entity_saved_settings ) ) {
 				$response      = $wpdb->insert(
 					$wpdb->prefix . Settings::$ainsys_entities_settings_table,
 					array(
-						'entiti'       => $entiti,
+						'entity'       => $entity,
 						'setting_name' => $seting_name,
 						'setting_key'  => 'saved_field',
 						'value'        => serialize( $fields ),
@@ -332,14 +332,14 @@ class Admin_UI implements Hooked {
 				$response      = $wpdb->update(
 					$wpdb->prefix . $this->settings::$ainsys_entities_settings_table,
 					array( 'value' => serialize( $fields ) ),
-					array( 'id' => $entiti_saved_settings['id'] )
+					array( 'id' => $entity_saved_settings['id'] )
 				);
-				$field_data_id = $entiti_saved_settings['id'];
+				$field_data_id = $entity_saved_settings['id'];
 			}
 
-			$request_action = 'field/' . $entiti . '/' . $seting_name;
+			$request_action = 'field/' . $entity . '/' . $seting_name;
 
-			$fields = apply_filters( 'ainsys_update_entiti_fields', $fields );
+			$fields = apply_filters( 'ainsys_update_entity_fields', $fields );
 
 			$request_data = array(
 				'entity'  => array(
@@ -370,7 +370,7 @@ class Admin_UI implements Hooked {
 		//            if (empty($val))
 		//                unset($fields[$field]);
 		//        }
-		unset( $fields['action'], $fields['entiti'], $fields['nonce'], $fields['seting_name'], $fields['id'] );
+		unset( $fields['action'], $fields['entity'], $fields['nonce'], $fields['seting_name'], $fields['id'] );
 
 		/// exclude 'constant' variables
 		foreach ( $this->settings::get_entities_settings() as $item => $setting ) {
@@ -551,71 +551,71 @@ class Admin_UI implements Hooked {
 			$inner_fields_header .= '<div class="properties_field_title ' . $checker_property . '">' . $settings['nice_name'] . '</div>';
 		}
 
-		foreach ( $entities_list as $entiti => $title ) {
+		foreach ( $entities_list as $entity => $title ) {
 
-			$properties = $this->settings::get_entities_settings( $entiti );
+			$properties = $this->settings::get_entities_settings( $entity );
 
 			$entities_html .= '<div class="entities_block">';
 
 			$get_fields_functions = $this->settings::get_entity_fields_handlers();
 
 			$section_fields = array();
-			$fields_getter  = $get_fields_functions[ $entiti ];
+			$fields_getter  = $get_fields_functions[ $entity ];
 			if ( is_callable( $fields_getter ) ) {
 				$section_fields = $fields_getter();
 			} else {
-				throw new \Exception( 'No fields getter registered for Entity: ' . $entiti );
+				throw new \Exception( 'No fields getter registered for Entity: ' . $entity );
 			}
 
 			if ( ! empty( $section_fields ) ) {
 				$collapsed      = $collapsed ? ' ' : ' active';
 				$collapsed_text = $collapsed_text ? 'expand' : 'collapse';
-				$entities_html .= '<div class="entiti_data ' . $entiti . '_data' . $collapsed . '"> ';
+				$entities_html .= '<div class="entity_data ' . $entity . '_data' . $collapsed . '"> ';
 
-				$entities_html .= '<div class="entiti_block_header"><div class="entiti_title">' . $title . '</div>' . $inner_fields_header . '<a class="button expand_entiti_container">' . $collapsed_text . '</a></div>';
+				$entities_html .= '<div class="entity_block_header"><div class="entity_title">' . $title . '</div>' . $inner_fields_header . '<a class="button expand_entity_container">' . $collapsed_text . '</a></div>';
 				foreach ( $section_fields as $field_slug => $field_content ) {
 					$first_active          = $first_active ? ' ' : ' active';
 					$field_name            = empty( $field_content['nice_name'] ) ? $field_slug : $field_content['nice_name'];
-					$entiti_saved_settings = array_merge( $field_content, $this->settings::get_saved_entity_settings_from_db( ' WHERE entiti="' . $entiti . '" AND setting_name="' . $field_slug . '"' ) );
+					$entity_saved_settings = array_merge( $field_content, $this->settings::get_saved_entity_settings_from_db( ' WHERE entity="' . $entity . '" AND setting_name="' . $field_slug . '"' ) );
 
 					if ( ! empty( $field_content['children'] ) ) {
 
-						$data_fields = 'data-seting_name="' . esc_html( $field_slug ) . '" data-entiti="' . esc_html( $entiti ) . '"';
+						$data_fields = 'data-seting_name="' . esc_html( $field_slug ) . '" data-entity="' . esc_html( $entity ) . '"';
 						foreach ( $properties as $name => $prop_val ) {
-							$prop_val_out = 'id' === $name ? $field_slug : $this->get_property( $name, $prop_val, $entiti_saved_settings );
+							$prop_val_out = 'id' === $name ? $field_slug : $this->get_property( $name, $prop_val, $entity_saved_settings );
 							$data_fields .= 'data-' . $name . '="' . esc_html( $prop_val_out ) . '" ';
 						}
-						$entities_html .= '<div id="' . $field_slug . '" class="entities_field multiple_filds ' . $first_active . '" ' . $data_fields . '><div class="entities_field_header"><i class="fa fa-sort-desc" aria-hidden="true"></i>' . $field_name . '</div>' . $this->generate_inner_fields( $properties, $entiti_saved_settings, $field_slug ) . '<i class="fa fa-floppy-o"></i><div class="loader_dual_ring"></div></div>';
+						$entities_html .= '<div id="' . $field_slug . '" class="entities_field multiple_filds ' . $first_active . '" ' . $data_fields . '><div class="entities_field_header"><i class="fa fa-sort-desc" aria-hidden="true"></i>' . $field_name . '</div>' . $this->generate_inner_fields( $properties, $entity_saved_settings, $field_slug ) . '<i class="fa fa-floppy-o"></i><div class="loader_dual_ring"></div></div>';
 
 						foreach ( $field_content['children'] as $inner_field_slug => $inner_field_content ) {
 							$field_name            = empty( $inner_field_content['description'] ) ? $inner_field_slug : $inner_field_content['discription'];
 							$field_slug_inner      = $field_slug . '_' . $inner_field_slug;
-							$entiti_saved_settings = array_merge( $field_content, $this->settings::get_saved_entity_settings_from_db( ' WHERE entiti="' . $entiti . '" AND setting_name="' . $field_slug_inner . '"' ) );
+							$entity_saved_settings = array_merge( $field_content, $this->settings::get_saved_entity_settings_from_db( ' WHERE entity="' . $entity . '" AND setting_name="' . $field_slug_inner . '"' ) );
 
-							$data_fields = 'data-seting_name="' . esc_html( $field_slug ) . '" data-entiti="' . esc_html( $entiti ) . '"';
+							$data_fields = 'data-seting_name="' . esc_html( $field_slug ) . '" data-entity="' . esc_html( $entity ) . '"';
 							foreach ( $properties as $name => $prop_val ) {
-								$prop_val_out = 'id' === $name ? $field_slug_inner : $this->get_property( $name, $prop_val, $entiti_saved_settings );
+								$prop_val_out = 'id' === $name ? $field_slug_inner : $this->get_property( $name, $prop_val, $entity_saved_settings );
 								$data_fields .= 'data-' . $name . '="' . esc_html( $prop_val_out ) . '" ';
 							}
-							$entities_html .= '<div id="' . $entiti . '_' . $inner_field_slug . '" class="entities_field multiple_filds_children ' . $first_active . '" ' . $data_fields . '><div class="entities_field_header"><i class="fa fa-angle-right" aria-hidden="true"></i>' . $field_name . '</div>' . $this->generate_inner_fields( $properties, $entiti_saved_settings, $field_slug ) . '<i class="fa fa-floppy-o"></i><div class="loader_dual_ring"></div></div>';
+							$entities_html .= '<div id="' . $entity . '_' . $inner_field_slug . '" class="entities_field multiple_filds_children ' . $first_active . '" ' . $data_fields . '><div class="entities_field_header"><i class="fa fa-angle-right" aria-hidden="true"></i>' . $field_name . '</div>' . $this->generate_inner_fields( $properties, $entity_saved_settings, $field_slug ) . '<i class="fa fa-floppy-o"></i><div class="loader_dual_ring"></div></div>';
 						}
 					} else {
-						$data_fields = 'data-seting_name="' . esc_html( $field_slug ) . '" data-entiti="' . esc_html( $entiti ) . '"';
+						$data_fields = 'data-seting_name="' . esc_html( $field_slug ) . '" data-entity="' . esc_html( $entity ) . '"';
 						foreach ( $properties as $name => $prop_val ) {
-							$prop_val_out = $this->get_property( $name, $prop_val, $entiti_saved_settings );
+							$prop_val_out = $this->get_property( $name, $prop_val, $entity_saved_settings );
 							$data_fields .= 'data-' . $name . '="' . esc_html( $prop_val_out ) . '" ';
 						}
-						$entities_html .= '<div id="' . $field_slug . '" class="entities_field ' . $first_active . '" ' . $data_fields . '><div class="entities_field_header">' . $field_name . '</div>' . $this->generate_inner_fields( $properties, $entiti_saved_settings, $field_slug ) . '<i class="fa fa-floppy-o"></i><div class="loader_dual_ring"></div></div>';
+						$entities_html .= '<div id="' . $field_slug . '" class="entities_field ' . $first_active . '" ' . $data_fields . '><div class="entities_field_header">' . $field_name . '</div>' . $this->generate_inner_fields( $properties, $entity_saved_settings, $field_slug ) . '<i class="fa fa-floppy-o"></i><div class="loader_dual_ring"></div></div>';
 					}
 				}
-				/// close //// div class="entiti_data"
+				/// close //// div class="entity_data"
 				$entities_html .= '</div>';
 			}
 			/// close //// div class="entities_block"
 			$entities_html .= '</div>';
 		}
 
-		return '<div class="entitis_table">' . $entities_html . '</div>';
+		return '<div class="entitys_table">' . $entities_html . '</div>';
 
 	}
 
@@ -624,13 +624,13 @@ class Admin_UI implements Hooked {
 	 *
 	 * @return string
 	 */
-	public function get_property( $name, $prop_val, $entiti_saved_settings ) {
+	public function get_property( $name, $prop_val, $entity_saved_settings ) {
 		if ( is_array( $prop_val['default'] ) ) {
-			return isset( $entiti_saved_settings[ strtolower( $name ) ] ) ? $entiti_saved_settings[ strtolower( $name ) ] : array_search( '1', $prop_val['default'], true );
+			return isset( $entity_saved_settings[ strtolower( $name ) ] ) ? $entity_saved_settings[ strtolower( $name ) ] : array_search( '1', $prop_val['default'], true );
 		}
 
-		return isset( $entiti_saved_settings[ strtolower( $name ) ] ) ?
-			$entiti_saved_settings[ strtolower( $name ) ] : $prop_val['default'];
+		return isset( $entity_saved_settings[ strtolower( $name ) ] ) ?
+			$entity_saved_settings[ strtolower( $name ) ] : $prop_val['default'];
 	}
 
 	/**
@@ -638,7 +638,7 @@ class Admin_UI implements Hooked {
 	 *
 	 * @return string
 	 */
-	public function generate_inner_fields( $properties, $entiti_saved_settings, $field_slug ) {
+	public function generate_inner_fields( $properties, $entity_saved_settings, $field_slug ) {
 
 		$inner_fields = '';
 		if ( empty( $properties ) ) {
@@ -648,25 +648,25 @@ class Admin_UI implements Hooked {
 		foreach ( $properties as $item => $settings ) {
 			$checker_property = 'bool' === $settings['type'] || 'api' === $item ? 'small_property' : '';
 			$inner_fields    .= '<div class="properties_field ' . $checker_property . '">';
-			$field_value      = 'id' === $item ? $field_slug : $this->get_property( $item, $settings, $entiti_saved_settings );
+			$field_value      = 'id' === $item ? $field_slug : $this->get_property( $item, $settings, $entity_saved_settings );
 			switch ( $settings['type'] ) {
 				case 'constant':
 					$field_value   = $field_value ? $field_value : '<i>' . __( 'empty', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</i>';
-					$inner_fields .= 'api' === $item ? '<div class="entiti_settings_value constant ' . $field_value . '"></div>' : '<div class="entiti_settings_value constant">' . $field_value . '</div>';
+					$inner_fields .= 'api' === $item ? '<div class="entity_settings_value constant ' . $field_value . '"></div>' : '<div class="entity_settings_value constant">' . $field_value . '</div>';
 					break;
 				case 'bool':
 					$checked       = (int) $field_value ? 'checked="" value="1"' : ' value="0"';
 					$checked_text  = (int) $field_value ? __( 'On', AINSYS_CONNECTOR_TEXTDOMAIN ) : __( 'Off', AINSYS_CONNECTOR_TEXTDOMAIN );
-					$inner_fields .= '<input type="checkbox"  class="editor_mode entiti_settings_value " id="' . $item . '" ' . $checked . '/> ';
-					$inner_fields .= '<div class="entiti_settings_value">' . $checked_text . '</div> ';
+					$inner_fields .= '<input type="checkbox"  class="editor_mode entity_settings_value " id="' . $item . '" ' . $checked . '/> ';
+					$inner_fields .= '<div class="entity_settings_value">' . $checked_text . '</div> ';
 					break;
 				case 'int':
-					$inner_fields .= '<input size="10" type="text"  class="editor_mode entiti_settings_value" id="' . $item . '" value="' . $field_value . '"/> ';
+					$inner_fields .= '<input size="10" type="text"  class="editor_mode entity_settings_value" id="' . $item . '" value="' . $field_value . '"/> ';
 					$field_value   = $field_value ? $field_value : '<i>' . __( 'empty', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</i>';
-					$inner_fields .= '<div class="entiti_settings_value">' . $field_value . '</div>';
+					$inner_fields .= '<div class="entity_settings_value">' . $field_value . '</div>';
 					break;
 				case 'select':
-					$inner_fields .= '<select id="' . $item . '" class="editor_mode entiti_settings_value" name="' . $item . '">';
+					$inner_fields .= '<select id="' . $item . '" class="editor_mode entity_settings_value" name="' . $item . '">';
 					$state_text    = '';
 					foreach ( $settings['default'] as $option => $state ) {
 						$selected      = $option === $field_value ? 'selected="selected"' : '';
@@ -674,13 +674,13 @@ class Admin_UI implements Hooked {
 						$inner_fields .= '<option value="' . $option . '" ' . $selected . '>' . $option . '</option>';
 					}
 					$inner_fields .= '</select>';
-					$inner_fields .= '<div class="entiti_settings_value">' . $field_value . '</div>';
+					$inner_fields .= '<div class="entity_settings_value">' . $field_value . '</div>';
 					break;
 				default:
 					$field_length  = 'description' === $item ? 20 : 8;
-					$inner_fields .= '<input size="' . $field_length . '" type="text" class="editor_mode entiti_settings_value" id="' . $item . '" value="' . $field_value . '"/>';
+					$inner_fields .= '<input size="' . $field_length . '" type="text" class="editor_mode entity_settings_value" id="' . $item . '" value="' . $field_value . '"/>';
 					$field_value   = $field_value ? $field_value : '<i>' . __( 'empty', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</i>';
-					$inner_fields .= '<div class="entiti_settings_value">' . $field_value . '</div>';
+					$inner_fields .= '<div class="entity_settings_value">' . $field_value . '</div>';
 			}
 			/// close //// div class="properties_field"
 			$inner_fields .= '</div>';

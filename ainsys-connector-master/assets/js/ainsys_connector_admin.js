@@ -247,7 +247,7 @@ jQuery(function($){
 
     let auto_update = false;
 
-    $('.entities_field .properties_field').on('change', '.entiti_settings_value', function () {
+    $('.entities_field .properties_field').on('change', '.entity_settings_value', function () {
         if (!auto_update) {
             let setting_id = '#' + $(this).parent().parent().attr('id');
             let new_value = $(this).val();
@@ -260,11 +260,11 @@ jQuery(function($){
             $( setting_id ).attr('data-' + $(this).attr("id"), $(this).val()).data($(this).attr("id"), $(this).val());
             if ( $(this).attr("id") == 'api' ){
                 $(this).parent().find('div').attr('class', '');
-                $(this).parent().find('div').addClass('entiti_settings_value').addClass(new_value);
+                $(this).parent().find('div').addClass('entity_settings_value').addClass(new_value);
             } else {
                 $(this).parent().find('div').html( new_value );
             }
-            //$('#save_entiti_properties').attr('disable', false);
+            //$('#save_entity_properties').attr('disable', false);
         }
     })
 
@@ -281,7 +281,7 @@ jQuery(function($){
         let setting_id = '#' + $(this).parent().attr('id');
         $(setting_id).toggleClass('loading');
         let data = {
-            action: "save_entiti_settings",
+            action: "save_entity_settings",
             nonce: ainsys_connector_params.nonce,
         };
         // let temp = $(setting_id).data();
@@ -309,7 +309,7 @@ jQuery(function($){
 
         let obj_id = $(this).attr("id");
         $('.properties_data #setting_name').html($(this).data('seting_name'));
-        $('.properties_data #setting_name').attr('data-seting_name', $(this).data('seting_name')).attr('data-entiti', $(this).data('entiti'));
+        $('.properties_data #setting_name').attr('data-seting_name', $(this).data('seting_name')).attr('data-entity', $(this).data('entity'));
 
         auto_update = true;
         $.each($(this).data(), function(key,value) {
@@ -336,7 +336,7 @@ jQuery(function($){
     });
  
 	//////// expand entity tab ////////
-    $('#setting_entities_section').on('click', ' .expand_entiti_container', function (e){
+    $('#setting_entities_section').on('click', ' .expand_entity_container', function (e){
         $(this).parent().parent().toggleClass('active');
         var text = $(this).text() == 'expand' ? 'collapse' : 'expand';
         $(this).text(text);

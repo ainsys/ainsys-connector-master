@@ -120,12 +120,12 @@ class Plugin implements Hooked {
 		$request_action = 'UPDATE';
 
 		$request_data = array(
-			'entity'  => [
-				'id'   => 0,
-				'name' => 'wpcf7'
-			],
+			'entity'  => array(
+				'id'   => time(),
+				'name' => 'wpcf7',
+			),
 			'action'  => $request_action,
-			'payload' => $_POST
+			'payload' => $_POST,
 		);
 
 

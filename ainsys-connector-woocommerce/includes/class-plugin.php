@@ -175,7 +175,6 @@ class Plugin implements Hooked {
 		return;
 	}
 
-	// TODO nonce from admin-ui
 	public function test_woo_connection() {
 		if ( isset( $_POST['entity'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], $this->admin_ui::$nonce_title ) ) {
 

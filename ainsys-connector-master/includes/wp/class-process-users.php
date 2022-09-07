@@ -32,7 +32,7 @@ class Process_Users implements Hooked {
 	 */
 	public function init_hooks() {
 		add_action( 'user_register', array( $this, 'process_new_user' ), 10, 2 );
-		add_action( 'profile_update', array( $this, 'send_user_details_update_to_ainsys' ), 10, 3 );
+		add_action( 'profile_update', array( $this, 'send_user_details_update_to_ainsys' ), 10, 4 );
 	}
 
 	/**
@@ -94,18 +94,18 @@ class Process_Users implements Hooked {
 	 *
 	 * @return
 	 */
-	public function send_user_details_update_to_ainsys( $user_id, $old_user_data, $userdata ) {
+	public function send_user_details_update_to_ainsys( $user_id, $old_user_data, $userdata, $test = false ) {
 		$request_action = 'UPDATE';
 
 		$fields = apply_filters( 'ainsys_user_details_update_fields', $this->prepare_user_data( $user_id, $userdata ), $userdata );
 
 		$request_data = array(
-			'entity'  => [
+			'entity'  => array(
 				'id'   => $user_id,
-				'name' => 'user'
-			],
+				'name' => 'user',
+			),
 			'action'  => $request_action,
-			'payload' => $fields
+			'payload' => $fields,
 		);
 
 		try {
@@ -116,8 +116,15 @@ class Process_Users implements Hooked {
 
 		$this->logger->save_log_information( $user_id, $request_action, serialize( $request_data ), serialize( $server_response ), 0 );
 
-		return;
+		if ( $test ) {
+			$result = array(
+				'request'  => $request_data,
+				'response' => $server_response,
+			);
+			return $result;
+		} else {
+			return;
+		}
 	}
-
 
 }

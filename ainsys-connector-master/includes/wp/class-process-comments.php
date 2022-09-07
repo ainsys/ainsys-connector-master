@@ -32,7 +32,7 @@ class Process_Comments implements Hooked {
 	 */
 	public function init_hooks() {
 		add_action( 'comment_post', array( $this, 'send_new_comment_to_ainsys' ), 10, 3 );
-		add_action( 'edit_comment', array( $this, 'send_update_comment_to_ainsys' ), 10, 2 );
+		add_action( 'edit_comment', array( $this, 'send_update_comment_to_ainsys' ), 10, 3 );
 	}
 
 	/**
@@ -89,7 +89,7 @@ class Process_Comments implements Hooked {
 	 *
 	 * @return
 	 */
-	public function send_update_comment_to_ainsys( $comment_id, $data ) {
+	public function send_update_comment_to_ainsys( $comment_id, $data, $test = false ) {
 		$request_action = 'UPDATE';
 
 		$fields = apply_filters( 'ainsys_update_comment_fields', $this->prepare_comment_data( $comment_id, $data ), $data );
@@ -97,7 +97,7 @@ class Process_Comments implements Hooked {
 		$request_data = array(
 			'object_id'      => $comment_id,
 			'request_action' => $request_action,
-			'request_data'   => $fields
+			'request_data'   => $fields,
 		);
 
 		try {
@@ -107,7 +107,15 @@ class Process_Comments implements Hooked {
 		}
 		$this->logger->save_log_information( $comment_id, $request_action, serialize( $request_data ), serialize( $server_response ), 0 );
 
-		return;
+		if ( $test ) {
+			$result = array(
+				'request'  => $request_data,
+				'response' => $server_response,
+			);
+			return $result;
+		} else {
+			return;
+		}
 	}
 
 }

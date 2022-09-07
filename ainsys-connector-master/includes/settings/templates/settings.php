@@ -20,13 +20,13 @@ try {
 	<h1><img src="<?php echo AINSYS_CONNECTOR_URL; ?>/assets/img/logo.svg" alt="Ainsys logo" class="ainsys-logo"></h1>
 
 	<div class="nav-tab-wrapper ainsys-nav-tab-wrapper">
-		<a class="nav-tab" href="#setting_section_general" data-target="setting_section_general"><?php _e( 'General', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
-		<a class="nav-tab nav-tab-active" href="#setting_section_test" data-target="setting_section_test"><?php _e( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
+		<a class="nav-tab nav-tab-active" href="#setting_section_general" data-target="setting_section_general"><?php _e( 'General', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
+		<a class="nav-tab" href="#setting_section_test" data-target="setting_section_test"><?php _e( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
 		<a class="nav-tab" href="#setting_section_log" data-target="setting_section_log"><?php _e( 'Transfer log', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
 		<a class="nav-tab" href="#setting_entities_section" data-target="setting_entities_section"><?php _e( 'Entities export settings', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
 	</div>
 
-	<div id="setting_section_general" class="tab-target">
+	<div id="setting_section_general" class="tab-target nav-tab-active tab-target-active">
 		<div class="ainsys-settings-blocks">
 			<div class="ainsys-settings-block ainsys-settings-block--connection">
 				<h2><?php _e( 'Connection Settings', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></h2>
@@ -220,7 +220,7 @@ try {
 
 	</div>
 
-	<div id="setting_section_test" class="tab-target nav-tab-active tab-target-active">
+	<div id="setting_section_test" class="tab-target">
 		<div class="ainsys-test-block">
 			<?php echo $admin_ui->generate_test_html(); ?> 
 		</div>

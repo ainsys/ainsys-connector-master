@@ -83,8 +83,7 @@ class Logger implements Hooked {
 		$log_html        = '<div id="connection_log"><table class="ainsys-table">';
 		$log_html_body   = '';
 		$log_html_header = '';
-		$query           = 'SELECT * 
-        FROM ' . $wpdb->prefix . self::$log_table_name . $where;
+		$query           = 'SELECT * FROM ' . $wpdb->prefix . self::$log_table_name . $where;
 		$output          = $wpdb->get_results( $query, ARRAY_A );
 
 		if ( empty( $output ) ) {
@@ -98,50 +97,48 @@ class Logger implements Hooked {
 				$log_html_header .= $header_full ? '<th>' . strtoupper( str_replace( '_', ' ', $name ) ) . '</th>' : '';
 
 				$log_html_body .= '<td class="' . $name . '">';
-				if ( 'incoming_call' === $name ) {
-					$value = 0 === (int) $value ? 'No' : 'Yes';
-				}
-				if ( 'request_data' === $name ) {
-					$value = maybe_unserialize( $value );
-					if ( empty( $value['request_data'] ) ) {
-						$log_html_body .= $value ? __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN ) : $value;
-						continue;
-					}
-					if ( is_array( $value ) ) {
-						if ( count( $value['request_data'] ) > 2 ) {
-							$log_html_body .= '<div class="request_data_container"> <a class="button expand_data_container">more</a>';
+
+				switch ( $name ) {
+
+					case 'incoming_call':
+						$value = ( 0 === (int) $value ) ? 'No' : 'Yes';
+						$log_html_body .= $value;
+						break;
+
+					case 'request_data':
+						//var_dump($value);
+						$value = maybe_unserialize( $value );
+						if ( isset( $value['request_data'] ) && empty( $value['request_data'] ) ) {
+							$log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN );
+						} elseif ( isset( $value['payload'] ) && empty( $value['payload'] ) ) {
+							$log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN );
+						} else {
+							$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( serialize( $value ), 0, 40 ) . ' ... </div>';
+
+							$value = ! is_array( $value ) ? json_decode( $value ) : $value;
+
+							$log_html_body .= '<div class="ainsys-responce-full">';
+							$log_html_body .= self::ainsys_render_json( $value );
+							$log_html_body .= '</div>';
 						}
-						foreach ( $value['request_data'] as $title => $param ) {
-							if ( 'products' === $title && ! empty( $param ) ) {
-								foreach ( $param as $prod_id => $product ) {
-									$log_html_body .= '</br> <strong>Prod# ' . $prod_id . '</strong>';
-									foreach ( $product as $param_title => $poduct_param ) {
-										if ( is_array( $poduct_param ) ) {
-											continue;
-										}
-										$log_html_body .= '<div><span class="gray_header">' . $param_title . ' : </span>' . maybe_serialize( $poduct_param ) . '</div>';
-									}
-								}
-							} else {
-								$log_html_body .= '<div><span class="gray_header">' . $title . ' : </span>' . maybe_serialize( $param ) . '</div>';
-							}
+						break;
+
+					case 'server_responce':
+						$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( $value, 0, 80 ) . ' ... </div>';
+
+						$value = json_decode( maybe_unserialize( $value ) );
+
+						$log_html_body .= '<div class="ainsys-responce-full">';
+						if ( json_last_error() === JSON_ERROR_NONE ) {
+							$log_html_body .= self::ainsys_render_json( $value );
 						}
 						$log_html_body .= '</div>';
-					}
-				}
-				if ( 'server_responce' === $name ) {
-					$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( $value, 0, 80 ) . ' ... </div>';
+						break;
 
-					$value = json_decode( maybe_unserialize( $value ) );
-
-					$log_html_body .= '<div class="ainsys-responce-full">';
-					if ( json_last_error() === JSON_ERROR_NONE ) {
-						$log_html_body .= self::ainsys_render_json( $value );
-					}
-					$log_html_body .= '</div>';
-				} else {
-					$log_html_body .= $value;
+					default:
+						$log_html_body .= is_array( $value ) ? serialize( $value ) : $value;
 				}
+
 				$log_html_body .= '</td>';
 			}
 			$log_html_body .= '</tr>';

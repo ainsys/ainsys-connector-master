@@ -6,6 +6,7 @@ namespace Ainsys\Connector\Master\Settings;
 use Ainsys\Connector\Master\Core;
 use Ainsys\Connector\Master\Hooked;
 use Ainsys\Connector\Master\Logger;
+use Ainsys\Connector\Master\WP\Process_Users;
 use Ainsys\Connector\Master\WP\Process_Comments;
 
 class Admin_UI implements Hooked {
@@ -35,10 +36,22 @@ class Admin_UI implements Hooked {
 	 */
 	public $logger;
 
-	public function __construct( Settings $settings, Core $core, Logger $logger ) {
-		$this->settings = $settings;
-		$this->core     = $core;
-		$this->logger   = $logger;
+	/**
+	 * @var Process_Users
+	 */
+	public $process_users;
+
+	/**
+	 * @var Process_Comments
+	 */
+	public $process_comments;
+
+	public function __construct( Settings $settings, Core $core, Logger $logger, Process_Users $process_users, Process_Comments $process_comments ) {
+		$this->settings         = $settings;
+		$this->core             = $core;
+		$this->logger           = $logger;
+		$this->process_users    = $process_users;
+		$this->process_comments = $process_comments;
 	}
 
 
@@ -392,8 +405,12 @@ class Admin_UI implements Hooked {
 			$entity = strip_tags( $_POST['entity'] );
 
 			if ( 'user' === $entity ) {
-				$fields = wp_get_current_user();
 				$make_request = true;
+				$fields               = (array) wp_get_current_user();
+				$user_id              = get_current_user_id();
+				$test_result          = $this->process_users->send_user_details_update_to_ainsys( $user_id, $fields, $fields, true );
+				$test_result_request  = $test_result['request']; // array
+				$test_result_response = $test_result['response']; // string
 			}
 			if ( 'comments' === $entity ) {
 				$args = array(
@@ -402,61 +419,25 @@ class Admin_UI implements Hooked {
 				$comments = get_comments( $args );
 				if ( ! empty( $comments ) ) {
 					foreach ( $comments as $comment ) {
-						$fields = $comment;
+						$fields = (array) $comment;
 						break;
 					}
-					$make_request = true;
-				}
-			}
-			if ( 'order' === $entity ) {
-				$args = array(
-					'limit' => 1,
-				);
-				$orders = wc_get_orders( $args );
-				if ( ! empty( $orders ) ) {
-					foreach ( $orders as $order ) {
-						$fields = $order;
-						break;
-					}
-					$make_request = true;
-				}
-			}
-			if ( 'product' === $entity ) {
-				$args = array(
-					'limit' => 1,
-				);
-				$products = wc_get_products( $args );
-				if ( ! empty( $products ) ) {
-					foreach ( $products as $product ) {
-						$fields = $product;
-						break;
-					}
-					$make_request = true;
+
+					$comment_id           = $fields['comment_ID'];
+					$make_request         = true;
+					$test_result          = $this->process_comments->send_update_comment_to_ainsys( $comment_id, $fields, true );
+					$test_result_request  = $test_result['request']; // array
+					$test_result_response = $test_result['response']; // string
 				}
 			}
 
 			if ( $make_request ) {
-				$request_action = 'UPDATE';
 
-				$request_data = array(
-					'entity'  => array(
-						'id'   => $fields->get_id(),
-						'name' => $entity,
-					),
-					'action'  => $request_action,
-					'payload' => $fields,
-				);
-
-				try {
-					$server_response = $this->core->curl_exec_func( $request_data );
-				} catch ( \Exception $e ) {
-					$server_response = 'Error: ' . $e->getMessage();
-				}
 				$result = array(
-					'short_request'  => mb_substr( serialize( $request_data ), 0, 80 ),
-					'short_responce' => mb_substr( $server_response, 0, 80 ),
-					'full_request'   => $this->logger::ainsys_render_json( $request_data ),
-					'full_responce'  => 0 === strpos( 'Error: ', $server_response ) ? $server_response : $this->logger::ainsys_render_json( json_decode( $server_response ) ),
+					'short_request'  => mb_substr( serialize( $test_result_request ), 0, 80 ) . ' ... ',
+					'short_responce' => mb_substr( $test_result_response, 0, 80 ) . ' ... ',
+					'full_request'   => $this->logger::ainsys_render_json( $test_result_request ),
+					'full_responce'  => 0 === strpos( 'Error: ', $test_result_response ) ? $test_result_response : $this->logger::ainsys_render_json( json_decode( $test_result_response ) ),
 				);
 			} else {
 				$result = array(
@@ -532,15 +513,15 @@ class Admin_UI implements Hooked {
 	public function generate_test_html() {
 
 		$test_html        = '<div id="connection_test"><table class="ainsys-table">';
-		$test_html_header = '<th>' . __( 'Entity', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>' . __( 'Object ID', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>' . __( 'Outgoing JSON', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>' . __( 'SERVER RESPONCE', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>Test</th>';
+		$test_html_header = '<th>' . __( 'Entity', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>' . __( 'Outgoing JSON', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>' . __( 'SERVER RESPONCE', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>Test</th>';
 		$test_html_body   = '';
 
 		$entities_list = $this->settings::get_entities();
-		$wp_entities   = array( 'user', 'comments', 'order', 'product' );
+		$wp_entities   = array( 'user', 'comments', 'post', 'page' );
 
 		foreach ( $entities_list as $entity => $title ) {
 			if ( in_array( $entity, $wp_entities ) ) {
-				$test_html_body .= '<tr><td class="ainsys_td_left">' . $title . '</td><td>Object ID</td><td class="ainsys_td_left ainsys-test-json"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_left ainsys-test-responce"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_btn"><a href="" class="btn btn-primary ainsys-test" data-entity-name="' . $entity . '">' . __( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a></td></tr>';
+				$test_html_body .= '<tr><td class="ainsys_td_left">' . $title . '</td><td class="ainsys_td_left ainsys-test-json"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_left ainsys-test-responce"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_btn"><a href="" class="btn btn-primary ainsys-test" data-entity-name="' . $entity . '">' . __( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a></td></tr>';
 			}
 		}
 

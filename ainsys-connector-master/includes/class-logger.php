@@ -83,11 +83,12 @@ class Logger implements Hooked {
 		$log_html        = '<div id="connection_log"><table class="ainsys-table">';
 		$log_html_body   = '';
 		$log_html_header = '';
-		$query           = 'SELECT * FROM ' . $wpdb->prefix . self::$log_table_name . $where;
-		$output          = $wpdb->get_results( $query, ARRAY_A );
+		$output          = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %s', $wpdb->prefix . self::$log_table_name . $where ), ARRAY_A );
+		//$query           = 'SELECT * FROM ' . $wpdb->prefix . self::$log_table_name . $where;
+		//$output          = $wpdb->get_results( $query, ARRAY_A );
 
 		if ( empty( $output ) ) {
-			return '<div class="empty_tab"><h3>' . __( 'No transactions to display', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</h3></div>';
+			return '<div class="empty_tab"><h3>' . __( 'No transactions to display', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</h3></div>'; // phpcs:ignore
 		}
 
 		foreach ( $output as $item ) {
@@ -101,7 +102,7 @@ class Logger implements Hooked {
 				switch ( $name ) {
 
 					case 'incoming_call':
-						$value = ( 0 === (int) $value ) ? 'No' : 'Yes';
+						$value          = ( 0 === (int) $value ) ? 'No' : 'Yes';
 						$log_html_body .= $value;
 						break;
 
@@ -109,9 +110,9 @@ class Logger implements Hooked {
 						//var_dump($value);
 						$value = maybe_unserialize( $value );
 						if ( isset( $value['request_data'] ) && empty( $value['request_data'] ) ) {
-							$log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN );
+							$log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore
 						} elseif ( isset( $value['payload'] ) && empty( $value['payload'] ) ) {
-							$log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN );
+							$log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore
 						} else {
 							$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( serialize( $value ), 0, 40 ) . ' ... </div>';
 
@@ -154,9 +155,9 @@ class Logger implements Hooked {
 	 */
 	public function truncate_log_table() {
 		global $wpdb;
-		$sql = 'TRUNCATE TABLE ' . $wpdb->prefix . self::$log_table_name;
-		$wpdb->query( $sql );
-
+		//$sql = 'TRUNCATE TABLE ' . $wpdb->prefix . self::$log_table_name;
+		//$wpdb->query( $sql );
+		$wpdb->query( $wpdb->prepare( 'TRUNCATE TABLE %s', self::$log_table_name ) );
 	}
 
 	/**
@@ -181,12 +182,8 @@ class Logger implements Hooked {
 
 	public function uninstall() {
 		global $wpdb;
-		$wpdb->query(
-			sprintf(
-				'DROP TABLE IF EXISTS %s',
-				$wpdb->prefix . self::$log_table_name
-			)
-		);
+		//$wpdb->query( sprintf( 'DROP TABLE IF EXISTS %s', $wpdb->prefix . self::$log_table_name ) );
+		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %s', self::$log_table_name ) );
 	}
 
 	/**

@@ -36,12 +36,12 @@ class Process_Users implements Hooked {
 	}
 
 	/**
-	 * We send a new user details to AINSYS
+	 * Sends new user details to AINSYS
 	 *
 	 * @param int $user_id
 	 * @param array $userdata
 	 *
-	 * @return
+	 * @return void
 	 */
 	public function process_new_user( $user_id, $userdata ) {
 		$request_action = 'CREATE';
@@ -49,12 +49,12 @@ class Process_Users implements Hooked {
 		$fields = apply_filters( 'ainsys_new_user_fields', $this->prepare_user_data( $user_id, $userdata ), $userdata );
 
 		$request_data = array(
-			'entity'  => [
+			'entity'  => array(
 				'id'   => $user_id,
-				'name' => 'user'
-			],
+				'name' => 'user',
+			),
 			'action'  => $request_action,
-			'payload' => $fields
+			'payload' => $fields,
 		);
 
 		try {
@@ -69,7 +69,7 @@ class Process_Users implements Hooked {
 	}
 
 	/**
-	 * Prepare WP user data. Add ACF fields if we have
+	 * Prepares WP user data. Adds ACF fields if there are any.
 	 *
 	 * @param int $user_id
 	 * @param array $data
@@ -86,7 +86,7 @@ class Process_Users implements Hooked {
 
 
 	/**
-	 * We send an updated user details to AINSYS
+	 * Sends updated user details to AINSYS.
 	 *
 	 * @param int $user_id
 	 * @param array $old_user_data

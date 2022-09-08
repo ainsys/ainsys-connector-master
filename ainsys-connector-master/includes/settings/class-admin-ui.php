@@ -11,7 +11,6 @@ use Ainsys\Connector\Master\WP\Process_Comments;
 
 class Admin_UI implements Hooked {
 
-
 	/**
 	 * Storage for admin notices.
 	 *
@@ -54,7 +53,9 @@ class Admin_UI implements Hooked {
 		$this->process_comments = $process_comments;
 	}
 
-
+	/**
+	 * Init plugin hooks.
+	 */
 	public function init_hooks() {
 		if ( is_admin() ) {
 			add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
@@ -82,13 +83,13 @@ class Admin_UI implements Hooked {
 	}
 
 	/**
-	 * Register setting page in menu
+	 * Registers the plugin settings page in WP menu
 	 *
 	 */
 	public function add_admin_menu() {
 		add_menu_page(
-			__( 'AINSYS connector integration', AINSYS_CONNECTOR_TEXTDOMAIN ),
-			__( 'AINSYS connector', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			__( 'AINSYS connector integration', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
+			__( 'AINSYS connector', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 			'administrator',
 			'ainsys-connector',
 			array( $this, 'include_setting_page' ),
@@ -98,7 +99,7 @@ class Admin_UI implements Hooked {
 	}
 
 	/**
-	 * Give rights to edit ainsys-connector page
+	 * Gives rights to edit ainsys-connector page
 	 *
 	 */
 	function ainsys_page_capability( $capability ) {
@@ -106,7 +107,7 @@ class Admin_UI implements Hooked {
 	}
 
 	/**
-	 * Include settings page
+	 * Includes settings page
 	 *
 	 */
 	public function include_setting_page() {
@@ -115,7 +116,7 @@ class Admin_UI implements Hooked {
 	}
 
 	/**
-	 * Add links to settings and ainsys portal
+	 * Adds a link to ainsys portal to the settings page.
 	 *
 	 * @param $links
 	 *
@@ -134,7 +135,7 @@ class Admin_UI implements Hooked {
 
 
 	/**
-	 * Enqueue admin styles and scripts
+	 * Enqueues admin styles and scripts.
 	 *
 	 * @return void
 	 */
@@ -162,8 +163,7 @@ class Admin_UI implements Hooked {
 	}
 
 	/**
-	 * Handshake with server, get AINSYS integration
-	 *
+	 * Handshake with server, implements AINSYS integration
 	 */
 	public function check_connection_to_server() {
 
@@ -214,7 +214,9 @@ class Admin_UI implements Hooked {
 		}
 	}
 
-
+	/**
+	 * Renders admin notices
+	 */
 	public function admin_notices( $message, $status = 'success' ) {
 		if ( self::$notices ) {
 			foreach ( self::$notices as $notice ) {
@@ -227,6 +229,9 @@ class Admin_UI implements Hooked {
 		}
 	}
 
+	/**
+	 * Adds a notice to the notices array.
+	 */
 	public function add_admin_notice( $message, $status = 'success' ) {
 		self::$notices[] = array(
 			'message' => $message,
@@ -236,11 +241,11 @@ class Admin_UI implements Hooked {
 
 
 	/**
-	 * Check if AINSYS integration active
+	 * Check if AINSYS integration is active.
 	 *
 	 * @param string $actions
 	 *
-	 * @return string[]
+	 * @return array
 	 */
 	public function is_ainsys_integration_active( $actions = '' ) {
 
@@ -275,11 +280,8 @@ class Admin_UI implements Hooked {
 		return array( 'status' => 'none' );
 	}
 
-
-	//#region AJAX related parts.
-
 	/**
-	 * Remove ainsys integration information
+	 * Removes ainsys integration information
 	 *
 	 * @return
 	 */
@@ -299,8 +301,7 @@ class Admin_UI implements Hooked {
 
 
 	/**
-	 * Regenerate log HTML
-	 *
+	 * Saves entities settings (for ajax).
 	 */
 	public function save_entities_settings() {
 		if ( isset( $_POST['action'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
@@ -364,6 +365,13 @@ class Admin_UI implements Hooked {
 		die();
 	}
 
+	/**
+	 * Prepares fields to save to DB (for ajax).
+	 *
+	 * @param array $fields
+	 *
+	 * @return array
+	 */
 	public function sanitise_fields_to_save( $fields ) {
 		// clear empty fields
 		//        foreach ($fields as $field => $val){
@@ -383,7 +391,7 @@ class Admin_UI implements Hooked {
 	}
 
 	/**
-	 * Regenerate log HTML
+	 * Regenerates log HTML (for ajax).
 	 *
 	 */
 	public function reload_log_html() {
@@ -394,7 +402,7 @@ class Admin_UI implements Hooked {
 	}
 
 	/**
-	 * Toggle logging on/off. Set up time till log will be saved if $_POST["time"] specified
+	 * Toggles logging on/off. Set up time till log is saved (for ajax).
 	 *
 	 */
 	public function toggle_logging() {
@@ -435,7 +443,7 @@ class Admin_UI implements Hooked {
 	}
 
 	/**
-	 * Clear log DB
+	 * Clears log DB table (for ajax).
 	 *
 	 */
 	public function clear_log() {
@@ -447,7 +455,7 @@ class Admin_UI implements Hooked {
 	}
 
 	/**
-	 * Test connection
+	 * Tests AINSYS connection for entities (for ajax).
 	 *
 	 */
 	public function test_entity_connection() {
@@ -458,7 +466,7 @@ class Admin_UI implements Hooked {
 			$entity = strip_tags( $_POST['entity'] );
 
 			if ( 'user' === $entity ) {
-				$make_request = true;
+				$make_request         = true;
 				$fields               = (array) wp_get_current_user();
 				$user_id              = get_current_user_id();
 				$test_result          = $this->process_users->send_user_details_update_to_ainsys( $user_id, $fields, $fields, true );
@@ -466,7 +474,7 @@ class Admin_UI implements Hooked {
 				$test_result_response = $test_result['response']; // string
 			}
 			if ( 'comments' === $entity ) {
-				$args = array(
+				$args     = array(
 					'status' => 'approve',
 				);
 				$comments = get_comments( $args );
@@ -494,7 +502,7 @@ class Admin_UI implements Hooked {
 				);
 			} else {
 				$result = array(
-					'short_request'  => __( 'No entities found', AINSYS_CONNECTOR_TEXTDOMAIN ),
+					'short_request'  => __( 'No entities found', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 					'short_responce' => '',
 					'full_request'   => '',
 					'full_responce'  => '',
@@ -506,22 +514,22 @@ class Admin_UI implements Hooked {
 	}
 
 	/**
-	 * Generate test data HTML.
+	 * Generates test data HTML.
 	 *
 	 * @return string
 	 */
 	public function generate_test_html() {
 
 		$test_html        = '<div id="connection_test"><table class="ainsys-table">';
-		$test_html_header = '<th>' . __( 'Entity', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>' . __( 'Outgoing JSON', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>' . __( 'SERVER RESPONCE', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>Test</th>';
+		$test_html_header = '<th>' . __( 'Entity', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>' . __( 'Outgoing JSON', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>' . __( 'SERVER RESPONCE', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>Test</th>'; // phpcs:ignore
 		$test_html_body   = '';
 
 		$entities_list = $this->settings::get_entities();
 		$wp_entities   = array( 'user', 'comments', 'post', 'page' );
 
 		foreach ( $entities_list as $entity => $title ) {
-			if ( in_array( $entity, $wp_entities ) ) {
-				$test_html_body .= '<tr><td class="ainsys_td_left">' . $title . '</td><td class="ainsys_td_left ainsys-test-json"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_left ainsys-test-responce"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_btn"><a href="" class="btn btn-primary ainsys-test" data-entity-name="' . $entity . '">' . __( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a></td></tr>';
+			if ( in_array( $entity, $wp_entities, true ) ) {
+				$test_html_body .= '<tr><td class="ainsys_td_left">' . $title . '</td><td class="ainsys_td_left ainsys-test-json"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_left ainsys-test-responce"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_btn"><a href="" class="btn btn-primary ainsys-test" data-entity-name="' . $entity . '">' . __( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a></td></tr>'; // phpcs:ignore
 			}
 		}
 
@@ -532,7 +540,7 @@ class Admin_UI implements Hooked {
 	}
 
 	/**
-	 * Generate entities HTML placeholder.
+	 * Generates entities HTML placeholder.
 	 *
 	 * @return string
 	 */
@@ -622,7 +630,11 @@ class Admin_UI implements Hooked {
 	}
 
 	/**
-	 * Get property from array.
+	 * Gets a property from an array.
+	 *
+	 * @param string $name
+	 * @param mixed $prop_val
+	 * @param array $entity_saved_settings
 	 *
 	 * @return string
 	 */
@@ -636,7 +648,11 @@ class Admin_UI implements Hooked {
 	}
 
 	/**
-	 * Generate properties for entity field.
+	 * Generates properties for entity field.
+	 *
+	 * @param array $properties
+	 * @param array $entity_saved_settings
+	 * @param string $field_slug
 	 *
 	 * @return string
 	 */
@@ -653,18 +669,18 @@ class Admin_UI implements Hooked {
 			$field_value      = 'id' === $item ? $field_slug : $this->get_property( $item, $settings, $entity_saved_settings );
 			switch ( $settings['type'] ) {
 				case 'constant':
-					$field_value   = $field_value ? $field_value : '<i>' . __( 'empty', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</i>';
+					$field_value   = $field_value ? $field_value : '<i>' . __( 'empty', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</i>'; // phpcs:ignore
 					$inner_fields .= 'api' === $item ? '<div class="entity_settings_value constant ' . $field_value . '"></div>' : '<div class="entity_settings_value constant">' . $field_value . '</div>';
 					break;
 				case 'bool':
 					$checked       = (int) $field_value ? 'checked="" value="1"' : ' value="0"';
-					$checked_text  = (int) $field_value ? __( 'On', AINSYS_CONNECTOR_TEXTDOMAIN ) : __( 'Off', AINSYS_CONNECTOR_TEXTDOMAIN );
+					$checked_text  = (int) $field_value ? __( 'On', AINSYS_CONNECTOR_TEXTDOMAIN ) : __( 'Off', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore
 					$inner_fields .= '<input type="checkbox"  class="editor_mode entity_settings_value " id="' . $item . '" ' . $checked . '/> ';
 					$inner_fields .= '<div class="entity_settings_value">' . $checked_text . '</div> ';
 					break;
 				case 'int':
 					$inner_fields .= '<input size="10" type="text"  class="editor_mode entity_settings_value" id="' . $item . '" value="' . $field_value . '"/> ';
-					$field_value   = $field_value ? $field_value : '<i>' . __( 'empty', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</i>';
+					$field_value   = $field_value ? $field_value : '<i>' . __( 'empty', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</i>'; // phpcs:ignore
 					$inner_fields .= '<div class="entity_settings_value">' . $field_value . '</div>';
 					break;
 				case 'select':
@@ -681,7 +697,7 @@ class Admin_UI implements Hooked {
 				default:
 					$field_length  = 'description' === $item ? 20 : 8;
 					$inner_fields .= '<input size="' . $field_length . '" type="text" class="editor_mode entity_settings_value" id="' . $item . '" value="' . $field_value . '"/>';
-					$field_value   = $field_value ? $field_value : '<i>' . __( 'empty', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</i>';
+					$field_value   = $field_value ? $field_value : '<i>' . __( 'empty', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</i>'; // phpcs:ignore
 					$inner_fields .= '<div class="entity_settings_value">' . $field_value . '</div>';
 			}
 			/// close //// div class="properties_field"

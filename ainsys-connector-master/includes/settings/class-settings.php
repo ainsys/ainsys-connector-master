@@ -14,19 +14,18 @@ use Ainsys\Connector\Master\Webhook_Listener;
  */
 class Settings implements Hooked {
 
-	// AINSYS log table name.
+	/**
+	 * AINSYS log table name.
+	 */
 	static $ainsys_entities_settings_table = 'ainsys_entitys_settings';
 
 	/**
-	 * Connect to wp hooks.
-	 *
+	 * Init hooks.
 	 */
 	public function init_hooks() {
 
 		add_action( 'admin_init', array( $this, 'register_options' ) );
-
 		add_action( 'init', array( $this, 'check_to_auto_disable_logging' ) );
-//		echo get_option( 'plugin_error' );
 
 	}
 
@@ -56,7 +55,7 @@ class Settings implements Hooked {
 	}
 
 	/**
-	 * Get options value by name
+	 * Gets options value by name.
 	 *
 	 * @param $name
 	 *
@@ -67,7 +66,7 @@ class Settings implements Hooked {
 	}
 
 	/**
-	 * Get full options name
+	 * Gets full options name.
 	 *
 	 * @param string $name
 	 *
@@ -80,7 +79,7 @@ class Settings implements Hooked {
 	//////////////////////////////
 
 	/**
-	 * Get plugin uniq name to setting
+	 * Gets plugin uniq name to show on the settings page.
 	 *
 	 * @return string
 	 */
@@ -90,9 +89,9 @@ class Settings implements Hooked {
 
 
 	/**
-	 * Install tables
+	 * Activates plugin
 	 *
-	 * @return
+	 * @return void
 	 */
 	public static function activate() {
 		global $wpdb;
@@ -114,7 +113,7 @@ class Settings implements Hooked {
 	}
 
 	/**
-	 * Get Table schema.
+	 * Gets Table schema.
 	 *
 	 * @return string
 	 */
@@ -150,9 +149,9 @@ class Settings implements Hooked {
 	}
 
 	/**
-	 * Remove logs, settings etc.
+	 * Deactivates plugin. Removes logs, settings, etc. if the option 'full_uninstall' is on.
 	 *
-	 * @return
+	 * @return void
 	 */
 	public static function deactivate() {
 		if ( (int) self::get_option( 'full_uninstall' ) ) {
@@ -162,6 +161,9 @@ class Settings implements Hooked {
 		return;
 	}
 
+	/**
+	 * Uninstalls plugin.
+	 */
 	public static function uninstall() {
 		delete_option( self::get_setting_name( 'ansys_api_key' ) );
 		delete_option( self::get_setting_name( 'handshake_url' ) );
@@ -188,14 +190,15 @@ class Settings implements Hooked {
 		delete_option( 'ainsys-webhook_url' );
 
 		global $wpdb;
-		$wpdb->query( sprintf( "DROP TABLE IF EXISTS %s",
-			$wpdb->prefix . self::$ainsys_entities_settings_table ) );
+		//$wpdb->query( sprintf( 'DROP TABLE IF EXISTS %s', $wpdb->prefix . self::$ainsys_entities_settings_table ) );
+		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %s', $wpdb->prefix . self::$ainsys_entities_settings_table ) );
+
 	}
 
 	/**
-	 * Get full options name
+	 * Gets full option name
 	 *
-	 * @param $name
+	 * @param string $name
 	 *
 	 * @return string
 	 */
@@ -204,9 +207,9 @@ class Settings implements Hooked {
 	}
 
 	/**
-	 * Get options value by name
+	 * Updates an option.
 	 *
-	 * @param $name
+	 * @param string $name
 	 *
 	 * @return mixed|void
 	 */
@@ -216,7 +219,7 @@ class Settings implements Hooked {
 
 
 	/**
-	 * Get saved email or admin email
+	 * Gets saved email or admin email.
 	 *
 	 * @return bool|mixed|void
 	 */
@@ -234,27 +237,31 @@ class Settings implements Hooked {
 
 
 	/**
-	 * Register options
+	 * Registers options.
 	 *
 	 */
 	public static function register_options() {
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'ansys_api_key' ) );
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'handshake_url' ) );
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'webhook_url' ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'server' ), [ 'default' => 'https://user-api.ainsys.com/' ] );
+		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'server' ), array( 'default' => 'https://user-api.ainsys.com/' ) );
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'sys_id' ) );
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'connectors' ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'workspace' ), [ 'default' => 14 ] );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'hook_url' ), [
-			Webhook_Listener::class,
-			'get_webhook_url'
-		] );
+		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'workspace' ), array( 'default' => 14 ) );
+		register_setting(
+			self::get_setting_name( 'group' ),
+			self::get_setting_name( 'hook_url' ),
+			array(
+				Webhook_Listener::class,
+				'get_webhook_url',
+			)
+		);
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'backup_email' ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'do_log_transactions' ), [ 'default' => 1 ] );
+		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'do_log_transactions' ), array( 'default' => 1 ) );
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'log_transactions_since' ) );
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'log_until_certain_time' ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'log_select_value' ), [ 'default' => -1 ] );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'full_uninstall' ), [ 'default' => 0 ] );
+		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'log_select_value' ), array( 'default' => -1 ) );
+		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'full_uninstall' ), array( 'default' => 0 ) );
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'connector_id' ) );
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'client_full_name' ) );
 		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'client_company_name' ) );
@@ -266,22 +273,22 @@ class Settings implements Hooked {
 
 
 	/**
-	 * Generate list of Entities.
+	 * Generates a list of Entities.
 	 *
 	 * @return array
 	 */
 	static function get_entities() {
-		/// Get Wordpress pre installed entities.
+		/// Get WordPress pre installed entities.
 		$entities = array(
-			'user'     => __( 'User / fields', AINSYS_CONNECTOR_TEXTDOMAIN ),
-			'comments' => __( 'Comments / fields', AINSYS_CONNECTOR_TEXTDOMAIN )
+			'user'     => __( 'User / fields', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
+			'comments' => __( 'Comments / fields', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 		);
 
 		return apply_filters( 'ainsys_get_entities_list', $entities );
 	}
 
 	/**
-	 * Used to give ability to provide specific to entity type fields getters supplied by other plugins.
+	 * Gives an ability to provide specific to entity type fields getters supplied by child plugins.
 	 *
 	 * @return array
 	 */
@@ -296,7 +303,7 @@ class Settings implements Hooked {
 
 
 	/**
-	 * Generate list of settings for entity field with default values
+	 * Generates a list of settings for entity field with default values
 	 * $entity param used for altering settins depending on entity
 	 *
 	 * @param string $entity
@@ -314,62 +321,60 @@ class Settings implements Hooked {
 
 		return array(
 			'id'          => array(
-				'nice_name' => __( 'Id', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'nice_name' => __( 'Id', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'default'   => '',
 				'type'      => 'constant',
 			),
 			'api'         => array(
-				'nice_name' => __( 'API', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'nice_name' => __( 'API', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'default'   => $default_apis,
 				'type'      => 'constant',
 			),
 			'read'        => array(
-				'nice_name' => __( 'Read', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'nice_name' => __( 'Read', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'default'   => '1',
-				'type'      => 'bool'
+				'type'      => 'bool',
 			),
 			'write'       => array(
-				'nice_name' => __( 'Write', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'nice_name' => __( 'Write', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'default'   => '0',
-				'type'      => 'bool'
+				'type'      => 'bool',
 			),
 			'required'    => array(
-				'nice_name' => __( 'Required', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'nice_name' => __( 'Required', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'default'   => '0',
-				'type'      => 'bool'
+				'type'      => 'bool',
 			),
 			'unique'      => array(
-				'nice_name' => __( 'Unique', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'nice_name' => __( 'Unique', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'default'   => '0',
-				'type'      => 'bool'
+				'type'      => 'bool',
 			),
 			'data_type'   => array(
-				'nice_name' => __( 'Data type', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'nice_name' => __( 'Data type', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'default'   => array(
 					'string' => '1',
 					'int'    => '',
 					'bool'   => '',
-					'mixed'  => ''
+					'mixed'  => '',
 				),
-				'type'      => $entity === 'acf' ? 'constant' : 'select'
+				'type'      => 'acf' === $entity ? 'constant' : 'select',
 			),
 			'description' => array(
-				'nice_name' => __( 'Description', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'nice_name' => __( 'Description', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'default'   => '',
-				'type'      => 'string'
+				'type'      => 'string',
 			),
 			'sample'      => array(
-				'nice_name' => __( 'Sample', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'nice_name' => __( 'Sample', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'default'   => '',
-				'type'      => 'string'
-			)
+				'type'      => 'string',
+			),
 		);
 	}
 
-	//#region Refactored
-
 	/**
-	 * Get entity field settings from DB.
+	 * Gets entity field settings from DB.
 	 *
 	 * @param string $where
 	 * @param bool $single
@@ -378,21 +383,22 @@ class Settings implements Hooked {
 	 */
 	public static function get_saved_entity_settings_from_db( $where = '', $single = true ) {
 		global $wpdb;
-		$query   = "SELECT * 
-        FROM " . $wpdb->prefix . self::$ainsys_entities_settings_table . $where;
-		$resoult = $wpdb->get_results( $query, ARRAY_A );
-		if ( isset( $resoult[0]["value"] ) && $single ) {
-			$keys = array_column( $resoult, 'setting_key' );
-			if ( count( $resoult ) > 1 && isset( array_flip( $keys )['saved_field'] ) ) {
+		//$query    = 'SELECT * FROM ' . $wpdb->prefix . self::$ainsys_entities_settings_table . $where;
+		//$result   = $wpdb->get_results( $query, ARRAY_A );
+		$result = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %s', $wpdb->prefix . self::$ainsys_entities_settings_table . $where ), ARRAY_A );
+
+		if ( isset( $result[0]['value'] ) && $single ) {
+			$keys = array_column( $result, 'setting_key' );
+			if ( count( $result ) > 1 && isset( array_flip( $keys )['saved_field'] ) ) {
 				$saved_settins_id = array_flip( $keys )['saved_field'];
-				$data             = maybe_unserialize( $resoult[ $saved_settins_id ]["value"] );
-				$data['id']       = $resoult[ $saved_settins_id ]["id"] ?? 0;
+				$data             = maybe_unserialize( $result[ $saved_settins_id ]['value'] );
+				$data['id']       = $result[ $saved_settins_id ]['id'] ?? 0;
 			} else {
-				$data       = maybe_unserialize( $resoult[0]["value"] );
-				$data['id'] = $resoult[0]["id"] ?? 0;
+				$data       = maybe_unserialize( $result[0]['value'] );
+				$data['id'] = $result[0]['id'] ?? 0;
 			}
 		} else {
-			$data = $resoult;
+			$data = $result;
 		}
 
 		return $data ?? array();
@@ -400,84 +406,84 @@ class Settings implements Hooked {
 
 
 	/**
-	 * Generate fields for COMMENTS entity
+	 * Generates fields for COMMENTS entity.
 	 *
 	 * @return array
 	 */
 	static function get_comments_fields() {
 		$prepered_fields = array(
-			'comment_ID'           => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			'comment_post_ID'      => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			'comment_author'       => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			'comment_author_email' => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			'comment_author_url'   => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			'comment_author_IP'    => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			'comment_date'         => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			'comment_date_gmt'     => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			'comment_content'      => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			'comment_karma'        => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			'comment_approved'     => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			'comment_agent'        => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			'comment_type'         => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			'comment_parent'       => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			'user_id'              => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			'children'             => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			'populated_children'   => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			'post_fields'          => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
+			'comment_ID'           => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'comment_post_ID'      => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'comment_author'       => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'comment_author_email' => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'comment_author_url'   => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'comment_author_IP'    => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'comment_date'         => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'comment_date_gmt'     => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'comment_content'      => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'comment_karma'        => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'comment_approved'     => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'comment_agent'        => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'comment_type'         => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'comment_parent'       => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'user_id'              => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'children'             => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'populated_children'   => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'post_fields'          => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
 		);
 
 		$extra_fields = apply_filters( 'ainsys_prepare_extra_comment_fields', array() );
@@ -486,102 +492,102 @@ class Settings implements Hooked {
 	}
 
 	/**
-	 * Generate fields for USER entity
+	 * Generates fields for USER entity
 	 *
 	 * @return array
 	 */
 	static function get_user_fields() {
 		$prepered_fields = array(
-			"ID"                   => [
-				"nice_name" => __( "{ID}", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			"user_login"           => [
-				"nice_name" => __( "User login", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			"user_nicename"        => [
-				"nice_name" => __( "Readable name", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			"user_email"           => [
-				"nice_name" => __( "User mail", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress",
-				"children"  => [
-					"primary"   => [
-						"nice_name" => __( "Main email", AINSYS_CONNECTOR_TEXTDOMAIN ),
-						"api"       => "wordpress"
-					],
-					"secondary" => [
-						"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-						"api"       => "wordpress"
-					]
-				]
-			],
-			"user_url"             => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			"user_registered"      => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			"user_activation_key"  => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			"user_status"          => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			"display_name"         => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			"first_name"           => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			"last_name"            => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			"nickname"             => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			"nice_name"            => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			"rich_editing"         => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			"syntax_highlighting"  => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			"comment_shortcuts"    => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			"admin_color"          => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			"use_ssl"              => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			"show_admin_bar_front" => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			],
-			"locale"               => [
-				"nice_name" => __( "", AINSYS_CONNECTOR_TEXTDOMAIN ),
-				"api"       => "wordpress"
-			]
+			'ID'                   => array(
+				'nice_name' => __( '{ID}', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
+				'api'       => 'wordpress',
+			),
+			'user_login'           => array(
+				'nice_name' => __( 'User login', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
+				'api'       => 'wordpress',
+			),
+			'user_nicename'        => array(
+				'nice_name' => __( 'Readable name', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
+				'api'       => 'wordpress',
+			),
+			'user_email'           => array(
+				'nice_name' => __( 'User mail', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
+				'api'       => 'wordpress',
+				'children'  => array(
+					'primary'   => array(
+						'nice_name' => __( 'Main email', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
+						'api'       => 'wordpress',
+					),
+					'secondary' => array(
+						'nice_name' => '',
+						'api'       => 'wordpress',
+					),
+				),
+			),
+			'user_url'             => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'user_registered'      => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'user_activation_key'  => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'user_status'          => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'display_name'         => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'first_name'           => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'last_name'            => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'nickname'             => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'nice_name'            => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'rich_editing'         => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'syntax_highlighting'  => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'comment_shortcuts'    => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'admin_color'          => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'use_ssl'              => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'show_admin_bar_front' => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
+			'locale'               => array(
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			),
 		);
 
 		$extra_fields = apply_filters( 'ainsys_prepare_extra_user_fields', array() );

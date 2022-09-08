@@ -36,7 +36,7 @@ class Process_Comments implements Hooked {
 	}
 
 	/**
-	 * We send an updated WP comment details to AINSYS
+	 * Sends updated WP comment details to AINSYS.
 	 *
 	 * @param int $comment_id
 	 * @param object $data
@@ -51,7 +51,7 @@ class Process_Comments implements Hooked {
 		$request_data = array(
 			'object_id'      => $comment_id,
 			'request_action' => $request_action,
-			'request_data'   => $fields
+			'request_data'   => $fields,
 		);
 
 		try {
@@ -66,7 +66,7 @@ class Process_Comments implements Hooked {
 	}
 
 	/**
-	 * Prepare WP comment data. Add ACF fields if we have
+	 * Prepares WP comment data. Adds ACF fields if there are any.
 	 *
 	 * @param int $comment_id
 	 * @param array $data
@@ -82,7 +82,7 @@ class Process_Comments implements Hooked {
 	}
 
 	/**
-	 * We send an updated WP comment details to AINSYS
+	 * Sends updated WP comment details to AINSYS.
 	 *
 	 * @param int $comment_id
 	 * @param array $data

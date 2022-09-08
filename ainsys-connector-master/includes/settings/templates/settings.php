@@ -20,24 +20,24 @@ try {
 	<h1><img src="<?php echo AINSYS_CONNECTOR_URL; ?>/assets/img/logo.svg" alt="Ainsys logo" class="ainsys-logo"></h1>
 
 	<div class="nav-tab-wrapper ainsys-nav-tab-wrapper">
-		<a class="nav-tab nav-tab-active" href="#setting_section_general" data-target="setting_section_general"><?php _e( 'General', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
-		<a class="nav-tab" href="#setting_section_test" data-target="setting_section_test"><?php _e( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
-		<a class="nav-tab" href="#setting_section_log" data-target="setting_section_log"><?php _e( 'Transfer log', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
-		<a class="nav-tab" href="#setting_entities_section" data-target="setting_entities_section"><?php _e( 'Entities export settings', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
+		<a class="nav-tab nav-tab-active" href="#setting_section_general" data-target="setting_section_general"><?php _e( 'General', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></a>
+		<a class="nav-tab" href="#setting_section_test" data-target="setting_section_test"><?php _e( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></a>
+		<a class="nav-tab" href="#setting_section_log" data-target="setting_section_log"><?php _e( 'Transfer log', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></a>
+		<a class="nav-tab" href="#setting_entities_section" data-target="setting_entities_section"><?php _e( 'Entities export settings', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></a>
 	</div>
 
 	<div id="setting_section_general" class="tab-target nav-tab-active tab-target-active">
 		<div class="ainsys-settings-blocks">
 			<div class="ainsys-settings-block ainsys-settings-block--connection">
-				<h2><?php _e( 'Connection Settings', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></h2>
+				<h2><?php _e( 'Connection Settings', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></h2>
 
 				<form method="post" action="options.php">
 					<?php settings_fields( $admin_ui->settings::get_option_name( 'group' ) ); ?>
 					<div class="aisys-form-group">
 						<label for="ansys-api-key" class="aisys-form-label">
-							<?php _e( 'AINSYS handshake url for the connector. You can find it in your ', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+							<?php _e( 'AINSYS handshake url for the connector. You can find it in your ', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
 							<a href="https://app.ainsys.com/en/settings/workspaces" target="_blank">
-								<?php _e( 'dashboard', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+								<?php _e( 'dashboard', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
 							</a>.
 						</label>
 						<div class="aisys-form-input">
@@ -46,7 +46,7 @@ try {
 					</div>
 					<div class="aisys-form-group">
 						<label for="hook-url" class="aisys-form-label">
-							<?php _e( 'Server hook_url', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+							<?php _e( 'Server hook_url', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
 						</label>
 						<div class="aisys-form-input">
 							<input id="hook-url" type="text" size="50" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'hook_url' ) ); ?>" value="<?php echo esc_attr( $admin_ui->settings::get_option( 'hook_url' ) ); ?>" disabled/>
@@ -54,8 +54,8 @@ try {
 					</div>
 					<div class="aisys-form-group">
 						<label for="backup-email" class="aisys-form-label">
-							<?php _e( 'Additional e-mail', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
-							<span><?php _e( 'Used for error reports', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></span>
+							<?php _e( 'Additional e-mail', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
+							<span><?php _e( 'Used for error reports', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></span>
 						</label>
 						<div class="aisys-form-input">
 							<input id="backup-email" type="text" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'backup_email' ) ); ?>" placeholder="backup@email.com" value="<?php echo esc_attr( $admin_ui->settings::get_backup_email() ); ?>"/>
@@ -66,30 +66,30 @@ try {
 							<input id="full-uninstall-checkbox" type="checkbox" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'full_uninstall' ) ); ?>" value="<?php echo esc_attr( $admin_ui->settings::get_option( 'full_uninstall' ) ); ?>" <?php checked( 1, esc_html( $admin_ui->settings::get_option( 'full_uninstall' ) ), true ); ?> />
 						</div>
 						<label for="full-uninstall-checkbox" class="aisys-form-label">
-							<?php _e( 'Purge all stored data during deactivation ', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
-							<div class="aisys-form-label-note"><?php _e( 'NB: if you delete the plugin from WordPress admin panel it will clear data regardless of this checkbox', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></div>
+							<?php _e( 'Purge all stored data during deactivation ', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
+							<div class="aisys-form-label-note"><?php _e( 'NB: if you delete the plugin from WordPress admin panel it will clear data regardless of this checkbox', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></div>
 						</label>
 					</div>
 					<div class="aisys-form-group">
 						<label for="connector-id" class="aisys-form-label">
-							<?php _e( 'Connector Id', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+							<?php _e( 'Connector Id', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
 						</label>
 						<div class="aisys-form-input">
 							<input id="connector-id" type="text" size="50" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'connector_id' ) ); ?>" value="<?php echo esc_attr( $admin_ui->settings::get_option( 'connector_id' ) ); ?>" />
 						</div>
 					</div>
 
-					<div class="aisys-form-group-title"><h3><?php _e( 'Your Data', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></h3></div>
+					<div class="aisys-form-group-title"><h3><?php _e( 'Your Data', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></h3></div>
 					<div class="ainsys-tabs">
 						<div class="ainsys-tabs-nav">
-							<a class="ainsys-nav-tab ainsys-nav-tab-active" href="#setting_section_individual" data-target="setting_section_individual"><?php _e( 'Individual', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
-							<a class="ainsys-nav-tab" href="#setting_section_organization" data-target="setting_section_organization"><?php _e( 'Legal Entity', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
+							<a class="ainsys-nav-tab ainsys-nav-tab-active" href="#setting_section_individual" data-target="setting_section_individual"><?php _e( 'Individual', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></a>
+							<a class="ainsys-nav-tab" href="#setting_section_organization" data-target="setting_section_organization"><?php _e( 'Legal Entity', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></a>
 						</div>
 						<div class="ainsys-tabs-target">
 							<div id="setting_section_individual" class="ainsys-tab-target ainsys-tab-target-active">
 								<div class="aisys-form-group">
 									<label for="client-full-name" class="aisys-form-label">
-										<?php _e( 'Full Name', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+										<?php _e( 'Full Name', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
 									</label>
 									<div class="aisys-form-input">
 										<input id="client-full-name" type="text" size="50" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'client_full_name' ) ); ?>" value="<?php echo esc_attr( $admin_ui->settings::get_option( 'client_full_name' ) ); ?>" />
@@ -99,7 +99,7 @@ try {
 							<div id="setting_section_organization" class="ainsys-tab-target">
 								<div class="aisys-form-group">
 									<label for="client-company-name" class="aisys-form-label">
-										<?php _e( 'Company Name', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+										<?php _e( 'Company Name', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
 									</label>
 									<div class="aisys-form-input">
 										<input id="client-company-name" type="text" size="50" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'client_company_name' ) ); ?>" value="<?php echo esc_attr( $admin_ui->settings::get_option( 'client_company_name' ) ); ?>" />
@@ -107,7 +107,7 @@ try {
 								</div>
 								<div class="aisys-form-group">
 									<label for="client_tin" class="aisys-form-label">
-										<?php _e( 'TIN', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+										<?php _e( 'TIN', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
 									</label>
 									<div class="aisys-form-input">
 										<input id="client_tin" type="text" size="50" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'client_tin' ) ); ?>" value="<?php echo esc_attr( $admin_ui->settings::get_option( 'client_tin' ) ); ?>" />
@@ -118,15 +118,15 @@ try {
 					</div>
 
 					<div class="submit">
-						<input type="submit" class="btn btn-primary" value="<?php
-							if ( ! empty( $status ) && 'success' === $status['status'] ) {
-								_e( 'Save', AINSYS_CONNECTOR_TEXTDOMAIN );
-							} else {
-								_e( 'Connect', AINSYS_CONNECTOR_TEXTDOMAIN );
-							}
-							?>"/>
+						<input type="submit" class="btn btn-primary" value="<?php // phpcs:ignore
+						if ( ! empty( $status ) && 'success' === $status['status'] ) {
+							_e( 'Save', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore
+						} else {
+							_e( 'Connect', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore
+						}
+						// phpcs:ignore ?>"/>
 						<?php if ( ! empty( $status ) && 'success' === $status['status'] ) { ?>
-							<a id="remove_ainsys_integration" class="btn btn-secondary"><?php _e( 'Disconect integration', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
+							<a id="remove_ainsys_integration" class="btn btn-secondary"><?php _e( 'Disconect integration', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></a>
 						<?php } ?>
 					</div>
 				</form>
@@ -148,21 +148,21 @@ try {
 
 				?>
 
-				<h2><?php _e( 'Connection Status', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></h2>
+				<h2><?php _e( 'Connection Status', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></h2>
 				<ul class="ainsys-status-items">
 					<li class="ainsys-li-underline">
-						<span class="ainsys-status-title"><?php _e( 'Conection', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></span>
+						<span class="ainsys-status-title"><?php _e( 'Conection', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></span>
 						<?php
 						if ( ! empty( $status ) && 'success' === $status['status'] ) :
 							?>
 							<span class="ainsys-status-ok">
-								<i class="fa fa-check-circle-o" aria-hidden="true"></i> <?php _e( 'Working', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+								<i class="fa fa-check-circle-o" aria-hidden="true"></i> <?php _e( 'Working', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
 							</span>
 							<?php
 						else :
 							?>
 							<span class="ainsys-status-error">
-								<i class="fa fa-times-circle-o" aria-hidden="true"></i> <?php _e( 'No AINSYS integration', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+								<i class="fa fa-times-circle-o" aria-hidden="true"></i> <?php _e( 'No AINSYS integration', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
 							</span>
 							<?php
 						endif;
@@ -174,42 +174,42 @@ try {
 							<span class="ainsys-status-title"><?php echo esc_html( $status_item['title'] ); ?></span>
 							<?php if ( $status_item['active'] ) : ?>
 								<span class="ainsys-status-ok">
-									<i class="fa fa-check-circle-o" aria-hidden="true"></i> <?php _e( 'Enabled', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+									<i class="fa fa-check-circle-o" aria-hidden="true"></i> <?php _e( 'Enabled', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
 								</span>
 							<?php else : ?>
 								<span class="ainsys-status-error">
-									<i class="fa fa-times-circle-o" aria-hidden="true"></i> <?php _e( 'Disabled', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+									<i class="fa fa-times-circle-o" aria-hidden="true"></i> <?php _e( 'Disabled', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
 								</span>
 							<?php endif; ?>
 						</li>
 					<?php endforeach; ?>
 
 					<li class="ainsys-li-overline">
-						<span class="ainsys-status-title"><?php _e( 'PHP version 7.2+', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></span>
+						<span class="ainsys-status-title"><?php _e( 'PHP version 7.2+', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></span>
 						<?php
 						if ( version_compare( PHP_VERSION, '7.2.0' ) > 0 ) :
 							?>
 							<span class="ainsys-status-ok"><i class="fa fa-check-circle-o" aria-hidden="true"></i> PHP <?php echo esc_html( PHP_VERSION ); ?></span>
 						<?php else : ?>
 							<span class="ainsys-status-error">
-								<i class="fa fa-times-circle-o" aria-hidden="true"></i> <?php _e( 'Bad PHP version ', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>(
+								<i class="fa fa-times-circle-o" aria-hidden="true"></i> <?php _e( 'Bad PHP version ', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>(
 								<?php echo esc_html( PHP_VERSION ); ?>
 								).
-								<?php _e( 'Update on your hosting', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+								<?php _e( 'Update on your hosting', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
 							</span>
 						<?php endif; ?>
 					</li>
 					<li>
-						<span class="ainsys-status-title"><?php _e( 'Backup email', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></span>
+						<span class="ainsys-status-title"><?php _e( 'Backup email', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></span>
 						<?php
 						if ( ! empty( $admin_ui->settings::get_backup_email() ) && filter_var( $admin_ui->settings::get_backup_email(), FILTER_VALIDATE_EMAIL ) ) :
 							?>
 							<span class="ainsys-status-ok">
-								<i class="fa fa-check-circle-o" aria-hidden="true"></i> <?php _e( 'Valid', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+								<i class="fa fa-check-circle-o" aria-hidden="true"></i> <?php _e( 'Valid', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
 							</span>
 						<?php else : ?>
 							<span class="ainsys-status-error">
-								<i class="fa fa-times-circle-o" aria-hidden="true"></i> <?php _e( 'Invalid', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+								<i class="fa fa-times-circle-o" aria-hidden="true"></i> <?php _e( 'Invalid', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
 							</span>
 						<?php endif; ?>
 					</li>
@@ -249,26 +249,26 @@ try {
 					$log_status_no_style = ' style="display: inline;"';
 				}
 				?>
-				<span class="ainsys-log-status-ok"<?php echo $log_status_ok_style; ?>><i class="fa fa-check-circle-o" aria-hidden="true"></i> <?php _e( 'Working since', AINSYS_CONNECTOR_TEXTDOMAIN ); ?> <span class="ainsys-log-since"><?php echo esc_html( $since ); ?></span></span>
-				<span class="ainsys-log-status-no"<?php echo $log_status_no_style; ?>><i class="fa fa-times-circle-o" aria-hidden="true"></i> <?php _e( 'Not Working', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></span>
-				<span class="ainsys-status-loading"><?php _e( 'Loading...', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></span>
+				<span class="ainsys-log-status-ok"<?php echo $log_status_ok_style; ?>><i class="fa fa-check-circle-o" aria-hidden="true"></i> <?php _e( 'Working since', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?> <span class="ainsys-log-since"><?php echo esc_html( $since ); ?></span></span>
+				<span class="ainsys-log-status-no"<?php echo $log_status_no_style; ?>><i class="fa fa-times-circle-o" aria-hidden="true"></i> <?php _e( 'Not Working', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></span>
+				<span class="ainsys-status-loading"><?php _e( 'Loading...', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></span>
 			</div>
 			<div class="ainsys-log-controls">
-				<a id="start_loging" class="btn btn-primary ainsys-log-control<?php echo esc_attr( $start ); ?>"><?php _e( 'Start loging', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
+				<a id="start_loging" class="btn btn-primary ainsys-log-control<?php echo esc_attr( $start ); ?>"><?php _e( 'Start loging', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></a>
 
 				<select id="start_loging_timeinterval" class="<?php echo esc_attr( $start ); ?>" <?php echo esc_attr( $start ); ?> name="loging_timeinterval">
-					<option value="1"<?php if ( 1 == $selected ) { echo ' selected="selected"';} ?>><?php _e( '1 hour', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></option>
-					<option value="5"<?php if ( 5 == $selected ) { echo ' selected="selected"';} ?>><?php _e( '5 hours', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></option>
-					<option value="12"<?php if ( 12 == $selected ) { echo ' selected="selected"';} ?>><?php _e( '12 hours', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></option>
-					<option value="24"<?php if ( 24 == $selected ) { echo ' selected="selected"';} ?>><?php _e( '24 hours', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></option>
-					<option value="-1"<?php if ( -1 == $selected ) { echo ' selected="selected"';} ?>><?php _e( 'unlimited', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></option>
+					<option value="1"<?php if ( 1 == $selected ) { echo ' selected="selected"';} ?>><?php _e( '1 hour', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></option>
+					<option value="5"<?php if ( 5 == $selected ) { echo ' selected="selected"';} ?>><?php _e( '5 hours', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></option>
+					<option value="12"<?php if ( 12 == $selected ) { echo ' selected="selected"';} ?>><?php _e( '12 hours', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></option>
+					<option value="24"<?php if ( 24 == $selected ) { echo ' selected="selected"';} ?>><?php _e( '24 hours', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></option>
+					<option value="-1"<?php if ( -1 == $selected ) { echo ' selected="selected"';} ?>><?php _e( 'unlimited', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></option>
 				</select>
 
-				<a id="stop_loging" class="btn btn-primary ainsys-log-control<?php echo esc_attr( $stop ); ?>"><?php _e( 'Stop loging', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
+				<a id="stop_loging" class="btn btn-primary ainsys-log-control<?php echo esc_attr( $stop ); ?>"><?php _e( 'Stop loging', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></a>
 
-				<a id="reload_log" class="btn btn-primary"><?php _e( 'Reload', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
+				<a id="reload_log" class="btn btn-primary"><?php _e( 'Reload', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></a>
 
-				<a id="clear_log" class="btn btn-primary"><?php _e( 'Clear log', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a>
+				<a id="clear_log" class="btn btn-primary"><?php _e( 'Clear log', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></a>
 			</div>
 			<?php echo $admin_ui->logger::generate_log_html(); ?> 
 		</div>
@@ -277,7 +277,7 @@ try {
 	<div id="setting_entities_section" class="tab-target">
 		<?php echo $admin_ui->generate_entities_html(); ?>
 
-		<p><?php _e( 'Detailed', AINSYS_CONNECTOR_TEXTDOMAIN ); ?> <a href="https://github.com/ainsys/ainsys-wp-connector"> <?php _e( ' API integration', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></a> <?php _e( ' documentation.', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></p>
+		<p><?php _e( 'Detailed', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?> <a href="https://github.com/ainsys/ainsys-wp-connector"> <?php _e( ' API integration', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></a> <?php _e( ' documentation.', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></p>
 	</div>
 </div>
 

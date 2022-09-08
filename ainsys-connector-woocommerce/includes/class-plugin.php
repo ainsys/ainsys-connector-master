@@ -11,6 +11,7 @@ use Ainsys\Connector\Master\Settings\Admin_UI;
 use Ainsys\Connector\Master\UTM_Handler;
 use Ainsys\Connector\Woocommerce\Webhooks\Handle_Order;
 use Ainsys\Connector\Woocommerce\Webhooks\Handle_Product;
+use Ainsys\Connector\Woocommerce\Woo_UI;
 
 class Plugin implements Hooked {
 
@@ -53,6 +54,8 @@ class Plugin implements Hooked {
 
 		$this->components['product_webhook'] = new Handle_Product();
 		$this->components['order_webhook']   = new Handle_Order();
+
+		$woo_ui = new Woo_UI( $this, $this->logger, $this->admin_ui );
 	}
 
 
@@ -68,22 +71,18 @@ class Plugin implements Hooked {
 			add_filter( 'ainsys_get_entities_list', array( $this, 'add_entity_to_list' ), 10, 1 );
 			add_filter( 'ainsys_get_entity_fields_handlers', array( $this, 'add_fields_getters_for_entities' ), 10, 1 );
 			add_filter( 'ainsys_default_apis_for_entities', array( $this, 'add_default_api_for_entities_option' ), 10, 1 );
-			add_filter( 'ainsys_test_table', array( $this, 'ainsys_test_table' ), 10, 1 );
 
 			add_action( 'woocommerce_checkout_order_processed', array( $this, 'new_order_processed' ) );
 			add_action( 'post_updated', array( $this, 'ainsys_update_order' ), 10, 4 );
 			add_action( 'woocommerce_order_status_changed', array( $this, 'send_order_status_update_to_ainsys' ) );
 			add_action( 'woocommerce_update_product', array( $this, 'send_update_product_to_ainsys' ), 10, 3 );
-			add_action( 'wp_ajax_test_woo_connection', array( $this, 'test_woo_connection' ) );
 
 			foreach ( $this->components as $component ) {
 				if ( $component instanceof Hooked ) {
 					$component->init_hooks();
 				}
 			}
-			if ( is_admin() ) {
-				add_action( 'admin_enqueue_scripts', array( $this, 'ainsys_woo_enqueue_scripts' ) );
-			}
+
 		}
 	}
 
@@ -173,108 +172,6 @@ class Plugin implements Hooked {
 			}
 		}
 		return;
-	}
-
-	public function test_woo_connection() {
-		if ( isset( $_POST['entity'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], $this->admin_ui::$nonce_title ) ) {
-
-			$make_request = false;
-
-			$entity = strip_tags( $_POST['entity'] );
-
-			if ( 'product' === $entity ) {
-				$args     = array(
-					'limit' => 1,
-				);
-				$products = wc_get_products( $args );
-				if ( ! empty( $products ) ) {
-					foreach ( $products as $product ) {
-						$fields     = $product;
-						$product_id = $product->get_id();
-						break;
-					}
-
-					$make_request         = true;
-					$test_result          = $this->send_update_product_to_ainsys( $product_id, $fields, true );
-					$test_result_request  = $test_result['request']; // array
-					$test_result_response = $test_result['response']; // string
-				}
-			}
-
-			if ( 'order' === $entity ) {
-				$args   = array(
-					'limit' => 1,
-				);
-				$orders = wc_get_orders( $args );
-				if ( ! empty( $orders ) ) {
-					foreach ( $orders as $order ) {
-						$fields   = $order;
-						$order_id = $order->get_id();
-						break;
-					}
-
-					$make_request         = true;
-					$test_result          = $this->ainsys_update_order( $order_id, $fields, $fields, true );
-					$test_result_request  = $test_result['request']; // array
-					$test_result_response = $test_result['response']; // string
-				}
-			}
-
-			if ( 'coupons' === $entity ) {
-				$args = array(
-					'posts_per_page' => 1,
-					'post_type'      => 'shop_coupon',
-					'post_status'    => 'publish',
-				);
-
-				$coupons = get_posts( $args );
-				if ( ! empty( $coupons ) ) {
-					foreach ( $coupons as $coupon ) {
-						$fields    = (array) $coupon;
-						$coupon_id = $coupon->ID;
-						break;
-					}
-
-					//$make_request         = true; TODO
-					//$test_result          = $this->send_update_coupon_to_ainsys( $coupon_id, $fields, true );
-					//$test_result_request  = $test_result['request']; // array
-					//$test_result_response = $test_result['response']; // string
-				}
-			}
-
-			if ( $make_request ) {
-
-				$result = array(
-					'short_request'  => mb_substr( serialize( $test_result_request ), 0, 80 ) . ' ... ',
-					'short_responce' => mb_substr( $test_result_response, 0, 80 ) . ' ... ',
-					'full_request'   => $this->logger::ainsys_render_json( $test_result_request ),
-					'full_responce'  => 0 === strpos( 'Error: ', $test_result_response ) ? $test_result_response : $this->logger::ainsys_render_json( json_decode( $test_result_response ) ),
-				);
-			} else {
-				$result = array(
-					'short_request'  => __( 'No entities found', AINSYS_CONNECTOR_TEXTDOMAIN ),
-					'short_responce' => '',
-					'full_request'   => '',
-					'full_responce'  => '',
-				);
-			}
-			echo json_encode( $result );
-		}
-		die();
-	}
-
-	public function ainsys_test_table( $html ) {
-		$html .= '<tr><td class="ainsys_td_left">Product / fields</td><td class="ainsys_td_left ainsys-test-json"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_left ainsys-test-responce"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_btn"><a href="" class="btn btn-primary ainsys-woo-test" data-entity-name="product">' . __( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a></td></tr>';
-
-		$html .= '<tr><td class="ainsys_td_left">Order / fields</td><td class="ainsys_td_left ainsys-test-json"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_left ainsys-test-responce"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_btn"><a href="" class="btn btn-primary ainsys-woo-test" data-entity-name="order">' . __( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a></td></tr>';
-
-		if ( function_exists( 'wc_coupons_enabled' ) ) {
-			if ( wc_coupons_enabled() ) {
-				$html .= '<tr><td class="ainsys_td_left">Coupons / fields</td><td class="ainsys_td_left ainsys-test-json"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_left ainsys-test-responce"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_btn"><a href="" class="btn btn-primary ainsys-woo-test" data-entity-name="coupons">' . __( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a></td></tr>';
-			}
-		}
-
-		return $html;
 	}
 
 	/**
@@ -1040,5 +937,4 @@ class Plugin implements Hooked {
 
 		return $prepared_fields;
 	}
-
 }

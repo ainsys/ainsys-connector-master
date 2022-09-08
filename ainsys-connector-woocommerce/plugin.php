@@ -29,13 +29,16 @@ if ( version_compare( PHP_VERSION, '7.2.0' ) < 0 ) {
 	}
 	deactivate_plugins( plugin_basename( __FILE__ ) );
 
-	add_action( 'admin_notices', function () {
-		$class    = 'notice notice-error is-dismissible';
-		$message1 = __( 'Upgrade your PHP version. Minimum version - 7.2+. Your PHP version ' );
-		$message2 = __( '! If you don\'t know how to upgrade PHP version, just ask in your hosting provider! If you can\'t upgrade - delete this plugin!' );
+	add_action(
+		'admin_notices',
+		function () {
+			$class    = 'notice notice-error is-dismissible';
+			$message1 = __( 'Upgrade your PHP version. Minimum version - 7.2+. Your PHP version ' );
+			$message2 = __( '! If you don\'t know how to upgrade PHP version, just ask in your hosting provider! If you can\'t upgrade - delete this plugin!' );
 
-		printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message1 . PHP_VERSION . $message2 ) );
-	} );
+			printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message1 . PHP_VERSION . $message2 ) );
+		}
+	);
 
 }
 
@@ -49,23 +52,28 @@ function check_if_master_plugin_is_active() {
 
 	if ( ! function_exists( '\Ainsys\Connector\autoloader' ) ) {
 		// show admin notice on error.
-		add_action( 'admin_notices', function () {
-			$class   = 'notice notice-error is-dismissible';
-			$message = __( 'Please install and activate `Ainsys WP Connector Master Plugin` first' );
+		add_action(
+			'admin_notices',
+			function () {
+				$class   = 'notice notice-error is-dismissible';
+				$message = __( 'Please install and activate `Ainsys WP Connector Master Plugin` first' );
 
-			printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
-		} );
+				printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
+			}
+		);
 	}
-
 
 	if ( ! function_exists( 'WC' ) ) {
 		// show admin notice on error.
-		add_action( 'admin_notices', function () {
-			$class   = 'notice notice-error is-dismissible';
-			$message = __( 'Please install and activate `Woocommerce` plugin ' );
+		add_action(
+			'admin_notices',
+			function () {
+				$class   = 'notice notice-error is-dismissible';
+				$message = __( 'Please install and activate `Woocommerce` plugin ' );
 
-			printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
-		} );
+				printf( '<div class="%1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $message ) );
+			}
+		);
 	}
 
 }

@@ -82,16 +82,14 @@ class Plugin implements Hooked {
 					$component->init_hooks();
 				}
 			}
-
 		}
 	}
 
-	public function ainsys_woo_enqueue_scripts() {
-
-		wp_enqueue_script( 'ainsys_connector_admin_woo_handle', plugins_url( 'ainsys-connector-woocommerce/assets/js/ainsys_connector_woo_admin.js' ), array( 'jquery' ), '4.0.0', true );
-
-	}
-
+	/**
+	 * Generates a component status to show on the General tab of the master plugin settings.
+	 *
+	 * @return array
+	 */
 	public function add_status_of_component( $status_items = array() ) {
 
 		$status_items['woocommerce'] = array(
@@ -103,16 +101,24 @@ class Plugin implements Hooked {
 	}
 
 	/**
+	 * Checks if the woocommerce plugin is active.
+	 *
 	 * @return bool
 	 */
 	public function is_woocommerce_active() {
 		return $this->is_plugin_active( 'woocommerce/woocommerce.php' );
 	}
 
+	/**
+	 * Adds woocommerce entities to the entities list.
+	 *
+	 * @return array
+	 */
 	public function add_entity_to_list( $entities_list = array() ) {
-		/// Get Woocommerce entities;
+
 		$entities_list['order']   = __( 'Order / fields', AINSYS_CONNECTOR_TEXTDOMAIN );
 		$entities_list['product'] = __( 'Product / fields', AINSYS_CONNECTOR_TEXTDOMAIN );
+
 		if ( function_exists( 'wc_coupons_enabled' ) ) {
 			if ( wc_coupons_enabled() ) {
 				$entities_list['coupons'] = __( 'Coupons / fields', AINSYS_CONNECTOR_TEXTDOMAIN );
@@ -122,6 +128,11 @@ class Plugin implements Hooked {
 		return $entities_list;
 	}
 
+	/**
+	 * Adds names of functions to get woocommerce entities to the getters array.
+	 *
+	 * @return array
+	 */
 	public function add_fields_getters_for_entities( $getters = array() ) {
 		$getters['product'] = array( $this, 'get_product_fields' );
 		$getters['order']   = array( $this, 'get_order_fields' );
@@ -130,12 +141,27 @@ class Plugin implements Hooked {
 		return $getters;
 	}
 
+	/**
+	 * Adds woocommerce to the apis array.
+	 *
+	 * @return array
+	 */
 	public function add_default_api_for_entities_option( $default_apis ) {
 		$default_apis['woocommerce'] = '';
 
 		return $default_apis;
 	}
 
+	/**
+	 * Sends an order to ainsys (used on order update action).
+	 *
+	 * @param int $order_id
+	 * @param object $order_new
+	 * @param object $order_old
+	 * @param bool $test - if true returns an array with the request data and a server responce. If false returns void.
+	 *
+	 * @return mixed
+	 */
 	public function ainsys_update_order( $order_id, $order_new, $order_old, $test = false ) {
 
 		if ( 'shop_order' === get_post_type( $order_id ) ) {
@@ -175,7 +201,7 @@ class Plugin implements Hooked {
 	}
 
 	/**
-	 * We send a new order to AINSYS
+	 * Sends a new order to AINSYS
 	 *
 	 * @param int $order_id
 	 *
@@ -232,7 +258,7 @@ class Plugin implements Hooked {
 	}
 
 	/**
-	 * We send an updated order status to AINSYS
+	 * Sends an updated order status to AINSYS
 	 *
 	 * @param int $order_id
 	 *
@@ -270,7 +296,7 @@ class Plugin implements Hooked {
 	}
 
 	/**
-	 * We send an updated WC product details to AINSYS
+	 * Sends updated WC product to AINSYS
 	 *
 	 * @param int $product_id
 	 * @param object $product
@@ -311,7 +337,7 @@ class Plugin implements Hooked {
 	}
 
 	/**
-	 * Preparing order fields
+	 * Prepares order fields
 	 *
 	 * @param array $data
 	 *
@@ -418,7 +444,7 @@ class Plugin implements Hooked {
 	}
 
 	/**
-	 * Preparing WC order products
+	 * Prepares WC order products
 	 *
 	 * @param object $products
 	 *
@@ -456,7 +482,7 @@ class Plugin implements Hooked {
 	}
 
 	/**
-	 * Preparing WC product fields
+	 * Prepares WC product fields
 	 *
 	 * @param object $product
 	 *
@@ -531,7 +557,7 @@ class Plugin implements Hooked {
 
 
 	/**
-	 * Sanitize additional order fields from current order and save them to order entity
+	 * Sanitizes additional order fields from current order and saves them to the order entity
 	 *
 	 * @param array $aditional_fields
 	 * @param string $prefix
@@ -577,7 +603,11 @@ class Plugin implements Hooked {
 		return $prepare_data;
 	}
 
-
+	/**
+	 * Creates an array with coupon fields.
+	 *
+	 * @return array
+	 */
 	public function get_coupons_fields() {
 		return array(
 			'code'                        => array(
@@ -652,7 +682,7 @@ class Plugin implements Hooked {
 	}
 
 	/**
-	 * Generate fields for USER entity
+	 * Generates fields for PRODUCT entity.
 	 *
 	 * @return array
 	 */
@@ -857,7 +887,7 @@ class Plugin implements Hooked {
 	}
 
 	/**
-	 * Generate fields for ORDER entity
+	 * Generates fields for ORDER entity
 	 *
 	 * @return array
 	 */

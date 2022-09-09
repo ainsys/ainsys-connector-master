@@ -114,6 +114,7 @@
 	display: flex;
 	flex-wrap: wrap;
 	align-items: flex-start;
+	width: calc( 100% + 4rem );
 	margin-left: -2rem;
 	margin-right: -2rem;
 }
@@ -127,6 +128,7 @@
 .ainsys-settings-block--connection {
 	flex: 0 0 calc( 60% - 4rem );
 	width: calc( 60% - 4rem );
+	padding-right: 8%;
 }
 .ainsys-settings-block--status {
 	flex: 0 0 calc( 40% - 4rem );
@@ -150,6 +152,7 @@
 	margin: 0;
 }
 .aisys-form-label-note {
+	display: block;
 	font-size: 0.75rem;
 	font-weight: 400;
 	color: #666;
@@ -159,7 +162,7 @@
 	color: #ab47bc;
 }
 .aisys-form-input input[type='text'] {
-	width: 86%;
+	width: 100%;
 	padding: 0.625rem 1rem;
 	background: #e2e2e2;
 	border: none;
@@ -180,6 +183,38 @@
 .aisys-form-input input:focus {
 	outline: none !important;
 	box-shadow: none !important;
+}
+.aisys-email {
+	display: none;
+}
+.aisys-email.aisys-email-show,
+.aisys-email.aisys-email-main {
+	display: block;
+}
+.aisys-email .aisys-form-input {
+	display: flex;
+	align-items: center;
+}
+.aisys-email .aisys-form-input input {
+	flex: 0 0 calc( 100% - 5.5rem );
+	width: calc( 100% - 5.5rem );
+}
+.ainsys-email-btn {
+	flex: 0 0 1.75rem;
+	width: 1.75rem;
+	height: 1.75rem;
+	margin-left: 1rem;
+	border-radius: 50%;
+	background: #ab47bc;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 1.6rem;
+	line-height: 1.75rem;
+	text-align: center;
+	color: #fff;
+	cursor: pointer;
+}
+.ainsys-email-btn.ainsys-minus {
+	line-height: 0.9;
 }
 .ainsys-status-items {
 	margin: 0;

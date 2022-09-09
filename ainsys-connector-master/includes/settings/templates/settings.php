@@ -52,22 +52,39 @@ try {
 							<input id="hook-url" type="text" size="50" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'hook_url' ) ); ?>" value="<?php echo esc_attr( $admin_ui->settings::get_option( 'hook_url' ) ); ?>" disabled/>
 						</div>
 					</div>
-					<div class="aisys-form-group">
+
+					<div class="aisys-form-group aisys-email aisys-email-main">
 						<label for="backup-email" class="aisys-form-label">
-							<?php _e( 'Additional e-mail', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
-							<span><?php _e( 'Used for error reports', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></span>
+							<?php _e( 'E-mail for error reports', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
 						</label>
 						<div class="aisys-form-input">
 							<input id="backup-email" type="text" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'backup_email' ) ); ?>" placeholder="backup@email.com" value="<?php echo esc_attr( $admin_ui->settings::get_backup_email() ); ?>"/>
+							<div class="ainsys-email-btn ainsys-plus" data-target="1">+</div>
 						</div>
 					</div>
+					<?php
+					for ( $i = 1; $i < 10; $i++ ) {
+						?>
+						<div class="aisys-form-group aisys-email<?php if ( ! empty( $admin_ui->settings::get_backup_email( $i ) ) ) { echo ' aisys-email-show'; } //phpcs:ignore ?>" data-block-id="<?=$i?>">
+							<label for="backup-email-<?php echo $i; ?>" class="aisys-form-label">
+								<?php _e( 'E-mail for error reports', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
+								<span class="aisys-form-label-note"><?php _e( 'Additional email error reports', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></span>
+							</label>
+							<div class="aisys-form-input">
+								<input id="backup-email-<?php echo $i; ?>" type="text" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'backup_email_' . $i ) ); ?>" placeholder="backup@email.com" value="<?php echo esc_attr( $admin_ui->settings::get_backup_email( $i ) ); ?>"/>
+								<div class="ainsys-email-btn ainsys-plus" data-target="<?php echo $i + 1; ?>">+</div>
+								<div class="ainsys-email-btn ainsys-minus">–</div>
+							</div>
+						</div>
+					<?php } ?>
+
 					<div class="aisys-form-group aisys-form-group-checkbox">
 						<div class="aisys-form-input">
 							<input id="full-uninstall-checkbox" type="checkbox" name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'full_uninstall' ) ); ?>" value="<?php echo esc_attr( $admin_ui->settings::get_option( 'full_uninstall' ) ); ?>" <?php checked( 1, esc_html( $admin_ui->settings::get_option( 'full_uninstall' ) ), true ); ?> />
 						</div>
 						<label for="full-uninstall-checkbox" class="aisys-form-label">
 							<?php _e( 'Purge all stored data during deactivation ', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
-							<div class="aisys-form-label-note"><?php _e( 'NB: if you delete the plugin from WordPress admin panel it will clear data regardless of this checkbox', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></div>
+							<span class="aisys-form-label-note"><?php _e( 'NB: if you delete the plugin from WordPress admin panel it will clear data regardless of this checkbox', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></span>
 						</label>
 					</div>
 					<div class="aisys-form-group">

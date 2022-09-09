@@ -20,6 +20,39 @@ class Settings implements Hooked {
 	static $ainsys_entities_settings_table = 'ainsys_entitys_settings';
 
 	/**
+	 * AINSYS options and their default values.
+	 */
+	public static $ainsys_options = array(
+		'ansys_api_key'          => '',
+		'handshake_url'          => '',
+		'webhook_url'            => '',
+		'server'                 => 'https://user-api.ainsys.com/',
+		'sys_id'                 => '',
+		'connectors'             => '',
+		'workspace'              => 14,
+		'backup_email'           => '',
+		'backup_email_1'         => '',
+		'backup_email_2'         => '',
+		'backup_email_3'         => '',
+		'backup_email_4'         => '',
+		'backup_email_5'         => '',
+		'backup_email_6'         => '',
+		'backup_email_7'         => '',
+		'backup_email_8'         => '',
+		'backup_email_9'         => '',
+		'do_log_transactions'    => 1,
+		'log_transactions_since' => '',
+		'log_until_certain_time' => '',
+		'log_select_value'       => -1,
+		'full_uninstall'         => 0,
+		'connector_id'           => '',
+		'client_full_name'       => '',
+		'client_company_name'    => '',
+		'client_tin'             => '',
+		'debug_log'              => '',
+	);
+
+	/**
 	 * Init hooks.
 	 */
 	public function init_hooks() {
@@ -162,41 +195,7 @@ class Settings implements Hooked {
 	}
 
 	/**
-	 * Uninstalls plugin.
-	 */
-	public static function uninstall() {
-		delete_option( self::get_setting_name( 'ansys_api_key' ) );
-		delete_option( self::get_setting_name( 'handshake_url' ) );
-		delete_option( self::get_setting_name( 'webhook_url' ) );
-		delete_option( self::get_setting_name( 'connectors' ) );
-		delete_option( self::get_setting_name( 'server' ) );
-		delete_option( self::get_setting_name( 'workspace' ) );
-		delete_option( self::get_setting_name( 'hook_url' ) );
-		delete_option( self::get_setting_name( 'backup_email' ) );
-		delete_option( self::get_setting_name( 'do_log_transactions' ) );
-		delete_option( self::get_setting_name( 'log_transactions_since' ) );
-		delete_option( self::get_setting_name( 'log_until_certain_time' ) );
-		delete_option( self::get_setting_name( 'log_select_value' ) );
-		delete_option( self::get_setting_name( 'full_uninstall' ) );
-		delete_option( self::get_plugin_name() );
-		delete_option( self::get_plugin_name() . '_db_version' );
-		delete_option( self::get_plugin_name() . 'connector_id' );
-		delete_option( self::get_plugin_name() . 'client_full_name' );
-		delete_option( self::get_plugin_name() . 'client_company_name' );
-		delete_option( self::get_plugin_name() . 'client_tin' );
-
-		delete_option( self::get_setting_name( 'debug_log' ) );
-
-		delete_option( 'ainsys-webhook_url' );
-
-		global $wpdb;
-		//$wpdb->query( sprintf( 'DROP TABLE IF EXISTS %s', $wpdb->prefix . self::$ainsys_entities_settings_table ) );
-		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %s', $wpdb->prefix . self::$ainsys_entities_settings_table ) );
-
-	}
-
-	/**
-	 * Gets full option name
+	 * Gets full option name.
 	 *
 	 * @param string $name
 	 *
@@ -223,52 +222,18 @@ class Settings implements Hooked {
 	 *
 	 * @return bool|mixed|void
 	 */
-	public static function get_backup_email() {
-		if ( ! empty( self::get_option( 'backup_email' ) ) ) {
-			return self::get_option( 'backup_email' );
+	public static function get_backup_email( $mail = '' ) {
+		$field  = 'backup_email';
+		$field .= $mail ? '_' . $mail : '';
+		if ( ! empty( self::get_option( $field ) ) ) {
+			return self::get_option( $field );
 		}
 
-		if ( ! empty( get_option( 'admin_email' ) ) ) {
+		if ( ! empty( get_option( 'admin_email' ) ) && empty( $mail ) ) {
 			return get_option( 'admin_email' );
 		}
 
 		return false;
-	}
-
-
-	/**
-	 * Registers options.
-	 *
-	 */
-	public static function register_options() {
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'ansys_api_key' ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'handshake_url' ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'webhook_url' ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'server' ), array( 'default' => 'https://user-api.ainsys.com/' ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'sys_id' ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'connectors' ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'workspace' ), array( 'default' => 14 ) );
-		register_setting(
-			self::get_setting_name( 'group' ),
-			self::get_setting_name( 'hook_url' ),
-			array(
-				Webhook_Listener::class,
-				'get_webhook_url',
-			)
-		);
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'backup_email' ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'do_log_transactions' ), array( 'default' => 1 ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'log_transactions_since' ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'log_until_certain_time' ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'log_select_value' ), array( 'default' => -1 ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'full_uninstall' ), array( 'default' => 0 ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'connector_id' ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'client_full_name' ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'client_company_name' ) );
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'client_tin' ) );
-
-		/*  DEBUG   */
-		register_setting( self::get_setting_name( 'group' ), self::get_setting_name( 'debug_log' ) );
 	}
 
 
@@ -593,6 +558,43 @@ class Settings implements Hooked {
 		$extra_fields = apply_filters( 'ainsys_prepare_extra_user_fields', array() );
 
 		return array_merge( $prepered_fields, $extra_fields );
+	}
+
+	/**
+	 * Registers options.
+	 *
+	 */
+	public static function register_options() {
+		foreach ( self::$ainsys_options as $option_name => $option_value ) {
+			if ( ! empty( $option_value ) ) {
+				register_setting( self::get_setting_name( 'group' ), self::get_setting_name( $option_name ), array( 'default' => $option_value ) );
+			} else {
+				register_setting( self::get_setting_name( 'group' ), self::get_setting_name( $option_name ) );
+			}
+		}
+		register_setting(
+			self::get_setting_name( 'group' ),
+			self::get_setting_name( 'hook_url' ),
+			array(
+				Webhook_Listener::class,
+				'get_webhook_url',
+			)
+		);
+	}
+
+	/**
+	 * Uninstalls plugin.
+	 */
+	public static function uninstall() {
+		foreach ( self::$ainsys_options as $option_name => $option_value ) {
+			delete_option( self::get_setting_name( $option_name ) );
+		}
+		delete_option( self::get_setting_name( 'hook_url' ) );
+
+		global $wpdb;
+		//$wpdb->query( sprintf( 'DROP TABLE IF EXISTS %s', $wpdb->prefix . self::$ainsys_entities_settings_table ) );
+		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %s', $wpdb->prefix . self::$ainsys_entities_settings_table ) );
+
 	}
 
 }

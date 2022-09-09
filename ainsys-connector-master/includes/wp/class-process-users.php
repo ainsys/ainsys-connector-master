@@ -112,6 +112,7 @@ class Process_Users implements Hooked {
 			$server_response = $this->core->curl_exec_func( $request_data );
 		} catch ( \Exception $e ) {
 			$server_response = 'Error: ' . $e->getMessage();
+			$this->core->send_error_email( $server_response );
 		}
 
 		$this->logger->save_log_information( $user_id, $request_action, serialize( $request_data ), serialize( $server_response ), 0 );

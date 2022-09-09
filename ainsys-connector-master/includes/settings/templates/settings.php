@@ -217,7 +217,7 @@ try {
 						<?php endif; ?>
 					</li>
 					<li>
-						<span class="ainsys-status-title"><?php _e( 'Backup email', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></span>
+						<span class="ainsys-status-title"><?php _e( 'Backup email', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>: <?php echo $admin_ui->settings::get_backup_email(); ?></span>
 						<?php
 						if ( ! empty( $admin_ui->settings::get_backup_email() ) && filter_var( $admin_ui->settings::get_backup_email(), FILTER_VALIDATE_EMAIL ) ) :
 							?>
@@ -230,6 +230,26 @@ try {
 							</span>
 						<?php endif; ?>
 					</li>
+					<?php
+					for ( $i = 1; $i < 10; $i++ ) {
+						if ( ! empty( $admin_ui->settings::get_backup_email( $i ) ) ) {
+							?>
+							<li>
+								<span class="ainsys-status-title"><?php _e( 'Backup email', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>: <?php echo $admin_ui->settings::get_backup_email( $i ); ?></span>
+								<?php
+								if ( filter_var( $admin_ui->settings::get_backup_email( $i ), FILTER_VALIDATE_EMAIL ) ) :
+									?>
+									<span class="ainsys-status-ok">
+										<i class="fa fa-check-circle-o" aria-hidden="true"></i> <?php _e( 'Valid', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
+									</span>
+								<?php else : ?>
+									<span class="ainsys-status-error">
+										<i class="fa fa-times-circle-o" aria-hidden="true"></i> <?php _e( 'Invalid', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
+									</span>
+								<?php endif; ?>
+							</li>
+						<?php } ?>
+					<?php } ?>
 				</ul>
 
 			</div>

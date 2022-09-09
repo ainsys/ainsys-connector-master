@@ -64,7 +64,6 @@ class Plugin implements Hooked {
 
 		add_action( 'wpcf7_submit', array( $this, 'on_wpcf7_submit' ), 10, 2 );
 
-
 		add_filter( 'ainsys_status_list', array( $this, 'add_status_of_component' ), 10, 1 );
 
 	}
@@ -73,11 +72,13 @@ class Plugin implements Hooked {
 		if ( class_exists( '\WPCF7_Integration' ) ) {
 			$integration = \WPCF7_Integration::get_instance();
 
-			$integration->add_category( 'ainsys',
+			$integration->add_category(
+				'ainsys',
 				__( 'AINSYS', 'contact-form-7' )
 			);
 
-			$integration->add_service( 'ainsys',
+			$integration->add_service(
+				'ainsys',
 				$this->wpcf7_service
 			);
 		}
@@ -91,12 +92,15 @@ class Plugin implements Hooked {
 			return $fields;
 		}
 
-		return array_merge( $fields, array(
-			'_wpcf7_ainsys_referrer'   => $this->utm_handler::get_referer_url(),
-			'_wpcf7_ainsys_user_agent' => $this->utm_handler::get_user_agent(),
-			'_wpcf7_ainsys_ip'         => $this->utm_handler::get_my_ip(),
-			'_wpcf7_ainsys_roistat'    => $this->utm_handler::get_roistat()
-		) );
+		return array_merge(
+			$fields,
+			array(
+				'_wpcf7_ainsys_referrer'   => $this->utm_handler::get_referer_url(),
+				'_wpcf7_ainsys_user_agent' => $this->utm_handler::get_user_agent(),
+				'_wpcf7_ainsys_ip'         => $this->utm_handler::get_my_ip(),
+				'_wpcf7_ainsys_roistat'    => $this->utm_handler::get_roistat(),
+			)
+		);
 	}
 
 	public function on_wpcf7_submit( \WPCF7_ContactForm $wpcf7, $result = array() ) {
@@ -107,15 +111,15 @@ class Plugin implements Hooked {
 
 		$form_id = $wpcf7->id();
 
-//		$fields = $wpcf7->scan_form_tags();
-//
-//		foreach ( $fields as $key => $field ) {
-//			if ( 'submit' === $field['basetype'] ) {
-//				unset( $fields[ $key ] );
-//			}
-//		}
-//
-//		$fields = array_values( $fields );
+		//      $fields = $wpcf7->scan_form_tags();
+		//
+		//      foreach ( $fields as $key => $field ) {
+		//          if ( 'submit' === $field['basetype'] ) {
+		//              unset( $fields[ $key ] );
+		//          }
+		//      }
+		//
+		//      $fields = array_values( $fields );
 
 		$request_action = 'UPDATE';
 
@@ -125,14 +129,14 @@ class Plugin implements Hooked {
 				'name' => 'wpcf7',
 			),
 			'action'  => $request_action,
-			'payload' => $_POST,
+			'payload' => array_merge( array( 'id' => time() ), $_POST ),
 		);
-
 
 		try {
 			$server_response = $this->core->curl_exec_func( $request_data );
 		} catch ( \Exception $e ) {
 			$server_response = 'Error: ' . $e->getMessage();
+			$this->core->send_error_email( $server_response );
 		}
 
 		$this->logger->save_log_information( $form_id, $request_action, serialize( $request_data ), serialize( $server_response ), 0 );
@@ -143,7 +147,7 @@ class Plugin implements Hooked {
 	public function add_status_of_component( $status_items = array() ) {
 
 		$status_items['wpcf7'] = array(
-			'title'  => __( 'Contact Form 7', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			'title'  => __( 'Contact Form 7', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 			'active' => $this->is_plugin_active( 'contact-form-7/wp-contact-form-7.php' ),
 		);
 

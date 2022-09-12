@@ -213,6 +213,9 @@
 	color: #fff;
 	cursor: pointer;
 }
+.ainsys-email-btn-disabled {
+	opacity: 50%;
+}
 .ainsys-email-btn.ainsys-minus {
 	line-height: 0.9;
 }
@@ -475,6 +478,26 @@
 /* Test */
 .ainsys-test-block {
 	width: 100%;
+}
+.ainsys-success,
+.ainsys-failure {
+	display: none;
+	width: 24px;
+	height: 24px;
+	margin: auto;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+.ainsys-success {
+	background-image: url( ../img/icon-success.svg );
+}
+.ainsys-failure {
+	background-image: url( ../img/icon-failure.svg );
+}
+.ainsys-success.ainsys-test-finished,
+.ainsys-failure.ainsys-test-finished {
+	display: inline-block;
 }
 
 /* Entities Settings */

@@ -51,6 +51,7 @@ jQuery(function($){
 
 	$('.ainsys_settings_wrap').on('click', '.ainsys-plus', function(){
 		const target = $( this ).data( 'target' );
+		$( this ).addClass( 'ainsys-email-btn-disabled' );
 		$( '.aisys-email' ).each( function() {
 			if ( $(this).data( 'block-id' ) == target ) {
 				$( this ).addClass( 'aisys-email-show' );
@@ -61,8 +62,79 @@ jQuery(function($){
 	$('.ainsys_settings_wrap').on('click', '.ainsys-minus', function(){
 		$( this ).closest( '.aisys-email' ).removeClass( 'aisys-email-show' );
 		$( this ).closest( '.aisys-email' ).find( 'input' ).val('');
+		const blockId = $( this ).closest( '.aisys-email' ).data( 'block-id' );
+		$( '.ainsys-email-btn.ainsys-plus' ).each( function() {
+			if ( $(this).data( 'target' ) == blockId ) {
+				$( this ).removeClass( 'ainsys-email-btn-disabled' );
+			}
+		} );
 	} );
 
+	$( '.ainsys-email-btn.ainsys-plus' ).each( function() {
+		const btnPlus = $( this );
+		const target = $(this).data( 'target' );
+		$( '.aisys-email' ).each( function() {
+			if ( $(this).data( 'block-id' ) == target && $(this).hasClass( 'aisys-email-show' ) ) {
+				btnPlus.addClass( 'ainsys-email-btn-disabled' );
+			}
+		} );
+	} );
+
+
+	/////////////////////////////////
+    ////////////   Test tab   ///////
+
+	//////// Ajax test btns ////////
+    $( '#setting_section_test' ).on( 'click', '.ainsys-test', function(e) {
+        e.preventDefault();
+
+        if ( $(this).hasClass( 'ainsys-loading' ) ){
+            return;
+        }
+        const entity = $( this ).data( 'entity-name' );
+		const requestTdShort = $( this ).closest( 'tr' ).find( '.ainsys-test-json' ).find( '.ainsys-responce-short' );
+		const requestTdFull = $( this ).closest( 'tr' ).find( '.ainsys-test-json' ).find( '.ainsys-responce-full' );
+		const responceTdShort = $( this ).closest( 'tr' ).find( '.ainsys-test-responce' ).find( '.ainsys-responce-short' );
+		const responceTdFull = $( this ).closest( 'tr' ).find( '.ainsys-test-responce' ).find( '.ainsys-responce-full' );
+		const testSuccess = $( this ).closest( 'tr' ).find( '.ainsys-success' );
+		const testFailure = $( this ).closest( 'tr' ).find( '.ainsys-failure' );
+
+		testFailure.removeClass( 'ainsys-test-finished' );
+		testSuccess.removeClass( 'ainsys-test-finished' );
+
+		$( this ).addClass( 'ainsys-loading' );
+
+		var data = {
+            action: 'test_entity_connection',
+            entity: entity,
+            nonce: ainsys_connector_params.nonce
+        };
+
+		$.ajax( {
+            url: ainsys_connector_params.ajax_url,
+            type: 'POST',
+            data: data,
+            success: function (response) {
+				$( '.ainsys-test' ).removeClass( 'ainsys-loading' );
+				const result = JSON.parse( response );
+				requestTdShort.text( result.short_request );
+				responceTdShort.text( result.short_responce );
+				requestTdFull.html( result.full_request );
+				responceTdFull.html( result.full_responce );
+				if ( result.full_responce.indexOf( 'Error' ) !== -1 ) {
+					testFailure.addClass( 'ainsys-test-finished' );
+				} else {
+					testSuccess.addClass( 'ainsys-test-finished' );
+				}
+			},
+            error: function () {
+				$( '.ainsys-test' ).removeClass( 'ainsys-loading' );
+				requestTdShort.text( 'Error!' );
+				responceTdShort.text( 'Error!' );
+				testFailure.addClass( 'ainsys-test-finished' );
+            }
+        } );
+    } );
 
 	/////////////////////////////////
     ////////////   Log tab   ///////
@@ -101,47 +173,6 @@ jQuery(function($){
 	$( document ).ready( function() {
 		checkToDisableLogging();
 	} );
-
-    //////// Ajax test btns ////////
-    $( '#setting_section_test' ).on( 'click', '.ainsys-test', function(e) {
-        e.preventDefault();
-
-        if ( $(this).hasClass( 'ainsys-loading' ) ){
-            return;
-        }
-        const entity = $( this ).data( 'entity-name' );
-		const requestTdShort = $( this ).closest( 'tr' ).find( '.ainsys-test-json' ).find( '.ainsys-responce-short' );
-		const requestTdFull = $( this ).closest( 'tr' ).find( '.ainsys-test-json' ).find( '.ainsys-responce-full' );
-		const responceTdShort = $( this ).closest( 'tr' ).find( '.ainsys-test-responce' ).find( '.ainsys-responce-short' );
-		const responceTdFull = $( this ).closest( 'tr' ).find( '.ainsys-test-responce' ).find( '.ainsys-responce-full' );
-
-		$( this ).addClass( 'ainsys-loading' );
-
-		var data = {
-            action: 'test_entity_connection',
-            entity: entity,
-            nonce: ainsys_connector_params.nonce
-        };
-
-		$.ajax( {
-            url: ainsys_connector_params.ajax_url,
-            type: 'POST',
-            data: data,
-            success: function (response) {
-				$( '.ainsys-test' ).removeClass( 'ainsys-loading' );
-				const result = JSON.parse( response );
-				requestTdShort.text( result.short_request );
-				responceTdShort.text( result.short_responce );
-				requestTdFull.html( result.full_request );
-				responceTdFull.html( result.full_responce );
-			},
-            error: function () {
-				$( '.ainsys-test' ).removeClass( 'ainsys-loading' );
-				requestTdShort.text( 'Error!' );
-				responceTdShort.text( 'Error!' );
-            }
-        } );
-    } );
 
     //////// Ajax start/stop loging btns  ////////
     $( '#setting_section_log' ).on( 'click', '.ainsys-log-control', function(e) {

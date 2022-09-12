@@ -12,6 +12,11 @@ jQuery(function($){
 		const requestTdFull = $( this ).closest( 'tr' ).find( '.ainsys-test-json' ).find( '.ainsys-responce-full' );
 		const responceTdShort = $( this ).closest( 'tr' ).find( '.ainsys-test-responce' ).find( '.ainsys-responce-short' );
 		const responceTdFull = $( this ).closest( 'tr' ).find( '.ainsys-test-responce' ).find( '.ainsys-responce-full' );
+		const testSuccess = $( this ).closest( 'tr' ).find( '.ainsys-success' );
+		const testFailure = $( this ).closest( 'tr' ).find( '.ainsys-failure' );
+
+		testFailure.removeClass( 'ainsys-test-finished' );
+		testSuccess.removeClass( 'ainsys-test-finished' );
 
 		$( this ).addClass( 'ainsys-loading' );
 
@@ -32,11 +37,17 @@ jQuery(function($){
 				responceTdShort.text( result.short_responce );
 				requestTdFull.html( result.full_request );
 				responceTdFull.html( result.full_responce );
+				if ( result.full_responce.indexOf( 'Error' ) !== -1 ) {
+					testFailure.addClass( 'ainsys-test-finished' );
+				} else {
+					testSuccess.addClass( 'ainsys-test-finished' );
+				}
 			},
             error: function () {
 				$( '.ainsys-woo-test' ).removeClass( 'ainsys-loading' );
 				requestTdShort.text( 'Error!' );
 				responceTdShort.text( 'Error!' );
+				testFailure.addClass( 'ainsys-test-finished' );
             }
         } );
     } );

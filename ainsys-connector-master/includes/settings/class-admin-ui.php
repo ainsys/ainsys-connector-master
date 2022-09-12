@@ -521,7 +521,7 @@ class Admin_UI implements Hooked {
 	public function generate_test_html() {
 
 		$test_html        = '<div id="connection_test"><table class="ainsys-table">';
-		$test_html_header = '<th>' . __( 'Entity', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>' . __( 'Outgoing JSON', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>' . __( 'SERVER RESPONCE', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>Test</th>'; // phpcs:ignore
+		$test_html_header = '<th>' . __( 'Entity', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>' . __( 'Outgoing JSON', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>' . __( 'SERVER RESPONCE', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th></th><th>Status</th>'; // phpcs:ignore
 		$test_html_body   = '';
 
 		$entities_list = $this->settings::get_entities();
@@ -529,7 +529,7 @@ class Admin_UI implements Hooked {
 
 		foreach ( $entities_list as $entity => $title ) {
 			if ( in_array( $entity, $wp_entities, true ) ) {
-				$test_html_body .= '<tr><td class="ainsys_td_left">' . $title . '</td><td class="ainsys_td_left ainsys-test-json"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_left ainsys-test-responce"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_btn"><a href="" class="btn btn-primary ainsys-test" data-entity-name="' . $entity . '">' . __( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a></td></tr>'; // phpcs:ignore
+				$test_html_body .= '<tr><td class="ainsys_td_left">' . $title . '</td><td class="ainsys_td_left ainsys-test-json"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_left ainsys-test-responce"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_btn"><a href="" class="btn btn-primary ainsys-test" data-entity-name="' . $entity . '">' . __( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a></td><td><span class="ainsys-success"></span><span class="ainsys-failure"></span></td></tr>'; // phpcs:ignore
 			}
 		}
 

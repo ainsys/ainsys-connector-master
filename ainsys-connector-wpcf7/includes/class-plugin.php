@@ -34,7 +34,7 @@ class Plugin implements Hooked {
 	 */
 	private $logger;
 
-	public function __construct( Core $core, UTM_Handler $utm_handler, Logger $logger ) {
+	public function __construct( Core $core, UTM_Handler $utm_handler, Logger $logger, WPCF7_Ainsys $wpcf7_service ) {
 
 		$this->core        = $core;
 		$this->utm_handler = $utm_handler;

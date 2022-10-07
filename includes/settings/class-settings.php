@@ -348,9 +348,9 @@ class Settings implements Hooked {
 	 */
 	public static function get_saved_entity_settings_from_db( $where = '', $single = true ) {
 		global $wpdb;
-		//$query    = 'SELECT * FROM ' . $wpdb->prefix . self::$ainsys_entities_settings_table . $where;
-		//$result   = $wpdb->get_results( $query, ARRAY_A );
-		$result = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM %s', $wpdb->prefix . self::$ainsys_entities_settings_table . $where ), ARRAY_A );
+
+		$query    = sprintf( "SELECT * FROM $wpdb->prefix%s %s" , self::$ainsys_entities_settings_table, $where );
+		$result   = $wpdb->get_results( $query, ARRAY_A );
 
 		if ( isset( $result[0]['value'] ) && $single ) {
 			$keys = array_column( $result, 'setting_key' );

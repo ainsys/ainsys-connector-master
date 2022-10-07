@@ -141,25 +141,38 @@ class Admin_UI implements Hooked {
 	 */
 	public function ainsys_enqueue_scripts() {
 
-		wp_enqueue_script( 'ainsys_connector_admin_handle', plugins_url( 'assets/js/ainsys_connector_admin.js', AINSYS_CONNECTOR_PLUGIN ), array( 'jquery' ), '4.0.0', true );
-
-		if ( false !== strpos( $_GET['page'] ?? '', 'ainsys-connector' ) ) {
+		if ( false === strpos( $_GET['page'] ?? '', 'ainsys-connector' ) ) {
 			//wp_enqueue_script('jquery-ui-sortable');
-			wp_enqueue_style( 'ainsys_connector_style_handle', plugins_url( 'assets/css/ainsys_connector_style.css', AINSYS_CONNECTOR_PLUGIN ) );
-			wp_enqueue_style( 'font-awesome_style_handle', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css' );
-
-			wp_enqueue_script( 'ainsys_connector_admin_handle', plugins_url( 'assets/js/ainsys_connector_admin.js', AINSYS_CONNECTOR_PLUGIN ), array( 'jquery' ), '4.0.0', true );
-			wp_localize_script(
-				'ainsys_connector_admin_handle',
-				'ainsys_connector_params',
-				array(
-					'ajax_url' => admin_url( 'admin-ajax.php' ),
-					'nonce'    => wp_create_nonce( self::$nonce_title ),
-				)
-			);
+			return;
 		}
 
-		return;
+		wp_enqueue_style(
+			'ainsys_connector_style_handle',
+			plugins_url( 'assets/css/ainsys_connector_style.css', AINSYS_CONNECTOR_PLUGIN ),
+			[],
+			AINSYS_CONNECTOR_VERSION
+		);
+
+		wp_enqueue_style( 'font-awesome_style_handle',
+			'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css',
+			[],
+			AINSYS_CONNECTOR_VERSION);
+
+		wp_enqueue_script( 'ainsys_connector_admin_handle',
+			plugins_url( 'assets/js/ainsys_connector_admin.js', AINSYS_CONNECTOR_PLUGIN ),
+			array( 'jquery' ),
+			AINSYS_CONNECTOR_VERSION,
+			true );
+
+		wp_localize_script(
+			'ainsys_connector_admin_handle',
+			'ainsys_connector_params',
+			array(
+				'ajax_url' => admin_url( 'admin-ajax.php' ),
+				'nonce'    => wp_create_nonce( self::$nonce_title ),
+			)
+		);
+
 	}
 
 	/**
@@ -303,66 +316,85 @@ class Admin_UI implements Hooked {
 	/**
 	 * Saves entities settings (for ajax).
 	 */
-	public function save_entities_settings() {
-		if ( isset( $_POST['action'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
-			$fields      = $_POST;
-			$entity      = isset( $_POST['entity'] ) ? $_POST['entity'] : '';
-			$seting_name = $_POST['seting_name'] ? $_POST['seting_name'] : '';
-			if ( ! $entity && ! $seting_name ) {
-				echo false;
-				die();
-			}
+	public function save_entities_settings(): void {
 
-			$fields = $this->sanitise_fields_to_save( $fields );
+		if ( ! isset( $_POST['action'], $_POST['nonce'] ) && ! wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
+			wp_die( 'Missing nonce' );
+		}
 
-			global $wpdb;
-			$entity_saved_settings = $this->settings::get_saved_entity_settings_from_db( ' WHERE entity="' . $entity . '" setting_key="saved_field" AND setting_name="' . $seting_name . '"' );
-			$response              = '';
-			if ( empty( $entity_saved_settings ) ) {
-				$response      = $wpdb->insert(
-					$wpdb->prefix . Settings::$ainsys_entities_settings_table,
-					array(
-						'entity'       => $entity,
-						'setting_name' => $seting_name,
-						'setting_key'  => 'saved_field',
-						'value'        => serialize( $fields ),
-					)
-				);
-				$field_data_id = $wpdb->insert_id;
-			} else {
-				$response      = $wpdb->update(
-					$wpdb->prefix . $this->settings::$ainsys_entities_settings_table,
-					array( 'value' => serialize( $fields ) ),
-					array( 'id' => $entity_saved_settings['id'] )
-				);
-				$field_data_id = $entity_saved_settings['id'];
-			}
+		$fields = $_POST;
 
-			$request_action = 'field/' . $entity . '/' . $seting_name;
+		$entity      = isset( $_POST['entity'] ) ? sanitize_text_field( $_POST['entity'] ) : '';
+		$seting_name = $_POST['seting_name'] ? sanitize_text_field( $_POST['seting_name'] ) : '';
 
-			$fields = apply_filters( 'ainsys_update_entity_fields', $fields );
+		if ( ! $entity && ! $seting_name ) {
+			wp_die( 'Missing entity or setting_name' );
+		}
 
-			$request_data = array(
-				'entity'  => array(
-					'id' => $field_data_id,
-				),
-				'action'  => $request_action,
-				'payload' => $fields,
+		$fields = $this->sanitise_fields_to_save( $fields );
+
+		global $wpdb;
+
+		$entity_saved_settings = $this->settings::get_saved_entity_settings_from_db(
+			sprintf(
+				' WHERE entity="%s" setting_key="saved_field" AND setting_name="%s"',
+				esc_sql( $entity ),
+				esc_sql( $seting_name )
+			)
+		);
+
+		if ( empty( $entity_saved_settings ) ) {
+			$wpdb->insert(
+				$wpdb->prefix . Settings::$ainsys_entities_settings_table,
+				[
+					'entity'       => $entity,
+					'setting_name' => $seting_name,
+					'setting_key'  => 'saved_field',
+					'value'        => serialize( $fields ),
+				]
 			);
 
-			try {
-				$server_response = $this->core->curl_exec_func( $request_data );
-			} catch ( \Exception $e ) {
-				$server_response = 'Error: ' . $e->getMessage();
-			}
+			$field_data_id = $wpdb->insert_id;
+		} else {
+			$wpdb->update(
+				$wpdb->prefix . $this->settings::$ainsys_entities_settings_table,
+				[ 'value' => serialize( $fields ) ],
+				[ 'id' => $entity_saved_settings['id'] ]
+			);
 
-			$this->logger->save_log_information( (int) $field_data_id, $request_action, serialize( $request_data ), serialize( $server_response ), 0 );
-
-			echo $field_data_id ?? 0;
-			die();
+			$field_data_id = $entity_saved_settings['id'];
 		}
-		echo false;
-		die();
+
+		$request_action = 'field/' . $entity . '/' . $seting_name;
+
+		$fields = apply_filters( 'ainsys_update_entity_fields', $fields );
+
+		$request_data = [
+			'entity'  => [
+				'id' => $field_data_id,
+			],
+			'action'  => $request_action,
+			'payload' => $fields,
+		];
+
+		try {
+			$server_response = $this->core->curl_exec_func( $request_data );
+		} catch ( \Exception $e ) {
+			$server_response = 'Error: ' . $e->getMessage();
+		}
+
+		$this->logger::save_log_information(
+			(int) $field_data_id,
+			$request_action,
+			serialize( $request_data ),
+			serialize( $server_response ),
+			0
+		);
+
+		echo $field_data_id ?? 0;
+
+		wp_die();
+
 	}
 
 	/**
@@ -395,9 +427,11 @@ class Admin_UI implements Hooked {
 	 *
 	 */
 	public function reload_log_html() {
-		if ( isset( $_POST['action'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
-			echo $this->logger->generate_log_html();
+
+		if ( isset( $_POST['action'], $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
+			echo $this->logger::generate_log_html();
 		}
+
 		die();
 	}
 
@@ -446,11 +480,13 @@ class Admin_UI implements Hooked {
 	 * Clears log DB table (for ajax).
 	 *
 	 */
-	public function clear_log() {
-		if ( isset( $_POST['action'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
+	public function clear_log(): void {
+
+		if ( isset( $_POST['action'], $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
 			$this->logger->truncate_log_table();
-			echo $this->logger->generate_log_html();
+			echo $this->logger::generate_log_html();
 		}
+
 		die();
 	}
 

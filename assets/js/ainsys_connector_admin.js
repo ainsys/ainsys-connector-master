@@ -141,15 +141,23 @@ jQuery(function($){
 
     //////// Ajax clear log ////////
     $('#setting_section_log').on('click', '#clear_log', function (e){
-        var data = {
-            action: "clear_log",
-            nonce: ainsys_connector_params.nonce
-        };
-        jQuery.post(ainsys_connector_params.ajax_url, data, function (value) {
-            if(value){
-                $('#connection_log').html(value);
-            }
-        });
+ 	    $.ajax( {
+		    url:        ainsys_connector_params.ajax_url,
+		    type:       'POST',
+		    data:{
+			    action: "clear_log",
+			    nonce: ainsys_connector_params.nonce
+		    },
+		    beforeSend: function ( xhr ) {
+			    $( e.target ).addClass( 'disabled' );
+		    },
+		    success:    function ( value ) {
+			    $( e.target ).removeClass( 'disabled' );
+			    if(value){
+				    $('#connection_log').html(value);
+			    }
+		    }
+	    } )
     });
 
 	//////// Ajax start/stop loging  ////////
@@ -222,26 +230,27 @@ jQuery(function($){
         } );
     } );
 
-    ////////  Ajax reload log HTML ////////
-    $('#setting_section_log').on('click', '#reload_log', function (e){
-        $.ajax({
-            url: ainsys_connector_params.ajax_url,
-            type: 'POST',
-            data: {
-                action: 'reload_log_html',
-                // check
-                nonce: ainsys_connector_params.nonce
-            },
-            success: function (msg) {
-                if(msg){
-                    $('#connection_log').html(msg);
-                }
-            }//,
-            // error: function (jqXHR, exception) {
-            //
-            // }
-        })
-    });
+	////////  Ajax reload log HTML ////////
+	$( '#setting_section_log' ).on( 'click', '#reload_log', function ( e ) {
+
+		$.ajax( {
+			url:        ainsys_connector_params.ajax_url,
+			type:       'POST',
+			data:       {
+				action: 'reload_log_html',
+				nonce:  ainsys_connector_params.nonce
+			},
+			beforeSend: function ( xhr ) {
+				$( e.target ).addClass( 'disabled' );
+			},
+			success:    function ( msg ) {
+				$( e.target ).removeClass( 'disabled' );
+				if ( msg ) {
+					$( '#connection_log' ).html( msg );
+				}
+			}
+		} )
+	} );
 
 	$('.ainsys_settings_wrap').on('click', '.ainsys-responce-short', function (e){
 		const fullResponse = $( this ).siblings( '.ainsys-responce-full' ).html();

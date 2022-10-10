@@ -17,12 +17,12 @@ class Settings implements Hooked {
 	/**
 	 * AINSYS log table name.
 	 */
-	static $ainsys_entities_settings_table = 'ainsys_entitys_settings';
+	public static string $ainsys_entities_settings_table = 'ainsys_entities_settings';
 
 	/**
 	 * AINSYS options and their default values.
 	 */
-	public static $ainsys_options = array(
+	public static array $ainsys_options = array(
 		'ansys_api_key'          => '',
 		'handshake_url'          => '',
 		'webhook_url'            => '',
@@ -68,7 +68,7 @@ class Settings implements Hooked {
 	 *
 	 * @return void
 	 */
-	public function check_to_auto_disable_logging() {
+	public function check_to_auto_disable_logging(): void {
 		$logging_enabled = (int) self::get_option( 'do_log_transactions' );
 		// Generate log until time settings
 		$current_time = time();
@@ -98,26 +98,28 @@ class Settings implements Hooked {
 		return get_option( self::get_option_name( $name ) );
 	}
 
+
 	/**
 	 * Gets full options name.
 	 *
-	 * @param string $name
+	 * @param  string $name
 	 *
 	 * @return string
 	 */
-	public static function get_option_name( $name ) {
+	public static function get_option_name( string $name ): string {
+
 		return self::get_plugin_name() . '_' . $name;
 	}
 
-	//////////////////////////////
 
 	/**
 	 * Gets plugin uniq name to show on the settings page.
 	 *
 	 * @return string
 	 */
-	public static function get_plugin_name() {
-		return 'ansys_connector_woocommerce';//strtolower( str_replace( '\\', '_', __NAMESPACE__ ) );
+	public static function get_plugin_name(): string {
+
+		return strtolower( str_replace( '\\', '_', __NAMESPACE__ ) );
 	}
 
 
@@ -126,10 +128,10 @@ class Settings implements Hooked {
 	 *
 	 * @return void
 	 */
-	public static function activate() {
+	public static function activate(): void {
 		global $wpdb;
 
-		update_option( self::get_plugin_name(), AINSYS_CONNECTOR_VERSION );
+		update_option( self::get_plugin_name(), AINSYS_CONNECTOR_VERSION , false);
 
 		flush_rewrite_rules();
 		ob_start();
@@ -138,21 +140,24 @@ class Settings implements Hooked {
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		dbDelta( self::get_schema() );
 
-		update_option( self::get_plugin_name() . '_db_version', AINSYS_CONNECTOR_VERSION );
+		update_option( self::get_plugin_name() . '_db_version', AINSYS_CONNECTOR_VERSION, false);
 
 		ob_get_clean();
 
-		return;
 	}
+
 
 	/**
 	 * Gets Table schema.
 	 *
 	 * @return string
 	 */
-	private static function get_schema() {
+	private static function get_schema(): string {
+
 		global $wpdb;
+
 		$collate = '';
+
 		if ( $wpdb->has_cap( 'collation' ) ) {
 			$collate = $wpdb->get_charset_collate();
 		}
@@ -166,9 +171,9 @@ class Settings implements Hooked {
 		 * indexes first causes too much load on some servers/larger DB.
 		 */
 
-		$table_entitys_settings = $wpdb->prefix . self::$ainsys_entities_settings_table;
+		$table_entities_settings = $wpdb->prefix . self::$ainsys_entities_settings_table;
 
-		$tables = "CREATE TABLE {$table_entitys_settings} (
+		return "CREATE TABLE {$table_entities_settings} (
                 `id` bigint unsigned NOT NULL AUTO_INCREMENT,
                 `entity` text DEFAULT NULL,
                 `setting_name` text DEFAULT NULL,
@@ -177,8 +182,6 @@ class Settings implements Hooked {
                 `creation_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 PRIMARY KEY  (`id`)
             ) $collate;";
-
-		return $tables;
 	}
 
 	/**
@@ -186,7 +189,7 @@ class Settings implements Hooked {
 	 *
 	 * @return void
 	 */
-	public static function deactivate() {
+	public static function deactivate(): void {
 		if ( (int) self::get_option( 'full_uninstall' ) ) {
 			self::uninstall();
 		}
@@ -205,15 +208,17 @@ class Settings implements Hooked {
 		return self::get_plugin_name() . '_' . $name;
 	}
 
+
 	/**
 	 * Updates an option.
 	 *
-	 * @param string $name
+	 * @param  string $name
+	 * @param         $value
 	 *
-	 * @return mixed|void
+	 * @return bool
 	 */
-	public static function set_option( $name, $value ) {
-		return update_option( self::get_option_name( $name ), $value );
+	public static function set_option( string $name, $value ): bool {
+		return update_option( self::get_option_name( $name ), $value, false );
 	}
 
 
@@ -341,12 +346,12 @@ class Settings implements Hooked {
 	/**
 	 * Gets entity field settings from DB.
 	 *
-	 * @param string $where
-	 * @param bool $single
+	 * @param  string $where
+	 * @param  bool   $single
 	 *
 	 * @return array
 	 */
-	public static function get_saved_entity_settings_from_db( $where = '', $single = true ) {
+	public static function get_saved_entity_settings_from_db( string $where = '', bool $single = true ): array {
 		global $wpdb;
 
 		$query    = sprintf( "SELECT * FROM $wpdb->prefix%s %s" , self::$ainsys_entities_settings_table, $where );
@@ -564,7 +569,8 @@ class Settings implements Hooked {
 	 * Registers options.
 	 *
 	 */
-	public static function register_options() {
+	public static function register_options(): void {
+
 		foreach ( self::$ainsys_options as $option_name => $option_value ) {
 			if ( ! empty( $option_value ) ) {
 				register_setting( self::get_setting_name( 'group' ), self::get_setting_name( $option_name ), array( 'default' => $option_value ) );
@@ -572,6 +578,7 @@ class Settings implements Hooked {
 				register_setting( self::get_setting_name( 'group' ), self::get_setting_name( $option_name ) );
 			}
 		}
+
 		register_setting(
 			self::get_setting_name( 'group' ),
 			self::get_setting_name( 'hook_url' ),
@@ -585,15 +592,17 @@ class Settings implements Hooked {
 	/**
 	 * Uninstalls plugin.
 	 */
-	public static function uninstall() {
+	public static function uninstall(): void {
+
 		foreach ( self::$ainsys_options as $option_name => $option_value ) {
 			delete_option( self::get_setting_name( $option_name ) );
 		}
+
 		delete_option( self::get_setting_name( 'hook_url' ) );
 
 		global $wpdb;
-		//$wpdb->query( sprintf( 'DROP TABLE IF EXISTS %s', $wpdb->prefix . self::$ainsys_entities_settings_table ) );
-		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %s', $wpdb->prefix . self::$ainsys_entities_settings_table ) );
+
+		$wpdb->query( sprintf( 'DROP TABLE IF EXISTS %s', $wpdb->prefix . self::$ainsys_entities_settings_table ) );
 
 	}
 

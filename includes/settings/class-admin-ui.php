@@ -16,34 +16,34 @@ class Admin_UI implements Hooked {
 	 *
 	 * @var array
 	 */
-	static $notices = array();
+	public static array $notices = array();
 
-	public static $nonce_title = 'ansys_admin_menu_nonce';
+	public static string $nonce_title = 'ainsys_admin_menu_nonce';
 
 	/**
 	 * @var Settings
 	 */
-	public $settings;
+	public Settings $settings;
 
 	/**
 	 * @var Core
 	 */
-	public $core;
+	public Core $core;
 
 	/**
 	 * @var Logger
 	 */
-	public $logger;
+	public Logger $logger;
 
 	/**
 	 * @var Process_Users
 	 */
-	public $process_users;
+	public Process_Users $process_users;
 
 	/**
 	 * @var Process_Comments
 	 */
-	public $process_comments;
+	public Process_Comments $process_comments;
 
 	public function __construct( Settings $settings, Core $core, Logger $logger, Process_Users $process_users, Process_Comments $process_comments ) {
 		$this->settings         = $settings;
@@ -299,7 +299,7 @@ class Admin_UI implements Hooked {
 	 * @return
 	 */
 	public function remove_ainsys_integration() {
-		if ( isset( $_POST['action'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
+		if ( isset( $_POST['action'], $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
 			$this->settings::set_option( 'connectors', '' );
 			$this->settings::set_option( 'ansys_api_key', '' );
 			$this->settings::set_option( 'handshake_url', '' );
@@ -668,19 +668,18 @@ class Admin_UI implements Hooked {
 	/**
 	 * Gets a property from an array.
 	 *
-	 * @param string $name
-	 * @param mixed $prop_val
-	 * @param array $entity_saved_settings
+	 * @param  string $name
+	 * @param mixed   $prop_val
+	 * @param  array  $entity_saved_settings
 	 *
 	 * @return string
 	 */
-	public function get_property( $name, $prop_val, $entity_saved_settings ) {
+	public function get_property( string $name, $prop_val, array $entity_saved_settings ): string {
 		if ( is_array( $prop_val['default'] ) ) {
-			return isset( $entity_saved_settings[ strtolower( $name ) ] ) ? $entity_saved_settings[ strtolower( $name ) ] : array_search( '1', $prop_val['default'], true );
+			return $entity_saved_settings[ strtolower( $name ) ] ?? array_search( '1', $prop_val['default'], true );
 		}
 
-		return isset( $entity_saved_settings[ strtolower( $name ) ] ) ?
-			$entity_saved_settings[ strtolower( $name ) ] : $prop_val['default'];
+		return $entity_saved_settings[ strtolower( $name ) ] ?? $prop_val['default'];
 	}
 
 	/**

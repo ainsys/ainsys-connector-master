@@ -391,7 +391,7 @@ jQuery(function($){
     });
  
 	//////// expand entity tab ////////
-    $('#setting_entities_section').on('click', ' .expand_entiti_container', function (e){
+    $('#setting_entities_section').on('click', ' .expand_entity_container', function (e){
         $(this).parent().parent().toggleClass('active');
         var text = $(this).text() == 'expand' ? 'collapse' : 'expand';
         $(this).text(text);

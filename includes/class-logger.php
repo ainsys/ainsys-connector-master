@@ -12,11 +12,6 @@ class Logger implements Hooked {
 
 	private static string $log_table_name = 'ainsys_log';
 
-	/**
-	 * @var Settings
-	 */
-	private Settings $settings;
-
 
 	public function __construct( Settings $settings ) {
 
@@ -35,12 +30,12 @@ class Logger implements Hooked {
 	 * @param  int    $object_id
 	 * @param  string $request_action
 	 * @param  string $request_data
-	 * @param  string $server_responce
+	 * @param  string $server_response
 	 * @param  int    $incoming_call
 	 *
-	 * @return string
+	 * @return bool|int|\mysqli_result|resource|null
 	 */
-	public static function save_log_information( $object_id, $request_action, $request_data, $server_responce = '', $incoming_call = 0 ) {
+	public static function save_log_information( int $object_id, string $request_action, string $request_data, string $server_response = '', int $incoming_call = 0 ) {
 
 		global $wpdb;
 
@@ -54,7 +49,7 @@ class Logger implements Hooked {
 				'object_id'       => $object_id,
 				'request_action'  => $request_action,
 				'request_data'    => $request_data,
-				'server_responce' => $server_responce,
+				'server_response' => $server_response,
 				'incoming_call'   => $incoming_call,
 			]
 		);
@@ -64,9 +59,12 @@ class Logger implements Hooked {
 	/**
 	 * Render json as HTML.
 	 *
+	 * @param         $json
+	 * @param  string $result
+	 *
 	 * @return string
 	 */
-	public static function ainsys_render_json( $json, $result = '' ) {
+	public static function ainsys_render_json( $json, string $result = '' ): string {
 
 		foreach ( $json as $key => $val ) {
 
@@ -135,7 +133,7 @@ class Logger implements Hooked {
 						}
 						break;
 
-					case 'server_responce':
+					case 'server_response':
 						$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( $value, 0, 80 ) . ' ... </div>';
 
 						$value = json_decode( maybe_unserialize( $value ) );
@@ -246,7 +244,7 @@ class Logger implements Hooked {
                 `object_id` bigint NOT NULL,
                 `request_action` varchar(100) NOT NULL,
                 `request_data` text DEFAULT NULL,
-                `server_responce` text DEFAULT NULL,
+                `server_response` text DEFAULT NULL,
                 `incoming_call` smallint NOT NULL,
                 `creation_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 PRIMARY KEY  (log_id),

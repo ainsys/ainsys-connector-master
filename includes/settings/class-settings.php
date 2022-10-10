@@ -173,7 +173,7 @@ class Settings implements Hooked {
 
 		$table_entities_settings = $wpdb->prefix . self::$ainsys_entities_settings_table;
 
-		return "CREATE TABLE {$table_entities_settings} (
+		return "CREATE TABLE $table_entities_settings (
                 `id` bigint unsigned NOT NULL AUTO_INCREMENT,
                 `entity` text DEFAULT NULL,
                 `setting_name` text DEFAULT NULL,
@@ -193,18 +193,16 @@ class Settings implements Hooked {
 		if ( (int) self::get_option( 'full_uninstall' ) ) {
 			self::uninstall();
 		}
-
-		return;
 	}
 
 	/**
 	 * Gets full option name.
 	 *
-	 * @param string $name
+	 * @param  string $name
 	 *
 	 * @return string
 	 */
-	public static function get_setting_name( $name ) {
+	public static function get_setting_name( string $name ): string {
 		return self::get_plugin_name() . '_' . $name;
 	}
 
@@ -234,7 +232,7 @@ class Settings implements Hooked {
 			return self::get_option( $field );
 		}
 
-		if ( ! empty( get_option( 'admin_email' ) ) && empty( $mail ) ) {
+		if ( empty( $mail ) && ! empty( get_option( 'admin_email' ) ) ) {
 			return get_option( 'admin_email' );
 		}
 
@@ -247,7 +245,7 @@ class Settings implements Hooked {
 	 *
 	 * @return array
 	 */
-	static function get_entities() {
+	public static function get_entities(): array {
 		/// Get WordPress pre installed entities.
 		$entities = array(
 			'user'     => __( 'User / fields', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
@@ -262,7 +260,7 @@ class Settings implements Hooked {
 	 *
 	 * @return array
 	 */
-	public static function get_entity_fields_handlers() {
+	public static function get_entity_fields_handlers(): array {
 		$field_getters = array(
 			'user'     => array( static::class, 'get_user_fields' ),
 			'comments' => array( static::class, 'get_comments_fields' ),
@@ -276,11 +274,11 @@ class Settings implements Hooked {
 	 * Generates a list of settings for entity field with default values
 	 * $entity param used for altering settins depending on entity
 	 *
-	 * @param string $entity
+	 * @param  string $entity
 	 *
 	 * @return array
 	 */
-	static function get_entities_settings( $entity = '' ) {
+	public static function get_entities_settings( string $entity = '' ): array {
 
 		$default_apis = apply_filters(
 			'ainsys_default_apis_for_entities',
@@ -380,7 +378,7 @@ class Settings implements Hooked {
 	 *
 	 * @return array
 	 */
-	static function get_comments_fields() {
+	public static function get_comments_fields(): array {
 		$prepered_fields = array(
 			'comment_ID'           => array(
 				'nice_name' => '',
@@ -466,7 +464,7 @@ class Settings implements Hooked {
 	 *
 	 * @return array
 	 */
-	static function get_user_fields() {
+	public static function get_user_fields(): array {
 		$prepered_fields = array(
 			'ID'                   => array(
 				'nice_name' => __( '{ID}', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore

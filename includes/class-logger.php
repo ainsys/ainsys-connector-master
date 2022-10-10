@@ -8,6 +8,8 @@ class Logger implements Hooked {
 
 	public static $do_log_transactions = false;
 
+	public static $clear_full_uninstall;
+
 	private static string $log_table_name = 'ainsys_log';
 
 	/**
@@ -18,8 +20,8 @@ class Logger implements Hooked {
 
 	public function __construct( Settings $settings ) {
 
-		$this->settings            = $settings;
-		self::$do_log_transactions = $this->settings::get_option( 'do_log_transactions' );
+		self::$do_log_transactions  = $settings::get_option( 'do_log_transactions' );
+		self::$clear_full_uninstall = $settings::get_option( 'full_uninstall' );
 	}
 
 
@@ -198,7 +200,7 @@ class Logger implements Hooked {
 
 	public function deactivate(): void {
 
-		if ( (int) $this->settings::get_option( 'full_uninstall' ) ) {
+		if ( self::$clear_full_uninstall ) {
 			$this->uninstall();
 		}
 	}

@@ -116,12 +116,13 @@ jQuery(function($){
             data: data,
             success: function (response) {
 				$( '.ainsys-test' ).removeClass( 'ainsys-loading' );
-				const result = JSON.parse( response );
-				requestTdShort.text( result.short_request );
-				responceTdShort.text( result.short_responce );
-				requestTdFull.html( result.full_request );
-				responceTdFull.html( result.full_responce );
-				if ( result.full_responce.indexOf( 'Error' ) !== -1 ) {
+				console.log(response);
+				//const result = JSON.parse( response );
+				requestTdShort.text( response.short_request );
+				responceTdShort.text( response.short_responce );
+				requestTdFull.html( response.full_request );
+				responceTdFull.html( response.full_responce );
+				if ( response.full_responce.indexOf( 'Error' ) !== -1 ) {
 					testFailure.addClass( 'ainsys-test-finished' );
 				} else {
 					testSuccess.addClass( 'ainsys-test-finished' );

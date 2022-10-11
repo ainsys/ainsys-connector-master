@@ -600,7 +600,11 @@ class Admin_UI implements Hooked {
 
 		foreach ( $properties as $item => $settings ) {
 			$checker_property     = ( 'bool' === $settings['type'] || 'api' === $item ) ? 'small_property' : '';
-			$inner_fields_header .= '<div class="properties_field_title ' . $checker_property . '">' . $settings['nice_name'] . '</div>';
+
+			$inner_fields_header .= sprintf( '<div class="properties_field_title %s">%s</div>',
+				$checker_property,
+				$settings['nice_name']
+			);
 		}
 
 		foreach ( $entities_list as $entity => $title ) {

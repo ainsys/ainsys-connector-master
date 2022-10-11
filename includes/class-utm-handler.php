@@ -7,7 +7,7 @@ class UTM_Handler {
 
 
 	public function __construct() {
-		include_once __DIR__ . '/vendor/xsuchy09/utm-cookie/src/UtmCookie/UtmCookie.php';
+		include_once __DIR__ . '/libs/UtmCookie.php';
 
 		$utm_source = \UtmCookie\UtmCookie::get( 'utm_source' );
 		if ( isset( $utm_source ) && $utm_source != false && $utm_source != null ) {

@@ -59,12 +59,12 @@ class Logger implements Hooked {
 	/**
 	 * Render json as HTML.
 	 *
-	 * @param  array  $json
+	 * @param  $json
 	 * @param  string $result
 	 *
 	 * @return string
 	 */
-	public static function ainsys_render_json( array $json, string $result = '' ): string {
+	public static function ainsys_render_json( $json, string $result = '' ): string {
 
 		foreach ( $json as $key => $val ) {
 

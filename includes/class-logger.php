@@ -116,11 +116,10 @@ class Logger implements Hooked {
 						break;
 
 					case 'request_data':
+
 						$value = maybe_unserialize( $value );
 
-						if ( empty( $value['request_data'] ) ) {
-							$log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore
-						} elseif ( empty( $value['payload'] ) ) {
+						if ( empty( $value['payload'] ) ) {
 							$log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore
 						} else {
 							$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( serialize( $value ), 0, 40 ) . ' ... </div>';

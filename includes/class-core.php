@@ -40,20 +40,20 @@ class Core implements Hooked {
 	/**
 	 * Curl connect and get data.
 	 *
-	 * @param array $post_fields
-	 * @param string $url
+	 * @param  array  $post_fields
+	 * @param  string $url
 	 *
 	 * @return string
 	 * @throws \Exception
 	 */
-	public function curl_exec_func( $post_fields = '', $url = '' ) {
-		$url = $url ? $url : (string) $this->settings::get_option( 'ansys_api_key' );
+	public function curl_exec_func( array $post_fields = [], string $url = '' ) {
+		$url = $url ? : (string) $this->settings::get_option( 'ansys_api_key' );
 
 		if ( empty( $url ) ) {
 			/// Save curl requests for debug
 			$this->settings::set_option( 'debug_log', $this->settings::get_option( 'debug_log' ) . 'cURL Error: No url provided<br>' );
 
-			throw new \Exception( 'Отсутствует url подключения' );
+			throw new \RuntimeException( 'No url provided' );
 		}
 
 		$response = wp_remote_post(
@@ -72,7 +72,7 @@ class Core implements Hooked {
 
 		/// Save curl requests for debug
 		$logged_string = is_wp_error( $response ) ? $response->get_error_message() : wp_json_encode( $response );
-		self::log( $logged_string );
+		$this->log( $logged_string );
 
 		if ( is_wp_error( $response ) ) {
 			//throw new \Exception( $response->get_error_message(), $response->get_error_code() );

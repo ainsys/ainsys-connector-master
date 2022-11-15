@@ -216,7 +216,7 @@ class Settings implements Hooked {
 	 * @return bool
 	 */
 	public static function set_option( string $name, $value ): bool {
-		return update_option( self::get_option_name( $name ), $value, false );
+		return update_option( self::get_option_name( $name ), $value, 'no' );
 	}
 
 

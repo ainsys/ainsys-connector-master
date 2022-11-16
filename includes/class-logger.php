@@ -118,7 +118,7 @@ class Logger implements Hooked {
 					case 'request_data':
 
 						$value = maybe_unserialize( $value );
-
+						error_log( print_r( $value, 1 ) );
 						if ( empty( $value['payload'] ) ) {
 							$log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore
 						} else {

@@ -2,7 +2,6 @@
 
 namespace Ainsys\Connector\Master\WP;
 
-
 use Ainsys\Connector\Master\Core;
 use Ainsys\Connector\Master\Hooked;
 use Ainsys\Connector\Master\Logger;
@@ -12,14 +11,16 @@ class Process_Comments implements Hooked {
 	/**
 	 * @var Core
 	 */
-	private $core;
+	private Core $core;
 
 	/**
 	 * @var Logger
 	 */
-	private $logger;
+	private Logger $logger;
+
 
 	public function __construct( Core $core, Logger $logger ) {
+
 		$this->core   = $core;
 		$this->logger = $logger;
 	}
@@ -31,74 +32,89 @@ class Process_Comments implements Hooked {
 	 * @return void
 	 */
 	public function init_hooks() {
-		add_action( 'comment_post', array( $this, 'send_new_comment_to_ainsys' ), 10, 3 );
-		add_action( 'edit_comment', array( $this, 'send_update_comment_to_ainsys' ), 10, 3 );
+
+		add_action( 'comment_post', [ $this, 'send_new_comment_to_ainsys' ], 10, 3 );
+		add_action( 'edit_comment', [ $this, 'send_update_comment_to_ainsys' ], 10, 3 );
 	}
+
 
 	/**
 	 * Sends updated WP comment details to AINSYS.
 	 *
-	 * @param int $comment_id
-	 * @param object $data
+	 * @param  int    $comment_id
+	 * @param         $comment_approved
+	 * @param  object $data
 	 *
-	 * @return
 	 */
-	public function send_new_comment_to_ainsys( $comment_id, $comment_approved, $data ) {
+	public function send_new_comment_to_ainsys( $comment_id, $comment_approved, $data ): void {
+
 		$request_action = 'CREATE';
 
 		$fields = apply_filters( 'ainsys_new_comment_fields', $this->prepare_comment_data( $comment_id, $data ), $data );
 
-		$request_data = array(
-			'object_id'      => $comment_id,
-			'request_action' => $request_action,
-			'request_data'   => $fields,
-		);
+		$this->send_data( $comment_id, $request_action, $fields );
 
-		try {
-			$server_response = $this->core->curl_exec_func( $request_data );
-		} catch ( \Exception $e ) {
-			$server_response = 'Error: ' . $e->getMessage();
-		}
-
-		$this->logger->save_log_information( $comment_id, $request_action, serialize( $request_data ), serialize( $server_response ), 0 );
-
-		return;
 	}
+
 
 	/**
 	 * Prepares WP comment data. Adds ACF fields if there are any.
 	 *
-	 * @param int $comment_id
-	 * @param array $data
+	 * @param  int   $comment_id
+	 * @param  array $data
 	 *
 	 * @return array
 	 */
 	private function prepare_comment_data( $comment_id, $data ) {
+
 		$data['id'] = $comment_id;
 		/// Get ACF fields
-		$acf_fields = apply_filters( 'ainsys_prepare_extra_comment_data', array(), $comment_id );
+		$acf_fields = apply_filters( 'ainsys_prepare_extra_comment_data', [], $comment_id );
 
 		return array_merge( $data, $acf_fields );
 	}
 
+
 	/**
 	 * Sends updated WP comment details to AINSYS.
 	 *
-	 * @param int $comment_id
-	 * @param array $data
+	 * @param  int   $comment_id
+	 * @param  array $data
+	 * @param  bool  $test
 	 *
-	 * @return
+	 * @return array|void
 	 */
 	public function send_update_comment_to_ainsys( $comment_id, $data, $test = false ) {
+
 		$request_action = 'UPDATE';
 
 		$fields = apply_filters( 'ainsys_update_comment_fields', $this->prepare_comment_data( $comment_id, $data ), $data );
 
-		$request_data = array(
-			'object_id'      => $comment_id,
-			'request_action' => $request_action,
-			'request_data'   => $fields,
-		);
+		$request_test = $this->send_data( $comment_id, $request_action, $fields );
+
+		if ( $test ) {
+			return $request_test;
+		}
+	}
+
+
+	/**
+	 * @param  int    $comment_id
+	 * @param  string $request_action
+	 * @param         $fields
+	 *
+	 * @return array
+	 */
+	protected function send_data( int $comment_id, string $request_action, $fields ): array {
+
+		$request_data = [
+			'entity'  => [
+				'id'   => $comment_id,
+				'name' => 'comment',
+			],
+			'action'  => $request_action,
+			'payload' => $fields,
+		];
 
 		try {
 			$server_response = $this->core->curl_exec_func( $request_data );
@@ -107,17 +123,12 @@ class Process_Comments implements Hooked {
 			$this->core->send_error_email( $server_response );
 		}
 
-		$this->logger->save_log_information( $comment_id, $request_action, serialize( $request_data ), serialize( $server_response ), 0 );
+		$this->logger::save_log_information( $comment_id, $request_action, serialize( $request_data ), serialize( $server_response ), 0 );
 
-		if ( $test ) {
-			$result = array(
-				'request'  => $request_data,
-				'response' => $server_response,
-			);
-			return $result;
-		} else {
-			return;
-		}
+		return [
+			'request'  => $request_data,
+			'response' => $server_response,
+		];
 	}
 
 }

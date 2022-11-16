@@ -27,13 +27,12 @@ class Logger implements Hooked {
 	/**
 	 * Save each update transactions to log
 	 *
-	 * int $object_id, string $request_action, string $request_data, string $server_response = '', int $incoming_call = 0
 	 *
 	 * @param $args
 	 *
 	 * @return bool|int|\mysqli_result|resource|null
 	 */
-	public static function save_log_information( $args  ) {
+	public static function save_log_information( $args ) {
 
 		global $wpdb;
 
@@ -43,11 +42,12 @@ class Logger implements Hooked {
 
 		$defaults = [
 			'object_id'       => 0,
-			'entity'       => '',
+			'entity'          => '',
 			'request_action'  => '',
-			'request_type'  => '',
+			'request_type'    => '',
 			'request_data'    => '',
 			'server_response' => '',
+			'error'           => 0,
 		];
 
 		$args = wp_parse_args( $args, $defaults );
@@ -62,7 +62,7 @@ class Logger implements Hooked {
 	/**
 	 * Render json as HTML.
 	 *
-	 * @param  $json
+	 * @param         $json
 	 * @param  string $result
 	 *
 	 * @return string
@@ -103,50 +103,49 @@ class Logger implements Hooked {
 		}
 
 		foreach ( $output as $item ) {
-			$log_html_body .= '<tr>';
+			$class_error   = $item['error'] ? 'class="error"' : '';
+			$log_html_body .= '<tr ' . $class_error . '>';
 			$header_full   = empty( $log_html_header );
 
 			foreach ( $item as $name => $value ) {
-				$log_html_header .= $header_full ? '<th class="' . $name . '">' . strtoupper( str_replace( '_', ' ', $name ) ) . '</th>' : '';
+
+				if ( 'error' === $name && 0 === (int) $value ) {
+					continue;
+				}
+
+				$log_html_header .= $header_full ? sprintf( '<th class="%s">%s</th>', $name, strtoupper( str_replace( '_', ' ', $name ) ) ) : '';
 
 				$log_html_body .= '<td class="' . $name . '">';
 
-				switch ( $name ) {
+				if ( 'request_data' === $name ) {
 
-					case 'request_data':
+					$value = maybe_unserialize( $value );
 
-						$value = maybe_unserialize( $value );
+					if ( empty( $value['payload'] ) ) {
+						$log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore
+					} else {
+						$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( serialize( $value ), 0, 40 ) . ' ... </div>';
 
-						if ( empty( $value['payload'] ) ) {
-							$log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore
-						} else {
-							$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( serialize( $value ), 0, 40 ) . ' ... </div>';
-
-							$value = is_serialized( $value, true ) ? json_decode( $value ) : $value;
-
-							$log_html_body .= '<div class="ainsys-responce-full">';
-							$log_html_body .= self::ainsys_render_json( $value );
-							$log_html_body .= '</div>';
-						}
-						break;
-
-					case 'server_response':
-						$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( $value, 0, 40 ) . ' ... </div>';
-
-						$value = json_decode( maybe_unserialize( $value ) );
+						$value = is_serialized( $value, true ) ? json_decode( $value ) : $value;
 
 						$log_html_body .= '<div class="ainsys-responce-full">';
-
-						if ( json_last_error() === JSON_ERROR_NONE ) {
-							$log_html_body .= self::ainsys_render_json( $value );
-						}
-
+						$log_html_body .= self::ainsys_render_json( $value );
 						$log_html_body .= '</div>';
+					}
+				} elseif ( 'server_response' === $name ) {
+					$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( $value, 0, 40 ) . ' ... </div>';
 
-						break;
+					$value = json_decode( maybe_unserialize( $value ) );
 
-					default:
-						$log_html_body .= is_array( $value ) ? serialize( $value ) : $value;
+					$log_html_body .= '<div class="ainsys-responce-full">';
+
+					if ( json_last_error() === JSON_ERROR_NONE ) {
+						$log_html_body .= self::ainsys_render_json( $value );
+					}
+
+					$log_html_body .= '</div>';
+				} else {
+					$log_html_body .= is_array( $value ) ? serialize( $value ) : $value;
 				}
 
 				$log_html_body .= '</td>';
@@ -170,7 +169,7 @@ class Logger implements Hooked {
 
 		global $wpdb;
 
-		$wpdb->query( sprintf( "TRUNCATE TABLE %s", $wpdb->prefix. self::$log_table_name ) );
+		$wpdb->query( sprintf( "TRUNCATE TABLE %s", $wpdb->prefix . self::$log_table_name ) );
 
 	}
 
@@ -245,6 +244,7 @@ class Logger implements Hooked {
                 `request_type` varchar(100) NOT NULL,
                 `request_data` text DEFAULT NULL,
                 `server_response` text DEFAULT NULL,
+                `error` smallint NOT NULL,
                 PRIMARY KEY  (log_id),
                 KEY object_id (object_id)
             ) $collate;";

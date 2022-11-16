@@ -120,6 +120,19 @@ class Process_Comments implements Hooked {
 			$server_response = $this->core->curl_exec_func( $request_data );
 		} catch ( \Exception $e ) {
 			$server_response = 'Error: ' . $e->getMessage();
+
+			$this->logger::save_log_information(
+				[
+					'object_id'       => 0,
+					'entity'          => 'comment',
+					'request_action'  => $request_action,
+					'request_type'    => 'outgoing',
+					'request_data'    => serialize( $request_data ),
+					'server_response' => $server_response,
+					'error'           => 1,
+				]
+			);
+
 			$this->core->send_error_email( $server_response );
 		}
 

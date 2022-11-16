@@ -27,15 +27,13 @@ class Logger implements Hooked {
 	/**
 	 * Save each update transactions to log
 	 *
-	 * @param  int    $object_id
-	 * @param  string $request_action
-	 * @param  string $request_data
-	 * @param  string $server_response
-	 * @param  int    $incoming_call
+	 * int $object_id, string $request_action, string $request_data, string $server_response = '', int $incoming_call = 0
+	 *
+	 * @param $args
 	 *
 	 * @return bool|int|\mysqli_result|resource|null
 	 */
-	public static function save_log_information( int $object_id, string $request_action, string $request_data, string $server_response = '', int $incoming_call = 0 ) {
+	public static function save_log_information( $args  ) {
 
 		global $wpdb;
 
@@ -43,15 +41,20 @@ class Logger implements Hooked {
 			return false;
 		}
 
+		$defaults = [
+			'object_id'       => 0,
+			'entity'       => '',
+			'request_action'  => '',
+			'request_type'  => '',
+			'request_data'    => '',
+			'server_response' => '',
+		];
+
+		$args = wp_parse_args( $args, $defaults );
+
 		return $wpdb->insert(
 			$wpdb->prefix . self::$log_table_name,
-			[
-				'object_id'       => $object_id,
-				'request_action'  => $request_action,
-				'request_data'    => $request_data,
-				'server_response' => $server_response,
-				'incoming_call'   => $incoming_call,
-			]
+			$args
 		);
 	}
 
@@ -104,21 +107,16 @@ class Logger implements Hooked {
 			$header_full   = empty( $log_html_header );
 
 			foreach ( $item as $name => $value ) {
-				$log_html_header .= $header_full ? '<th>' . strtoupper( str_replace( '_', ' ', $name ) ) . '</th>' : '';
+				$log_html_header .= $header_full ? '<th class="' . $name . '">' . strtoupper( str_replace( '_', ' ', $name ) ) . '</th>' : '';
 
 				$log_html_body .= '<td class="' . $name . '">';
 
 				switch ( $name ) {
 
-					case 'incoming_call':
-						$value         = ( 0 === (int) $value ) ? 'No' : 'Yes';
-						$log_html_body .= $value;
-						break;
-
 					case 'request_data':
 
 						$value = maybe_unserialize( $value );
-						error_log( print_r( $value, 1 ) );
+
 						if ( empty( $value['payload'] ) ) {
 							$log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore
 						} else {
@@ -133,7 +131,7 @@ class Logger implements Hooked {
 						break;
 
 					case 'server_response':
-						$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( $value, 0, 80 ) . ' ... </div>';
+						$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( $value, 0, 40 ) . ' ... </div>';
 
 						$value = json_decode( maybe_unserialize( $value ) );
 
@@ -240,12 +238,13 @@ class Logger implements Hooked {
 
 		return "CREATE TABLE $table_log (
                 `log_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+                `creation_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 `object_id` bigint NOT NULL,
+                `entity` varchar(100) NOT NULL,
                 `request_action` varchar(100) NOT NULL,
+                `request_type` varchar(100) NOT NULL,
                 `request_data` text DEFAULT NULL,
                 `server_response` text DEFAULT NULL,
-                `incoming_call` smallint NOT NULL,
-                `creation_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 PRIMARY KEY  (log_id),
                 KEY object_id (object_id)
             ) $collate;";

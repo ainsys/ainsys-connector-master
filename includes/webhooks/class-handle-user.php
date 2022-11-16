@@ -86,6 +86,7 @@ class Handle_User implements Hooked, Webhook_Handler {
 					'request_type'    => 'incoming',
 					'request_data'    => serialize( $data ),
 					'server_response' => $message,
+					'error'           => 1,
 				]
 			);
 
@@ -136,6 +137,7 @@ class Handle_User implements Hooked, Webhook_Handler {
 					'request_type'    => 'incoming',
 					'request_data'    => serialize( $data ),
 					'server_response' => $message,
+					'error'           => 1,
 				]
 			);
 

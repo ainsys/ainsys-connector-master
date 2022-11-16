@@ -126,7 +126,16 @@ class Process_Users implements Hooked {
 			$this->core->send_error_email( $server_response );
 		}
 
-		$this->logger::save_log_information( $user_id, $request_action, serialize( $request_data ), serialize( $server_response ), 0 );
+		$this->logger::save_log_information(
+			[
+				'object_id'       => $user_id,
+				'entity'          => 'user',
+				'request_action'  => $request_action,
+				'request_type'    => 'outgoing',
+				'request_data'    => serialize( $request_data ),
+				'server_response' => serialize( $server_response ),
+			]
+		);
 
 		return [
 			'request'  => $request_data,

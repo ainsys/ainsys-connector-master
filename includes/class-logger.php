@@ -117,6 +117,7 @@ class Logger implements Hooked {
 
 				$log_html_body .= '<td class="' . $name . '">';
 
+
 				if ( 'request_data' === $name ) {
 
 					$value = maybe_unserialize( $value );

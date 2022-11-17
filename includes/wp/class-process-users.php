@@ -123,10 +123,32 @@ class Process_Users implements Hooked {
 			$server_response = $this->core->curl_exec_func( $request_data );
 		} catch ( \Exception $e ) {
 			$server_response = 'Error: ' . $e->getMessage();
+
+			$this->logger::save_log_information(
+				[
+					'object_id'       => 0,
+					'entity'          => 'user',
+					'request_action'  => $request_action,
+					'request_type'    => 'outgoing',
+					'request_data'    => serialize( $request_data ),
+					'server_response' => $server_response,
+					'error'           => 1,
+				]
+			);
+
 			$this->core->send_error_email( $server_response );
 		}
 
-		$this->logger::save_log_information( $user_id, $request_action, serialize( $request_data ), serialize( $server_response ), 0 );
+		$this->logger::save_log_information(
+			[
+				'object_id'       => $user_id,
+				'entity'          => 'user',
+				'request_action'  => $request_action,
+				'request_type'    => 'outgoing',
+				'request_data'    => serialize( $request_data ),
+				'server_response' => serialize( $server_response ),
+			]
+		);
 
 		return [
 			'request'  => $request_data,

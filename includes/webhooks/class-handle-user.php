@@ -54,10 +54,10 @@ class Handle_User implements Hooked, Webhook_Handler {
 
 		switch ( $action ) {
 			case 'CREATE':
-				$response = $this->create_user( $data );
+				$response = $this->create( $data );
 				break;
 			case 'UPDATE':
-				$response = $this->update_user( $data, $object_id );
+				$response = $this->update( $data, $object_id );
 				break;
 			case 'DELETE':
 				$response = wp_delete_user( $object_id );
@@ -68,27 +68,44 @@ class Handle_User implements Hooked, Webhook_Handler {
 	}
 
 
-	private function update_user( $data ): string {
-
-		$result = wp_update_user( $data );
+	protected function update( $data ): string {
 
 		$success = __( 'The user has been successfully updated: user ID ', AINSYS_CONNECTOR_TEXTDOMAIN );
 		$error   = __( 'An error has occurred, perhaps such a user does not exist', AINSYS_CONNECTOR_TEXTDOMAIN );
 
-		$message = $success . $result;
+		$result = wp_update_user( $data );
 
 		if ( is_wp_error( $result ) ) {
 			$message = $error . $result->get_error_message();
+
+			$this->logger::save_log_information(
+				[
+					'object_id'       => 0,
+					'entity'          => 'user (error)',
+					'request_action'  => 'CREATE',
+					'request_type'    => 'incoming',
+					'request_data'    => serialize( $data ),
+					'server_response' => $message,
+					'error'           => 1,
+				]
+			);
+
 			$this->core->send_error_email( $message );
 
 			return $message;
 		}
 
+		$message = $success . $result;
+
 		$this->logger::save_log_information(
-			0,
-			'UPDATE',
-			serialize( $data ),
-			$message
+			[
+				'object_id'       => $result,
+				'entity'          => 'user',
+				'request_action'  => 'UPDATE',
+				'request_type'    => 'incoming',
+				'request_data'    => serialize( $data ),
+				'server_response' => $message,
+			]
 		);
 
 		return $message;
@@ -100,7 +117,7 @@ class Handle_User implements Hooked, Webhook_Handler {
 	 *
 	 * @return string
 	 */
-	protected function create_user( array $data ): string {
+	protected function create( array $data ): string {
 
 		$success = __( 'The user has been successfully created: user ID ', AINSYS_CONNECTOR_TEXTDOMAIN );
 		$error   = __( 'An error occurred when creating a user: ', AINSYS_CONNECTOR_TEXTDOMAIN );
@@ -109,24 +126,40 @@ class Handle_User implements Hooked, Webhook_Handler {
 
 		$user_id = wp_insert_user( $data );
 
-		$message = $success . $user_id;
-
 		if ( is_wp_error( $user_id ) ) {
 			$message = $error . $user_id->get_error_message();
+
+			$this->logger::save_log_information(
+				[
+					'object_id'       => 0,
+					'entity'          => 'user (error)',
+					'request_action'  => 'CREATE',
+					'request_type'    => 'incoming',
+					'request_data'    => serialize( $data ),
+					'server_response' => $message,
+					'error'           => 1,
+				]
+			);
+
 			$this->core->send_error_email( $message );
 
 			return $message;
 		}
 
+		$message = $success . $user_id;
+
 		$this->logger::save_log_information(
-			0,
-			'CREATE',
-			serialize( $data ),
-			$message
+			[
+				'object_id'       => $user_id,
+				'entity'          => 'user',
+				'request_action'  => 'CREATE',
+				'request_type'    => 'incoming',
+				'request_data'    => serialize( $data ),
+				'server_response' => $message,
+			]
 		);
 
 		return $message;
-
 	}
 
 }

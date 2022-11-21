@@ -137,7 +137,6 @@ class Logger implements Hooked {
 				} elseif ( 'server_response' === $name ) {
 					$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( $value, 0, 40 ) . ' ... </div>';
 
-
 					$value = maybe_unserialize( $value );
 
 					$value = is_string($value) ? json_decode( $value ) : $value;

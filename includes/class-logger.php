@@ -122,12 +122,13 @@ class Logger implements Hooked {
 
 					$value = maybe_unserialize( $value );
 
-					if ( empty( $value['payload'] ) ) {
+					if ( empty( $value ) ) {
 						$log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore
 					} else {
 						$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( serialize( $value ), 0, 40 ) . ' ... </div>';
 
 						$value = is_serialized( $value, true ) ? json_decode( $value ) : $value;
+						$value = is_array($value) ? $value : (array) $value;
 
 						$log_html_body .= '<div class="ainsys-responce-full">';
 						$log_html_body .= self::ainsys_render_json( $value );
@@ -136,7 +137,9 @@ class Logger implements Hooked {
 				} elseif ( 'server_response' === $name ) {
 					$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( $value, 0, 40 ) . ' ... </div>';
 
-					$value = json_decode( maybe_unserialize( $value ) );
+					$value = maybe_unserialize( $value );
+
+					$value = is_string($value) ? json_decode( $value ) : $value;
 
 					$log_html_body .= '<div class="ainsys-responce-full">';
 

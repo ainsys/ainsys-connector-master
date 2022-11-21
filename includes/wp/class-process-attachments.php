@@ -36,6 +36,9 @@ class Process_Attachments implements Hooked {
 		add_action( 'add_attachment', [ $this, 'process_new_attachment' ], 10, 1 );
 		add_action( 'attachment_updated', [ $this, 'process_edit_attachment' ], 10, 3 );
 		add_action( 'delete_attachment', [ $this, 'process_delete_attachment' ], 10, 3 );
+
+		add_filter( 'bulk_actions-upload', [ $this, 'bulk_updates_attachment' ] );
+		add_filter( 'handle_bulk_actions-upload', [ $this, 'bulk_updates_attachment_action_handler' ], 10, 3 );
 	}
 
 
@@ -115,6 +118,47 @@ class Process_Attachments implements Hooked {
 
 
 	/**
+	 *
+	 *
+	 * @param $redirect_to
+	 * @param $doaction
+	 * @param $post_ids
+	 *
+	 * @return string
+	 */
+	public function bulk_updates_attachment_action_handler( $redirect_to, $doaction, $post_ids ): string {
+
+		if ( 'update_attachments' !== $doaction ) {
+			return $redirect_to;
+		}
+
+		foreach ( $post_ids as $attach_id ) {
+			wp_update_post(
+				wp_slash( [
+					'ID'                => $attach_id,
+					'ainsys_attachment' => true,
+				] )
+			);
+		}
+
+		return add_query_arg( 'update_attachments_action_done', count( $post_ids ), $redirect_to );
+	}
+
+
+	/**
+	 * @param $bulk_actions
+	 *
+	 * @return mixed
+	 */
+	public function bulk_updates_attachment( $bulk_actions ) {
+
+		$bulk_actions['update_attachments'] = 'Update attachments';
+
+		return $bulk_actions;
+	}
+
+
+	/**
 	 * @param  int    $attachment_id
 	 * @param  string $request_action
 	 * @param         $fields
@@ -184,6 +228,7 @@ class Process_Attachments implements Hooked {
 		if ( ! $attachment ) {
 			return [];
 		}
+
 		if ( $attachment->post_type !== 'attachment' ) {
 			return [];
 		}
@@ -197,25 +242,26 @@ class Process_Attachments implements Hooked {
 		}
 
 		return [
-			'ID'          => $attachment->ID,
-			'id'          => $attachment->ID,
-			'title'       => $attachment->post_title,
-			'filename'    => wp_basename( $attached_file ),
-			'filesize'    => size_format( filesize( $attached_file ), 2 ),
-			'url'         => wp_get_attachment_url( $attachment->ID ),
-			'link'        => get_attachment_link( $attachment->ID ),
-			'alt'         => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
-			'author'      => $attachment->post_author,
-			'description' => $attachment->post_content,
-			'caption'     => $attachment->post_excerpt,
-			'name'        => $attachment->post_name,
-			'uploaded_to' => $attachment->post_parent,
-			'date'        => $attachment->post_date_gmt,
-			'modified'    => $attachment->post_modified_gmt,
-			'mime_type'   => $attachment->post_mime_type,
-			'type'        => $type,
-			'subtype'     => $subtype,
-			'meta'        => wp_get_attachment_metadata( $post_ID, false ),
+			'ID'                => $attachment->ID,
+			'id'                => $attachment->ID,
+			'title'             => $attachment->post_title,
+			'filename'          => wp_basename( $attached_file ),
+			'filesize'          => size_format( filesize( $attached_file ), 2 ),
+			'url'               => wp_get_attachment_url( $attachment->ID ),
+			'link'              => get_attachment_link( $attachment->ID ),
+			'alt'               => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
+			'author'            => $attachment->post_author,
+			'description'       => $attachment->post_content,
+			'caption'           => $attachment->post_excerpt,
+			'name'              => $attachment->post_name,
+			'uploaded_to'       => $attachment->post_parent,
+			'date'              => $attachment->post_date_gmt,
+			'modified'          => $attachment->post_modified_gmt,
+			'mime_type'         => $attachment->post_mime_type,
+			'type'              => $type,
+			'subtype'           => $subtype,
+			'ainsys_attachment' => true,
+			'meta'              => wp_get_attachment_metadata( $post_ID, false ),
 		];
 	}
 

@@ -58,6 +58,19 @@ class Webhook_Listener implements Hooked {
 		} catch ( \Exception $exception ) {
 			$response      = $exception->getMessage();
 			$response_code = 500;
+
+			$this->logger::save_log_information(
+				[
+					'object_id'       => 0,
+					'entity'          => 'Webhook_Listener',
+					'request_action'  => '',
+					'request_type'    => 'parse entityBody',
+					'request_data'    => serialize( $entityBody ),
+					'server_response' => serialize( $response ),
+					'error'           => 1,
+				]
+			);
+
 		}
 
 		$object_id = $request['entity']['id'] ?? 0;
@@ -80,6 +93,19 @@ class Webhook_Listener implements Hooked {
 			} catch ( \Exception $exception ) {
 				$response      = $exception->getMessage();
 				$response_code = 500;
+
+				$this->logger::save_log_information(
+					[
+						'object_id'       => 0,
+						'entity'          => 'Webhook_Listener',
+						'request_action'  => '',
+						'request_type'    => 'response handler',
+						'request_data'    => serialize( $entityBody ),
+						'server_response' => serialize( $response ),
+						'error'           => 1,
+					]
+				);
+
 			}
 		} else {
 			$response_code = 404;

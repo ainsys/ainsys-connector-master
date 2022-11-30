@@ -90,7 +90,7 @@ class Handle_Comment implements Hooked, Webhook_Handler {
 					'request_action'  => 'CREATE',
 					'request_type'    => 'incoming',
 					'request_data'    => serialize( $data ),
-					'server_response' => $message,
+					'server_response' => serialize($message),
 					'error'           => 1,
 				]
 			);
@@ -109,7 +109,7 @@ class Handle_Comment implements Hooked, Webhook_Handler {
 				'request_action'  => 'CREATE',
 				'request_type'    => 'incoming',
 				'request_data'    => serialize( $data ),
-				'server_response' => $message,
+				'server_response' => serialize($message),
 			]
 		);
 
@@ -134,7 +134,7 @@ class Handle_Comment implements Hooked, Webhook_Handler {
 					'request_action'  => 'CREATE',
 					'request_type'    => 'incoming',
 					'request_data'    => serialize( $data ),
-					'server_response' => $message,
+					'server_response' => serialize($message),
 					'error'           => 1,
 				]
 			);
@@ -153,7 +153,7 @@ class Handle_Comment implements Hooked, Webhook_Handler {
 				'request_action'  => 'UPDATE',
 				'request_type'    => 'incoming',
 				'request_data'    => serialize( $data ),
-				'server_response' => $message,
+				'server_response' => serialize($message),
 			]
 		);
 

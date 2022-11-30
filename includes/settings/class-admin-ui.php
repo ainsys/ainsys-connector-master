@@ -142,38 +142,57 @@ class Admin_UI implements Hooked {
 	public function ainsys_enqueue_scripts() {
 
 		if ( false === strpos( $_GET['page'] ?? '', 'ainsys-connector' ) ) {
-			//wp_enqueue_script('jquery-ui-sortable');
 			return;
 		}
 
 		wp_enqueue_style(
 			'ainsys_connector_style_handle',
 			plugins_url( 'assets/css/ainsys_connector_style.css', AINSYS_CONNECTOR_PLUGIN ),
+			[ 'datatables_style_handle' ],
+			AINSYS_CONNECTOR_VERSION
+		);
+
+		wp_enqueue_style(
+			'font-awesome_style_handle',
+			'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css',
 			[],
 			AINSYS_CONNECTOR_VERSION
 		);
 
-		wp_enqueue_style( 'font-awesome_style_handle',
-			'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css',
-			[],
-			AINSYS_CONNECTOR_VERSION);
-
-		wp_enqueue_script( 'ainsys_connector_admin_handle',
+		wp_enqueue_script(
+			'ainsys_connector_admin_handle',
 			plugins_url( 'assets/js/ainsys_connector_admin.js', AINSYS_CONNECTOR_PLUGIN ),
-			array( 'jquery' ),
+			[ 'jquery', 'dataTables_script_handle' ],
 			AINSYS_CONNECTOR_VERSION,
-			true );
+			true
+		);
+
+		wp_enqueue_style(
+			'datatables_style_handle',
+			'https://cdn.datatables.net/1.13.1/css/jquery.dataTables.css',
+			[],
+			AINSYS_CONNECTOR_VERSION
+		);
+
+		wp_enqueue_script(
+			'dataTables_script_handle',
+			'https://cdn.datatables.net/1.13.1/js/jquery.dataTables.js',
+			[ 'jquery' ],
+			AINSYS_CONNECTOR_VERSION,
+			true
+		);
 
 		wp_localize_script(
 			'ainsys_connector_admin_handle',
 			'ainsys_connector_params',
-			array(
+			[
 				'ajax_url' => admin_url( 'admin-ajax.php' ),
 				'nonce'    => wp_create_nonce( self::$nonce_title ),
-			)
+			]
 		);
 
 	}
+
 
 	/**
 	 * Handshake with server, implements AINSYS integration

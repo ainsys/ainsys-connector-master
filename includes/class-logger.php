@@ -20,8 +20,7 @@ class Logger implements Hooked {
 	}
 
 
-	public function init_hooks() {
-	}
+	public function init_hooks() {}
 
 
 	/**
@@ -85,13 +84,15 @@ class Logger implements Hooked {
 	/**
 	 * Generate server data transactions HTML.
 	 *
+	 * @param  string $where
+	 *
 	 * @return string
 	 */
-	public static function generate_log_html( $where = '' ) {
+	public static function generate_log_html( string $where = '' ): string {
 
 		global $wpdb;
 
-		$log_html        = '<div id="connection_log"><table class="ainsys-table">';
+		$log_html        = '<div id="connection_log"><table class="ainsys-table display"style="width:100%">';
 		$log_html_body   = '';
 		$log_html_header = '';
 
@@ -109,45 +110,41 @@ class Logger implements Hooked {
 
 			foreach ( $item as $name => $value ) {
 
-				if ( 'error' === $name && 0 === (int) $value ) {
-					continue;
-				}
-
 				$log_html_header .= $header_full ? sprintf( '<th class="%s">%s</th>', $name, strtoupper( str_replace( '_', ' ', $name ) ) ) : '';
 
 				$log_html_body .= '<td class="' . $name . '">';
 
-
-				if ( 'request_data' === $name ) {
+				if ( $name === 'request_data' || $name === 'server_response' ) {
 
 					$value = maybe_unserialize( $value );
 
 					if ( empty( $value ) ) {
-						$log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore
+
+            $log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN );
+
 					} else {
 						$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( serialize( $value ), 0, 40 ) . ' ... </div>';
 
-						$value = is_serialized( $value, true ) ? json_decode( $value ) : $value;
-						$value = is_array($value) ? $value : (array) $value;
+						if ( is_array( $value ) ) {
+							$value = wp_json_encode( $value );
+						}
+
+						try {
+							$value_out = json_decode( $value, true, 512, JSON_THROW_ON_ERROR );
+						} catch ( \JsonException $exception ) {
+							$value_out = $value;
+						}
 
 						$log_html_body .= '<div class="ainsys-responce-full">';
-						$log_html_body .= self::ainsys_render_json( $value );
+
+						if ( is_string( $value_out ) ) {
+							$log_html_body .= $value_out;
+						} else {
+							$log_html_body .= self::ainsys_render_json( $value_out );
+						}
+
 						$log_html_body .= '</div>';
 					}
-				} elseif ( 'server_response' === $name ) {
-					$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( $value, 0, 40 ) . ' ... </div>';
-
-					$value = maybe_unserialize( $value );
-
-					$value = is_string($value) ? json_decode( $value ) : $value;
-
-					$log_html_body .= '<div class="ainsys-responce-full">';
-
-					if ( json_last_error() === JSON_ERROR_NONE ) {
-						$log_html_body .= self::ainsys_render_json( $value );
-					}
-
-					$log_html_body .= '</div>';
 				} else {
 					$log_html_body .= is_array( $value ) ? serialize( $value ) : $value;
 				}

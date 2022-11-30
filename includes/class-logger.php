@@ -119,7 +119,8 @@ class Logger implements Hooked {
 					$value = maybe_unserialize( $value );
 
 					if ( empty( $value ) ) {
-						$log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN );
+
+            $log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN );
 
 					} else {
 						$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( serialize( $value ), 0, 40 ) . ' ... </div>';

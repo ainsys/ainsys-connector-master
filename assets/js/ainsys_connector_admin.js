@@ -249,8 +249,9 @@ jQuery(function($){
 			success:    function ( msg ) {
 				$( e.target ).removeClass( 'disabled' );
 				if ( msg ) {
-					//$( '#connection_log' ).html( msg );
+					$( '#connection_log' ).html( msg );
 					$('#connection_log .ainsys-table').DataTable();
+					//location.reload();
 				}
 			}
 		} )

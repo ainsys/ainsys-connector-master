@@ -132,7 +132,7 @@ class Handle_User implements Hooked, Webhook_Handler {
 			$this->logger::save_log_information(
 				[
 					'object_id'       => 0,
-					'entity'          => 'user (error)',
+					'entity'          => 'user',
 					'request_action'  => 'CREATE',
 					'request_type'    => 'incoming',
 					'request_data'    => serialize( $data ),

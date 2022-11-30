@@ -86,7 +86,7 @@ class Handle_Comment implements Hooked, Webhook_Handler {
 			$this->logger::save_log_information(
 				[
 					'object_id'       => 0,
-					'entity'          => 'comment (error)',
+					'entity'          => 'comment',
 					'request_action'  => 'CREATE',
 					'request_type'    => 'incoming',
 					'request_data'    => serialize( $data ),
@@ -130,7 +130,7 @@ class Handle_Comment implements Hooked, Webhook_Handler {
 			$this->logger::save_log_information(
 				[
 					'object_id'       => 0,
-					'entity'          => 'comment (error)',
+					'entity'          => 'comment',
 					'request_action'  => 'CREATE',
 					'request_type'    => 'incoming',
 					'request_data'    => serialize( $data ),

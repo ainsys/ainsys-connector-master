@@ -188,7 +188,7 @@ class Process_Attachments implements Hooked {
 					'request_action'  => $request_action,
 					'request_type'    => 'outgoing',
 					'request_data'    => serialize( $request_data ),
-					'server_response' => $server_response,
+					'server_response' => serialize( $server_response ),
 					'error'           => 1,
 				]
 			);

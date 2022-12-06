@@ -1,44 +1,64 @@
-// ////////////////////////////////////
 jQuery(function($){
 
-	$('#connection_log .ainsys-table').DataTable();
+	const ainsys_settings = {
 
-    setTimeout(() => {
-        $('.ainsys-logo').css('opacity', 1)
-    }, 500)
+		$ainsys_settings_wrap: $( '.ainsys_settings_wrap' ),
 
-    $('.ainsys_settings_wrap').on('click', '.nav-tab', function(event){
+		activeLastTab: function () {
+			const lastTab = localStorage.getItem( 'lastTab' );
 
-        event.preventDefault();
+			if ( lastTab ) {
+				$( '.nav-tab' ).removeClass( 'nav-tab-active' );
+				$( '.tab-target' ).removeClass( 'tab-target-active' );
+				$( 'a[href="' + lastTab + '"]' ).addClass( 'nav-tab-active' )
+				$( lastTab ).addClass( 'tab-target-active' );
+			} else {
+				$( 'a[href="#setting_section_general"]' ).addClass( 'nav-tab-active' )
+				$( '#setting_section_general' ).addClass( 'tab-target-active' );
+			}
+		},
 
-        var targ = $(this).data('target');
+		toggleTabs: function ( event ) {
+			event.preventDefault();
+			localStorage.setItem( 'lastTab', $( event.target ).attr( 'href' ) );
+			const target = $( event.target ).data( 'target' );
 
-        $('.nav-tab').removeClass('nav-tab-active');
-        $('.tab-target').removeClass('tab-target-active');
-        $(this).addClass('nav-tab-active');
-        $('#'+targ).addClass('tab-target-active');
+			$( '.nav-tab' ).removeClass( 'nav-tab-active' );
+			$( '.tab-target' ).removeClass( 'tab-target-active' );
+			$( event.target ).addClass( 'nav-tab-active' );
+			$( '#' + target ).addClass( 'tab-target-active' );
+		},
 
-        var ref = $('.ainsys_settings_wrap input[name="_wp_http_referer"]').val();
-        var new_ref = ref;
-        var query_string = {};
-        var url_vars = ref.split("?");
-        if (url_vars.length > 1){
-            new_ref = url_vars[0] + '?';
-            var url_pairs = url_vars[1].split("&");
-            for (var i=0;i<url_pairs.length;i++){
+		animationLogo: function () {
+			setTimeout( () => {
+				$( '.ainsys-logo' ).css( 'opacity', 1 )
+			}, 500 )
+		},
 
-                var pair = url_pairs[i].split("=");
+		init:   function () {
 
-                if (pair[0] != 'setting_tab'){
-                    new_ref = new_ref + url_pairs[i] + '&';
-                }
-            }
-        } else {
-            new_ref = new_ref + '?';
-        }
-        new_ref = new_ref + 'setting_tab=' + targ;
-        $('.ainsys_settings_wrap input[name="_wp_http_referer"]').val(new_ref);
-    });
+			$( '#connection_log .ainsys-table' ).DataTable();
+
+			this.animationLogo();
+
+			this.activeLastTab();
+
+			this.$ainsys_settings_wrap
+				.on(
+					'click',
+					'.nav-tab',
+					function ( event ) {
+						ainsys_settings.toggleTabs( event );
+					}
+				);
+		},
+
+	};
+
+	ainsys_settings.init();
+
+
+
 	$('.ainsys-tabs').on('click', '.ainsys-nav-tab', function(event){
 
         event.preventDefault();
@@ -336,7 +356,7 @@ jQuery(function($){
     });
 
     //////// Ajax clear log ////////
-    $('#setting_entities_section .entities_field').on('click', '.fa.active', function (e){
+    $('#setting_section_entities .entities_field').on('click', '.fa.active', function (e){
 
         let setting_id = '#' + $(this).parent().attr('id');
         $(setting_id).toggleClass('loading');
@@ -362,7 +382,7 @@ jQuery(function($){
     });
 
     ////////  ////////
-    $('#setting_entities_section').on('click', ' .entities_field', function (e){
+    $('#setting_section_entities').on('click', ' .entities_field', function (e){
         $('.entities_field.active').each(function(){
             $(this).removeClass('active');
         })
@@ -396,7 +416,7 @@ jQuery(function($){
     });
  
 	//////// expand entity tab ////////
-    $('#setting_entities_section').on('click', ' .expand_entity_container', function (e){
+    $('#setting_section_entities').on('click', ' .expand_entity_container', function (e){
         $(this).parent().parent().toggleClass('active');
         var text = $(this).text() == 'expand' ? 'collapse' : 'expand';
         $(this).text(text);

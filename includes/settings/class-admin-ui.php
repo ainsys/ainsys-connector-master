@@ -106,6 +106,63 @@ class Admin_UI implements Hooked {
 		return 'administrator';
 	}
 
+
+	public function uasort_comparison( $a, $b ): int {
+
+		if ( $a === $b ) {
+			return 0;
+		}
+
+		return ( $a < $b ) ? - 1 : 1;
+	}
+
+
+	public function fields_uasort_comparison( $a, $b ): int {
+
+		/*
+		 * We are not guaranteed to get a priority
+		 * setting. So don't compare if they don't
+		 * exist.
+		 */
+		if ( ! isset( $a['priority'], $b['priority'] ) ) {
+			return 0;
+		}
+
+		return $this->uasort_comparison( $a['priority'], $b['priority'] );
+	}
+
+
+	public function get_nav_fields(): array {
+
+
+		$settings_nav_tabs = [
+			'general'  => [
+				'label'    => __( 'General', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'active'   => false,
+				'priority' => 10,
+			],
+			'test'     => [
+				'label'    => __( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'active'   => false,
+				'priority' => 20,
+			],
+			'log'      => [
+				'label'    => __( 'Transfer log', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'active'   => false,
+				'priority' => 30,
+			],
+			'entities' => [
+				'label'    => __( 'Entities export settings', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'active'   => false,
+				'priority' => 40,
+			],
+		];
+
+		uasort( $settings_nav_tabs, [ $this, 'fields_uasort_comparison' ] );
+
+		return apply_filters( 'ainsys_get_nav_fields', $settings_nav_tabs );
+	}
+
 	/**
 	 * Includes settings page
 	 *

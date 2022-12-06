@@ -1,4 +1,9 @@
 /*========= Settings panel ===========*/
+body.toplevel_page_ainsys-connector,
+body.toplevel_page_ainsys-connector .nav-tab-active {
+	background: #fff;
+}
+
 .ainsys-logo {
 	opacity: 0;
 	transition: .5s all linear;
@@ -87,13 +92,14 @@
 }
 
 /* Tabs */
-.nav-tab-wrapper.ainsys-nav-tab-wrapper {
+.ainsys-tabs-nav-wrapper {
 	margin: 0;
 	padding: 0 1.875rem;
 	border-bottom: 2px solid #e2e2e2;
+	display: flex;
 }
 
-.ainsys-nav-tab-wrapper .nav-tab {
+.ainsys-tabs-nav-wrapper .nav-tab {
 	margin: 0 0.625rem -1px;
 	padding: 0.625rem 2.25rem;
 	background-color: #e2e2e2;
@@ -101,11 +107,11 @@
 	border: none;
 }
 
-.ainsys-nav-tab-wrapper .nav-tab:focus {
+.ainsys-tabs-nav-wrapper .nav-tab:focus {
 	box-shadow: none;
 }
 
-.ainsys-nav-tab-wrapper .nav-tab.nav-tab-active {
+.ainsys-tabs-nav-wrapper .nav-tab.nav-tab-active {
 	background-color: #ab47bc;
 	color: #fff;
 }
@@ -139,7 +145,7 @@
 .ainsys-settings-block {
 	margin: 0 2rem 4rem;
 	padding: 1.25rem;
-	background: #f4f4f4;
+	background: #F4F4F4;
 	border-radius: 1rem;
 	box-sizing: border-box;
 }
@@ -155,16 +161,16 @@
 	width: calc(40% - 4rem);
 }
 
-.aisys-form-group {
+.ainsys-form-group {
 	margin: 0 0 1rem;
 }
 
-.aisys-form-group-checkbox {
+.ainsys-form-group-checkbox {
 	display: flex;
 	align-items: center;
 }
 
-.aisys-form-label {
+.ainsys-form-label {
 	display: block;
 	margin: 0 0 0.5rem;
 	font-size: 0.875rem;
@@ -172,23 +178,23 @@
 	line-height: 1.45;
 }
 
-.aisys-form-group-checkbox .aisys-form-label {
+.ainsys-form-group-checkbox .ainsys-form-label {
 	margin: 0;
 }
 
-.aisys-form-label-note {
+.ainsys-form-label-note {
 	display: block;
 	font-size: 0.75rem;
 	font-weight: 400;
 	color: #666;
 }
 
-.aisys-form-label a,
-.aisys-form-label a:hover {
+.ainsys-form-label a,
+.ainsys-form-label a:hover {
 	color: #ab47bc;
 }
 
-.aisys-form-input input[type='text'] {
+.ainsys-form-input input[type='text'] {
 	width: 100%;
 	padding: 0.625rem 1rem;
 	background: #e2e2e2;
@@ -197,39 +203,39 @@
 	line-height: 1;
 }
 
-.aisys-form-input input[type='checkbox'] {
+.ainsys-form-input input[type='checkbox'] {
 	margin-right: 1rem;
 	background: #e2e2e2;
 	border: none;
 }
 
-.aisys-form-input input[type=checkbox]:checked::before {
+.ainsys-form-input input[type=checkbox]:checked::before {
 	content: url(data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2020%2020%27%3E%3Cpath%20d%3D%27M14.83%204.89l1.34.94-5.81%208.38H9.02L5.78%209.67l1.34-1.25%202.57%202.4z%27%20fill%3D%27%23ab47bc%27%2F%3E%3C%2Fsvg%3E);
 	margin: -0.1875rem 0 0 -0.25rem;
 	height: 1.3125rem;
 	width: 1.3125rem;
 }
 
-.aisys-form-input input:focus {
+.ainsys-form-input input:focus {
 	outline: none !important;
 	box-shadow: none !important;
 }
 
-.aisys-email {
+.ainsys-email {
 	display: none;
 }
 
-.aisys-email.aisys-email-show,
-.aisys-email.aisys-email-main {
+.ainsys-email.ainsys-email-show,
+.ainsys-email.ainsys-email-main {
 	display: block;
 }
 
-.aisys-email .aisys-form-input {
+.ainsys-email .ainsys-form-input {
 	display: flex;
 	align-items: center;
 }
 
-.aisys-email .aisys-form-input input {
+.ainsys-email .ainsys-form-input input {
 	flex: 0 0 calc(100% - 5.5rem);
 	width: calc(100% - 5.5rem);
 }
@@ -576,16 +582,16 @@
 }
 
 /* Entities Settings */
-#setting_entities_section .empty_tab {
+#setting_section_entities .empty_tab {
 	width: 100%;
 	text-align: center;
 }
 
-.ainsys_settings_wrap #setting_entities_section {
+.ainsys_settings_wrap #setting_section_entities {
 	flex-direction: column;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entitys_table {
+.ainsys_settings_wrap #setting_section_entities .entitys_table {
 	display: flex;
 	flex-direction: column;
 }
@@ -594,73 +600,73 @@
 	color: grey;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entities_field.active {
+.ainsys_settings_wrap #setting_section_entities .entities_field.active {
 	background: #67A1D0;
 	color: white;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entities_field {
+.ainsys_settings_wrap #setting_section_entities .entities_field {
 	width: auto;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entities_field.multiple_filds .fa {
+.ainsys_settings_wrap #setting_section_entities .entities_field.multiple_filds .fa {
 	font-size: 1.8em;
 	margin-top: -10px;
 	margin-right: 10px;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entities_field.multiple_filds_children .fa {
+.ainsys_settings_wrap #setting_section_entities .entities_field.multiple_filds_children .fa {
 	font-size: 1.2em;
 	margin-top: -10px;
 	margin-right: 10px;
 	margin-left: 10px;
 }
 
-#setting_entities_section .entities_field.multiple_filds {
+#setting_section_entities .entities_field.multiple_filds {
 	background: #c2c0c0;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entity_data.active .entities_field div.entity_settings_value.constant {
+.ainsys_settings_wrap #setting_section_entities .entity_data.active .entities_field div.entity_settings_value.constant {
 	display: block;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entities_field .editor_mode.entity_settings_value {
+.ainsys_settings_wrap #setting_section_entities .entities_field .editor_mode.entity_settings_value {
 	display: none;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entities_field.active .entity_settings_value {
+.ainsys_settings_wrap #setting_section_entities .entities_field.active .entity_settings_value {
 	display: none;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entities_field.active .editor_mode.entity_settings_value {
+.ainsys_settings_wrap #setting_section_entities .entities_field.active .editor_mode.entity_settings_value {
 	display: block;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entities_field i.fa.fa-floppy-o {
+.ainsys_settings_wrap #setting_section_entities .entities_field i.fa.fa-floppy-o {
 	color: #D7D7DB;
 	font-size: 2em;
 	margin: 0 1px 0 2px;
 	display: block;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entities_field.loading i.fa {
+.ainsys_settings_wrap #setting_section_entities .entities_field.loading i.fa {
 	display: none;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entities_field i.fa.active {
+.ainsys_settings_wrap #setting_section_entities .entities_field i.fa.active {
 	color: #575757;
 	cursor: pointer;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entities_field.loading .loader_dual_ring {
+.ainsys_settings_wrap #setting_section_entities .entities_field.loading .loader_dual_ring {
 	display: inline-block;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entities_field .loader_dual_ring {
+.ainsys_settings_wrap #setting_section_entities .entities_field .loader_dual_ring {
 	display: none;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entities_field .loader_dual_ring::after {
+.ainsys_settings_wrap #setting_section_entities .entities_field .loader_dual_ring::after {
 	content: " ";
 	display: block;
 	width: 20px;
@@ -681,23 +687,23 @@
 	}
 }
 
-.ainsys_settings_wrap #setting_entities_section .entity_title {
+.ainsys_settings_wrap #setting_section_entities .entity_title {
 	margin-left: 14px;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entity_title,
-.ainsys_settings_wrap #setting_entities_section .entities_field_header {
+.ainsys_settings_wrap #setting_section_entities .entity_title,
+.ainsys_settings_wrap #setting_section_entities .entities_field_header {
 	width: 10%;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entities_field {
+.ainsys_settings_wrap #setting_section_entities .entities_field {
 	padding: 0 10px;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 }
 
-.ainsys_settings_wrap #setting_entities_section .properties_field {
+.ainsys_settings_wrap #setting_section_entities .properties_field {
 	display: flex;
 	justify-content: space-between;
 	height: 3.2em;
@@ -707,21 +713,21 @@
 	cursor: pointer;
 }
 
-.ainsys_settings_wrap #setting_entities_section .properties_data #save_entity_properties {
+.ainsys_settings_wrap #setting_section_entities .properties_data #save_entity_properties {
 	margin-top: 1.8em;
 }
 
-.ainsys_settings_wrap #setting_entities_section .properties_field,
-.ainsys_settings_wrap #setting_entities_section .properties_field_title {
+.ainsys_settings_wrap #setting_section_entities .properties_field,
+.ainsys_settings_wrap #setting_section_entities .properties_field_title {
 	flex: 1 7%;
 }
 
-.ainsys_settings_wrap #setting_entities_section .properties_field.small_property,
-.ainsys_settings_wrap #setting_entities_section .properties_field_title.small_property {
+.ainsys_settings_wrap #setting_section_entities .properties_field.small_property,
+.ainsys_settings_wrap #setting_section_entities .properties_field_title.small_property {
 	flex: 1 2%;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entity_block_header {
+.ainsys_settings_wrap #setting_section_entities .entity_block_header {
 	background: grey;
 	color: white;
 	font-size: 1em;
@@ -731,34 +737,34 @@
 	padding-top: 8px;
 }
 
-.ainsys_settings_wrap #setting_entities_section .properties_field input {
+.ainsys_settings_wrap #setting_section_entities .properties_field input {
 	height: 1em;
 }
 
-.ainsys_settings_wrap #setting_entities_section .entities_block .entity_data {
+.ainsys_settings_wrap #setting_section_entities .entities_block .entity_data {
 	overflow: hidden;
 	height: 38px;
 	margin-bottom: 1em
 }
 
-.ainsys_settings_wrap #setting_entities_section .entities_block .entity_data.active {
+.ainsys_settings_wrap #setting_section_entities .entities_block .entity_data.active {
 	overflow: hidden;
 	height: auto;
 }
 
-.ainsys_settings_wrap #setting_entities_section .properties_data {
+.ainsys_settings_wrap #setting_section_entities .properties_data {
 	text-align: center;
 }
 
-#setting_entities_section .entities_field:nth-child(2n) {
+#setting_section_entities .entities_field:nth-child(2n) {
 	background-color: white;
 }
 
-#setting_entities_section .expand_entity_container.button {
+#setting_section_entities .expand_entity_container.button {
 	height: 30px;
 }
 
-#setting_entities_section .expand_entity_container {
+#setting_section_entities .expand_entity_container {
 	position: relative;
 	float: right;
 	width: 85px;

@@ -9,27 +9,26 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	transition: .5s all linear;
 }
 
-.ainsys_settings_wrap {
+.ainsys-settings-wrap {
 	padding: 1rem 0.25rem;
 }
 
-.wrap.ainsys_settings_wrap h1 {
+.wrap.ainsys-settings-wrap h1 {
 	margin: 0 0 4.375rem;
 	padding: 0;
 	text-align: center;
 }
 
-.wrap.ainsys_settings_wrap h2 {
-	margin: 0 0 2rem;
+.wrap.ainsys-settings-wrap h2 {
+	margin: 0 0 1.25rem;
 	padding: 0;
 	font-size: 1.125rem;
 	font-weight: 600;
 	line-height: 1.45;
-	text-align: center;
 	color: #101828;
 }
 
-.wrap.ainsys_settings_wrap h3 {
+.wrap.ainsys-settings-wrap h3 {
 	font-size: 1rem;
 	font-weight: 600;
 	line-height: 1.25;
@@ -116,19 +115,19 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	color: #fff;
 }
 
-.ainsys_settings_wrap .tab-target {
+.ainsys-settings-wrap .tab-target {
 	display: none;
 	position: relative;
 	overflow: hidden;
 	padding: 3.75rem 2.25rem 0.5rem;
 }
 
-.ainsys_settings_wrap .tab-target.tab-target-active {
+.ainsys-settings-wrap .tab-target.tab-target-active {
 	display: flex;
 }
 
 @media only screen and (max-width: 791px) {
-	.ainsys_settings_wrap .tab-target.tab-target-active {
+	.ainsys-settings-wrap .tab-target.tab-target-active {
 		display: block;
 	}
 }
@@ -143,7 +142,7 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 }
 
 .ainsys-settings-block {
-	margin: 0 2rem 4rem;
+	margin: 0 1.25rem 2.25rem;
 	padding: 1.25rem;
 	background: #F4F4F4;
 	border-radius: 1rem;
@@ -151,14 +150,14 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 }
 
 .ainsys-settings-block--connection {
-	flex: 0 0 calc(60% - 4rem);
-	width: calc(60% - 4rem);
-	padding-right: 8%;
+	flex: 0 0 calc(60% - 2rem);
+	width: calc(60% - 2rem);
+	padding-right: 0;
 }
 
-.ainsys-settings-block--status {
-	flex: 0 0 calc(40% - 4rem);
-	width: calc(40% - 4rem);
+.ainsys-settings-block--sidebar {
+	flex: 0 0 calc(40% - 2rem);
+	width: calc(40% - 2rem);
 }
 
 .ainsys-form-group {
@@ -246,13 +245,17 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	height: 1.75rem;
 	margin-left: 1rem;
 	border-radius: 50%;
-	background: #ab47bc;
+	background: #f4f4f4;
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 1.6rem;
-	line-height: 1.75rem;
+	/* line-height: 1.75rem; */
 	text-align: center;
-	color: #fff;
+	color: #ab47bc;
 	cursor: pointer;
+	border: 2px solid;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .ainsys-email-btn-disabled {
@@ -260,7 +263,7 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 }
 
 .ainsys-email-btn.ainsys-minus {
-	line-height: 0.9;
+	padding-bottom: 3px;
 }
 
 .ainsys-status-items {
@@ -270,39 +273,57 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 }
 
 .ainsys-status-items li {
-	display: flex;
+	display: grid;
 	justify-content: space-between;
 	margin: 0.875rem 0;
 	padding: 0;
 	font-size: 0.875rem;
 	line-height: 1.4;
+	grid-template-columns: 1fr 30%;
 }
 
-.ainsys-status-items li.ainsys-li-underline {
+.ainsys-status-items .ainsys-li-underline {
 	margin-bottom: 0;
 	padding-bottom: 1.375rem;
 	border-bottom: 2px solid #D0D5DD;
 }
 
-.ainsys-status-items li.ainsys-li-overline {
+.ainsys-underline {
+	margin-bottom: 0;
+	padding-bottom: 1.25rem;
+	border-bottom: 1px solid #D0D5DD;
+}
+
+.ainsys-overline {
 	margin-top: 0;
-	padding-top: 1.375rem;
-	border-top: 2px solid #D0D5DD;
+	padding-top: 1.25rem;
+	border-top: 1px solid #D0D5DD;
 }
 
-.ainsys-status-title {
-	font-weight: 500;
+.ainsys-status--state {
+	display: flex;
+	align-items: center;
+	gap: 2px;
 }
 
-.ainsys-status-title + span {
-	width: 5.5rem;
+.ainsys-status--state svg {
+	width: 1.25rem;
 }
 
-.ainsys-status-ok {
+.ainsys-status--state.ainsys-status--ok {
 	color: #37b34a;
 }
 
-.ainsys-status-error {
+.ainsys-status--title {
+	font-weight: 500;
+}
+
+/*.ainsys-status--title + span {
+	width: 5.5rem;
+}*/
+
+
+.ainsys-status--error {
 	color: #d5031e;
 }
 
@@ -359,7 +380,7 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	margin-bottom: 2.3rem;
 }
 
-.ainsys_settings_wrap .ainsys-log-controls .btn {
+.ainsys-settings-wrap .ainsys-log-controls .btn {
 	min-width: 0;
 }
 
@@ -427,28 +448,28 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	color: #d5031e;
 }
 
-.ainsys_settings_wrap .ainsys-table {
+.ainsys-settings-wrap .ainsys-table {
 	border-collapse: collapse;
 	width: 100%;
 }
 
-.ainsys_settings_wrap .ainsys-table tr {
+.ainsys-settings-wrap .ainsys-table tr {
 	border-bottom: solid 2px #e2e2e2;
 }
 
-.ainsys_settings_wrap .ainsys-table thead th {
+.ainsys-settings-wrap .ainsys-table thead th {
 	white-space: nowrap;
 }
 
-.ainsys_settings_wrap .ainsys-responce-short {
+.ainsys-settings-wrap .ainsys-responce-short {
 	cursor: pointer;
 }
 
-.ainsys_settings_wrap .ainsys-responce-full {
+.ainsys-settings-wrap .ainsys-responce-full {
 	display: none;
 }
 
-.ainsys_settings_wrap .ainsys-table .ainsys_td_btn {
+.ainsys-settings-wrap .ainsys-table .ainsys_td_btn {
 	width: 7rem;
 	padding-right: 0;
 	text-align: right;
@@ -477,16 +498,16 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	background-size: contain;
 }
 
-#setting_section_log .request_data_container {
+#setting-section-log .request_data_container {
 	height: 39px;
 	overflow: hidden;
 }
 
-#setting_section_log .request_data_container.expand_tab {
+#setting-section-log .request_data_container.expand_tab {
 	height: auto;
 }
 
-#setting_section_log .expand_data_container {
+#setting-section-log .expand_data_container {
 	position: relative;
 	float: right;
 	width: 70px;
@@ -582,16 +603,16 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 }
 
 /* Entities Settings */
-#setting_section_entities .empty_tab {
+#setting-section-entities .empty_tab {
 	width: 100%;
 	text-align: center;
 }
 
-.ainsys_settings_wrap #setting_section_entities {
+.ainsys-settings-wrap #setting-section-entities {
 	flex-direction: column;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entitys_table {
+.ainsys-settings-wrap #setting-section-entities .entitys_table {
 	display: flex;
 	flex-direction: column;
 }
@@ -600,73 +621,73 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	color: grey;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entities_field.active {
+.ainsys-settings-wrap #setting-section-entities .entities_field.active {
 	background: #67A1D0;
 	color: white;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entities_field {
+.ainsys-settings-wrap #setting-section-entities .entities_field {
 	width: auto;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entities_field.multiple_filds .fa {
+.ainsys-settings-wrap #setting-section-entities .entities_field.multiple_filds .fa {
 	font-size: 1.8em;
 	margin-top: -10px;
 	margin-right: 10px;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entities_field.multiple_filds_children .fa {
+.ainsys-settings-wrap #setting-section-entities .entities_field.multiple_filds_children .fa {
 	font-size: 1.2em;
 	margin-top: -10px;
 	margin-right: 10px;
 	margin-left: 10px;
 }
 
-#setting_section_entities .entities_field.multiple_filds {
+#setting-section-entities .entities_field.multiple_filds {
 	background: #c2c0c0;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entity_data.active .entities_field div.entity_settings_value.constant {
+.ainsys-settings-wrap #setting-section-entities .entity_data.active .entities_field div.entity_settings_value.constant {
 	display: block;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entities_field .editor_mode.entity_settings_value {
+.ainsys-settings-wrap #setting-section-entities .entities_field .editor_mode.entity_settings_value {
 	display: none;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entities_field.active .entity_settings_value {
+.ainsys-settings-wrap #setting-section-entities .entities_field.active .entity_settings_value {
 	display: none;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entities_field.active .editor_mode.entity_settings_value {
+.ainsys-settings-wrap #setting-section-entities .entities_field.active .editor_mode.entity_settings_value {
 	display: block;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entities_field i.fa.fa-floppy-o {
+.ainsys-settings-wrap #setting-section-entities .entities_field i.fa.fa-floppy-o {
 	color: #D7D7DB;
 	font-size: 2em;
 	margin: 0 1px 0 2px;
 	display: block;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entities_field.loading i.fa {
+.ainsys-settings-wrap #setting-section-entities .entities_field.loading i.fa {
 	display: none;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entities_field i.fa.active {
+.ainsys-settings-wrap #setting-section-entities .entities_field i.fa.active {
 	color: #575757;
 	cursor: pointer;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entities_field.loading .loader_dual_ring {
+.ainsys-settings-wrap #setting-section-entities .entities_field.loading .loader_dual_ring {
 	display: inline-block;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entities_field .loader_dual_ring {
+.ainsys-settings-wrap #setting-section-entities .entities_field .loader_dual_ring {
 	display: none;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entities_field .loader_dual_ring::after {
+.ainsys-settings-wrap #setting-section-entities .entities_field .loader_dual_ring::after {
 	content: " ";
 	display: block;
 	width: 20px;
@@ -687,23 +708,23 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	}
 }
 
-.ainsys_settings_wrap #setting_section_entities .entity_title {
+.ainsys-settings-wrap #setting-section-entities .entity_title {
 	margin-left: 14px;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entity_title,
-.ainsys_settings_wrap #setting_section_entities .entities_field_header {
+.ainsys-settings-wrap #setting-section-entities .entity_title,
+.ainsys-settings-wrap #setting-section-entities .entities_field_header {
 	width: 10%;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entities_field {
+.ainsys-settings-wrap #setting-section-entities .entities_field {
 	padding: 0 10px;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 }
 
-.ainsys_settings_wrap #setting_section_entities .properties_field {
+.ainsys-settings-wrap #setting-section-entities .properties_field {
 	display: flex;
 	justify-content: space-between;
 	height: 3.2em;
@@ -713,21 +734,21 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	cursor: pointer;
 }
 
-.ainsys_settings_wrap #setting_section_entities .properties_data #save_entity_properties {
+.ainsys-settings-wrap #setting-section-entities .properties_data #save_entity_properties {
 	margin-top: 1.8em;
 }
 
-.ainsys_settings_wrap #setting_section_entities .properties_field,
-.ainsys_settings_wrap #setting_section_entities .properties_field_title {
+.ainsys-settings-wrap #setting-section-entities .properties_field,
+.ainsys-settings-wrap #setting-section-entities .properties_field_title {
 	flex: 1 7%;
 }
 
-.ainsys_settings_wrap #setting_section_entities .properties_field.small_property,
-.ainsys_settings_wrap #setting_section_entities .properties_field_title.small_property {
+.ainsys-settings-wrap #setting-section-entities .properties_field.small_property,
+.ainsys-settings-wrap #setting-section-entities .properties_field_title.small_property {
 	flex: 1 2%;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entity_block_header {
+.ainsys-settings-wrap #setting-section-entities .entity_block_header {
 	background: grey;
 	color: white;
 	font-size: 1em;
@@ -737,34 +758,34 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	padding-top: 8px;
 }
 
-.ainsys_settings_wrap #setting_section_entities .properties_field input {
+.ainsys-settings-wrap #setting-section-entities .properties_field input {
 	height: 1em;
 }
 
-.ainsys_settings_wrap #setting_section_entities .entities_block .entity_data {
+.ainsys-settings-wrap #setting-section-entities .entities_block .entity_data {
 	overflow: hidden;
 	height: 38px;
 	margin-bottom: 1em
 }
 
-.ainsys_settings_wrap #setting_section_entities .entities_block .entity_data.active {
+.ainsys-settings-wrap #setting-section-entities .entities_block .entity_data.active {
 	overflow: hidden;
 	height: auto;
 }
 
-.ainsys_settings_wrap #setting_section_entities .properties_data {
+.ainsys-settings-wrap #setting-section-entities .properties_data {
 	text-align: center;
 }
 
-#setting_section_entities .entities_field:nth-child(2n) {
+#setting-section-entities .entities_field:nth-child(2n) {
 	background-color: white;
 }
 
-#setting_section_entities .expand_entity_container.button {
+#setting-section-entities .expand_entity_container.button {
 	height: 30px;
 }
 
-#setting_section_entities .expand_entity_container {
+#setting-section-entities .expand_entity_container {
 	position: relative;
 	float: right;
 	width: 85px;

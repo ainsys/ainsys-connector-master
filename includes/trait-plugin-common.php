@@ -105,12 +105,25 @@ trait Plugin_Common {
 	/**
 	 * Is plugin active
 	 *
-	 * @param string $plugin
+	 * @param  string $plugin
 	 *
 	 * @return bool
 	 */
-	public function is_plugin_active( $plugin ) {
-		return in_array( $plugin, (array) get_option( 'active_plugins', array() ) );
+	public function is_plugin_active( string $plugin ): bool {
+		return in_array( $plugin, (array) get_option( 'active_plugins', [] ), true );
+	}
+
+
+	/**
+	 * Is install active
+	 *
+	 * @param  string $plugin
+	 *
+	 * @return bool
+	 */
+	public function is_plugin_install( string $plugin ): bool {
+
+		return array_key_exists( $plugin, get_plugins() );
 	}
 
 }

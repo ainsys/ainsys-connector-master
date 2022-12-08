@@ -152,7 +152,7 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 .ainsys-settings-block--connection {
 	flex: 0 0 calc(60% - 2rem);
 	width: calc(60% - 2rem);
-	padding-right: 0;
+
 }
 
 .ainsys-settings-block--sidebar {
@@ -235,8 +235,8 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 }
 
 .ainsys-email .ainsys-form-input input {
-	flex: 0 0 calc(100% - 5.5rem);
-	width: calc(100% - 5.5rem);
+	flex: 0 0 calc(100% - 25.5rem);
+	width: calc(100% - 25.5rem);
 }
 
 .ainsys-email-btn {

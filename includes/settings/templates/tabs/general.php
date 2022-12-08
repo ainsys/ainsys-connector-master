@@ -107,60 +107,6 @@ do_action( 'qm/info', $status_addons );
 					</div>
 				</div>
 
-				<div class="ainsys-form-group-title"><h3><?php _e( 'Your Data', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></h3></div>
-				<div class="ainsys-tabs">
-					<div class="ainsys-tabs-nav">
-						<a class="ainsys-nav-tab ainsys-nav-tab-active" href="#setting_section_individual" data-target="setting_section_individual"><?php _e(
-								'Individual', AINSYS_CONNECTOR_TEXTDOMAIN
-							); // phpcs:ignore ?></a>
-						<a class="ainsys-nav-tab" href="#setting_section_organization" data-target="setting_section_organization"><?php _e(
-								'Legal Entity', AINSYS_CONNECTOR_TEXTDOMAIN
-							); // phpcs:ignore ?></a>
-					</div>
-					<div class="ainsys-tabs-target">
-						<div id="setting_section_individual" class="ainsys-tab-target ainsys-tab-target-active">
-							<div class="ainsys-form-group">
-								<label for="client-full-name" class="ainsys-form-label">
-									<?php _e( 'Full Name', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
-								</label>
-								<div class="ainsys-form-input">
-									<input id="client-full-name"
-									       type="text"
-									       size="50"
-									       name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'client_full_name' ) ); ?>"
-									       value="<?php echo esc_attr( $admin_ui->settings::get_option( 'client_full_name' ) ); ?>"/>
-								</div>
-							</div>
-						</div>
-						<div id="setting_section_organization" class="ainsys-tab-target">
-							<div class="ainsys-form-group">
-								<label for="client-company-name" class="ainsys-form-label">
-									<?php _e( 'Company Name', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
-								</label>
-								<div class="ainsys-form-input">
-									<input id="client-company-name"
-									       type="text"
-									       size="50"
-									       name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'client_company_name' ) ); ?>"
-									       value="<?php echo esc_attr( $admin_ui->settings::get_option( 'client_company_name' ) ); ?>"/>
-								</div>
-							</div>
-							<div class="ainsys-form-group">
-								<label for="client_tin" class="ainsys-form-label">
-									<?php _e( 'TIN', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
-								</label>
-								<div class="ainsys-form-input">
-									<input id="client_tin"
-									       type="text"
-									       size="50"
-									       name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'client_tin' ) ); ?>"
-									       value="<?php echo esc_attr( $admin_ui->settings::get_option( 'client_tin' ) ); ?>"/>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
 				<div class="submit">
 					<input type="submit" class="btn btn-primary" value="<?php // phpcs:ignore
 					if ( ! empty( $status ) && 'success' === $status['status'] ) {

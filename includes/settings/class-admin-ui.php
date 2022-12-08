@@ -6,11 +6,12 @@ namespace Ainsys\Connector\Master\Settings;
 use Ainsys\Connector\Master\Core;
 use Ainsys\Connector\Master\Hooked;
 use Ainsys\Connector\Master\Logger;
+use Ainsys\Connector\Master\Plugin_Common;
 use Ainsys\Connector\Master\WP\Process_Users;
 use Ainsys\Connector\Master\WP\Process_Comments;
 
 class Admin_UI implements Hooked {
-
+	use Plugin_Common;
 	/**
 	 * Storage for admin notices.
 	 *
@@ -163,6 +164,135 @@ class Admin_UI implements Hooked {
 		return apply_filters( 'ainsys_get_nav_fields', $settings_nav_tabs );
 	}
 
+
+	public function get_nav_content_fields(): array {
+
+
+		$settings_content_tabs = [
+			'general'  => [
+				'template'    => '/includes/settings/templates/tabs/general.php',
+				'active'   => false,
+				'priority' => 10,
+			],
+			'test'     => [
+				'template'    => '/includes/settings/templates/tabs/tests.php',
+				'active'   => false,
+				'priority' => 20,
+			],
+			'log'      => [
+				'template'    => '/includes/settings/templates/tabs/logs.php',
+				'active'   => false,
+				'priority' => 30,
+			],
+			'entities' => [
+				'template'    => '/includes/settings/templates/tabs/entities.php',
+				'active'   => false,
+				'priority' => 40,
+			],
+		];
+
+		uasort( $settings_content_tabs, [ $this, 'fields_uasort_comparison' ] );
+
+		return apply_filters( 'ainsys_get_nav_content_fields', $settings_content_tabs );
+	}
+
+
+	public function get_statuses_system() {
+
+		$status_system = [
+			'curl'   => [
+				'title'         => 'CURL',
+				'active'        => extension_loaded( 'curl' ),
+				'label_success' => __( 'Enabled', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'label_error'   => __( 'Disabled', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			],
+			'ssl'    => [
+				'title'         => 'SSL',
+				'active'        => \is_ssl(),
+				'label_success' => __( 'Enabled', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'label_error'   => __( 'Disabled', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			],
+			'php'    => [
+				'title'         => __( 'PHP version 7.2+', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'active'        => version_compare( PHP_VERSION, '7.2.0' ) > 0,
+				'label_success' => 'PHP ' . esc_html( PHP_VERSION ),
+				'label_error'   => sprintf( __( 'Bad PHP version %s Update on your hosting', AINSYS_CONNECTOR_TEXTDOMAIN ), esc_html( PHP_VERSION ) ),
+			],
+			'emails' => [
+				'title'         => sprintf(
+					__( 'Backup email: %s', AINSYS_CONNECTOR_TEXTDOMAIN ), esc_html(
+						$this->settings::get_backup_email()
+					)
+				),
+				'active'        => ! empty( $this->settings::get_backup_email() ) && filter_var( $this->settings::get_backup_email(), FILTER_VALIDATE_EMAIL ),
+				'label_success' => __( 'Valid', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'label_error'   => __( 'Invalid', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			],
+		];
+
+		for ( $i = 1; $i < 10; $i ++ ) {
+
+			if ( empty( $this->settings::get_backup_email( $i ) ) ) {
+				continue;
+			}
+
+			$status_system[ 'emails_' . $i ] = [
+				'title'         => sprintf(
+					__( 'Backup email: %s', AINSYS_CONNECTOR_TEXTDOMAIN ),
+					esc_html( $this->settings::get_backup_email( $i ) )
+				),
+				'active'        => ! empty( $this->settings::get_backup_email( $i ) ) && filter_var( $this->settings::get_backup_email( $i ), FILTER_VALIDATE_EMAIL ),
+				'label_success' => __( 'Valid', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'label_error'   => __( 'Invalid', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			];
+
+		}
+
+		return apply_filters( 'ainsys_status_system_list', $status_system );
+	}
+
+
+	public function get_statuses_addons() {
+
+		if (!$this->is_plugin_install('ainsys-connector-content/plugin.php')){
+			$la = __( 'Not installed', AINSYS_CONNECTOR_TEXTDOMAIN );
+		} elseif ($this->is_plugin_install('ainsys-connector-content/plugin.php') && ! $this->is_plugin_active( 'ainsys-connector-content/plugin.php' )){
+			$la = __( 'Not activated', AINSYS_CONNECTOR_TEXTDOMAIN );
+		} else {
+			$la = 'OK';
+		}
+
+
+
+		$status = [
+			'woocommerce'   => [
+				'title'         => 'AINSYS connector Woocommerce Integration',
+				'slug'         => 'ainsys-connector-woocommerce',
+				'active'        => $this->is_plugin_active( 'ainsys-connector-woocommerce/plugin.php' ),
+				'install'        => $this->is_plugin_install( 'ainsys-connector-woocommerce/plugin.php' ),
+			],
+			'content'   => [
+				'title'         => 'AINSYS Connector Headless CMS',
+				'slug'         => 'ainsys-connector-content',
+				'active'        => $this->is_plugin_active( 'ainsys-connector-content/plugin.php' ),
+				'install'        => $this->is_plugin_install( 'ainsys-connector-content/plugin.php' ),
+			],
+			'acf'   => [
+				'title'         => 'AINSYS connector ACF Integration',
+				'slug'         => 'ainsys-connector-acf',
+				'active'        => $this->is_plugin_active( 'ainsys-connector-acf/plugin.php' ),
+				'install'        => $this->is_plugin_install( 'ainsys-connector-acf/plugin.php' ),
+			],
+			'wpcf7'   => [
+				'title'         => 'AINSYS connector WPCF7 Integration',
+				'slug'         => 'ainsys-connector-wpcf7',
+				'active'        => $this->is_plugin_active( 'ainsys-connector-wpcf7/plugin.php' ),
+				'install'        => $this->is_plugin_install( 'ainsys-connector-wpcf7/plugin.php' ),
+			],
+		];
+
+		return apply_filters( 'ainsys_status_list', $status );
+	}
 	/**
 	 * Includes settings page
 	 *
@@ -209,12 +339,12 @@ class Admin_UI implements Hooked {
 			AINSYS_CONNECTOR_VERSION
 		);
 
-		wp_enqueue_style(
+		/*wp_enqueue_style(
 			'font-awesome_style_handle',
 			'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css',
 			[],
 			AINSYS_CONNECTOR_VERSION
-		);
+		);*/
 
 		wp_enqueue_script(
 			'ainsys_connector_admin_handle',
@@ -570,7 +700,7 @@ class Admin_UI implements Hooked {
 	 * Tests AINSYS connection for entities (for ajax).
 	 *
 	 */
-	public function test_entity_connection() {
+/*	public function test_entity_connection() {
 
 		if ( ! isset( $_POST['entity'], $_POST['nonce'] ) && ! wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
 			wp_die( 'Missing nonce' );
@@ -628,7 +758,7 @@ class Admin_UI implements Hooked {
 
 		wp_send_json( $result );
 
-	}
+	}*/
 
 
 	/**

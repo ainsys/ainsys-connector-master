@@ -2,7 +2,7 @@ jQuery(function($){
 
 	const ainsys_settings = {
 
-		$ainsys_settings_wrap: $( '.ainsys_settings_wrap' ),
+		$settingsWrap: $( '.ainsys-settings-wrap' ),
 
 		activeLastTab: function () {
 			const lastTab = localStorage.getItem( 'lastTab' );
@@ -13,8 +13,8 @@ jQuery(function($){
 				$( 'a[href="' + lastTab + '"]' ).addClass( 'nav-tab-active' )
 				$( lastTab ).addClass( 'tab-target-active' );
 			} else {
-				$( 'a[href="#setting_section_general"]' ).addClass( 'nav-tab-active' )
-				$( '#setting_section_general' ).addClass( 'tab-target-active' );
+				$( 'a[href="#setting-section-general"]' ).addClass( 'nav-tab-active' )
+				$( '#setting-section-general' ).addClass( 'tab-target-active' );
 			}
 		},
 
@@ -35,7 +35,41 @@ jQuery(function($){
 			}, 500 )
 		},
 
-		init:   function () {
+		buttonsEach: function () {
+			$( '.ainsys-email-btn.ainsys-plus' ).each( function(e) {
+				let btnPlus = $( this );
+				let target = $(this).data( 'target' );
+
+				$( '.ainsys-email' ).each( function() {
+					if ( $(this).data( 'block-id' ) === target && $(this).hasClass( 'ainsys-email-show' ) ) {
+						btnPlus.addClass( 'ainsys-email-btn-disabled' );
+					}
+				} );
+			} );
+		},
+
+		togglePlus:   function ( event ) {
+			const target = $( event.target ).data( 'target' );
+			$( event.target ).addClass( 'ainsys-email-btn-disabled' );
+			$( '.ainsys-email' ).each( function () {
+				if ( $( this ).data( 'block-id' ) === target ) {
+					$( this ).addClass( 'ainsys-email-show' );
+				}
+			} );
+		},
+
+		toggleMinus: function ( event ) {
+			$( event.target ).closest( '.ainsys-email' ).removeClass( 'ainsys-email-show' );
+			$( event.target ).closest( '.ainsys-email' ).find( 'input' ).val( '' );
+			const blockId = $( event.target ).closest( '.ainsys-email' ).data( 'block-id' );
+			$( '.ainsys-email-btn.ainsys-plus' ).each( function () {
+				if ( $( this ).data( 'target' ) === blockId ) {
+					$( this ).removeClass( 'ainsys-email-btn-disabled' );
+				}
+			} );
+		},
+
+		init:      function () {
 
 			$( '#connection_log .ainsys-table' ).DataTable();
 
@@ -43,14 +77,30 @@ jQuery(function($){
 
 			this.activeLastTab();
 
-			this.$ainsys_settings_wrap
+			this.buttonsEach();
+
+			this.$settingsWrap
 				.on(
 					'click',
 					'.nav-tab',
 					function ( event ) {
 						ainsys_settings.toggleTabs( event );
 					}
-				);
+				)
+				.on(
+					'click',
+					'.ainsys-plus',
+					function ( event ) {
+						ainsys_settings.togglePlus( event );
+					}
+				)
+				.on(
+					'click',
+					'.ainsys-minus',
+					function ( event ) {
+						ainsys_settings.toggleMinus( event );
+					}
+				)
 		},
 
 	};
@@ -71,43 +121,12 @@ jQuery(function($){
         $('#'+targ).addClass('ainsys-tab-target-active');
 	});
 
-	$('.ainsys_settings_wrap').on('click', '.ainsys-plus', function(){
-		const target = $( this ).data( 'target' );
-		$( this ).addClass( 'ainsys-email-btn-disabled' );
-		$( '.aisys-email' ).each( function() {
-			if ( $(this).data( 'block-id' ) == target ) {
-				$( this ).addClass( 'aisys-email-show' );
-			}
-		} );
-	} );
-
-	$('.ainsys_settings_wrap').on('click', '.ainsys-minus', function(){
-		$( this ).closest( '.aisys-email' ).removeClass( 'aisys-email-show' );
-		$( this ).closest( '.aisys-email' ).find( 'input' ).val('');
-		const blockId = $( this ).closest( '.aisys-email' ).data( 'block-id' );
-		$( '.ainsys-email-btn.ainsys-plus' ).each( function() {
-			if ( $(this).data( 'target' ) == blockId ) {
-				$( this ).removeClass( 'ainsys-email-btn-disabled' );
-			}
-		} );
-	} );
-
-	$( '.ainsys-email-btn.ainsys-plus' ).each( function() {
-		const btnPlus = $( this );
-		const target = $(this).data( 'target' );
-		$( '.aisys-email' ).each( function() {
-			if ( $(this).data( 'block-id' ) == target && $(this).hasClass( 'aisys-email-show' ) ) {
-				btnPlus.addClass( 'ainsys-email-btn-disabled' );
-			}
-		} );
-	} );
-
 
 	/////////////////////////////////
     ////////////   Test tab   ///////
 
 	//////// Ajax test btns ////////
-    $( '#setting_section_test' ).on( 'click', '.ainsys-test', function(e) {
+    $( '#setting-section-test' ).on( 'click', '.ainsys-test', function(e) {
         e.preventDefault();
 
         if ( $(this).hasClass( 'ainsys-loading' ) ){
@@ -163,7 +182,7 @@ jQuery(function($){
     ////////////   Log tab   ///////
 
     //////// Ajax clear log ////////
-    $('#setting_section_log').on('click', '#clear_log', function (e){
+    $('#setting-section-log').on('click', '#clear_log', function (e){
  	    $.ajax( {
 		    url:        ainsys_connector_params.ajax_url,
 		    type:       'POST',
@@ -206,7 +225,7 @@ jQuery(function($){
 	} );
 
     //////// Ajax start/stop loging btns  ////////
-    $( '#setting_section_log' ).on( 'click', '.ainsys-log-control', function(e) {
+    $( '#setting-section-log' ).on( 'click', '.ainsys-log-control', function(e) {
         e.preventDefault();
 
         if ( $(this).hasClass( 'disabled' ) ){
@@ -254,7 +273,7 @@ jQuery(function($){
     } );
 
 	////////  Ajax reload log HTML ////////
-	$( '#setting_section_log' ).on( 'click', '#reload_log', function ( e ) {
+	$( '#setting-section-log' ).on( 'click', '#reload_log', function ( e ) {
 
 		$.ajax( {
 			url:        ainsys_connector_params.ajax_url,
@@ -277,7 +296,7 @@ jQuery(function($){
 		} )
 	} );
 
-	$('.ainsys_settings_wrap').on('click', '.ainsys-responce-short', function (e){
+	$('.ainsys-settings-wrap').on('click', '.ainsys-responce-short', function (e){
 		const fullResponse = $( this ).siblings( '.ainsys-responce-full' ).html();
 		$( 'body' ).append('<div class="ainsys-overlay"><div class="ainsys-popup"><div class="ainsys-popup-body"><div class="ainsys-popup-response">' + fullResponse + '</div></div><div class="ainsys-popup-btns"><span class="btn btn-primary ainsys-popup-copy">Copy to Clipboard</span><span class="btn btn-tertiary ainsys-popup-close">Close</span></div></div></div>');
 		const respHeight = $( '.ainsys-popup' ).height() - $( '.ainsys-popup-btns' ).outerHeight() - 40;
@@ -303,7 +322,7 @@ jQuery(function($){
 	} );
 
     //////// Ajax remove ainsys integration ////////
-    $('#setting_section_general').on('click', '#remove_ainsys_integration', function (e){
+    $('#setting-section-general').on('click', '#remove_ainsys_integration', function (e){
         var data = {
             action: "remove_ainsys_integration",
             nonce: ainsys_connector_params.nonce
@@ -314,7 +333,7 @@ jQuery(function($){
     });
 
     //////// Expand/collapse data container ////////
-    $('#setting_section_log').on('click', '.expand_data_container', function (e){
+    $('#setting-section-log').on('click', '.expand_data_container', function (e){
         $(this).parent().toggleClass('expand_tab');
 
         var text = $(this).text() == 'less' ? 'more' : 'less';
@@ -356,7 +375,7 @@ jQuery(function($){
     });
 
     //////// Ajax clear log ////////
-    $('#setting_section_entities .entities_field').on('click', '.fa.active', function (e){
+    $('#setting-section-entities .entities_field').on('click', '.fa.active', function (e){
 
         let setting_id = '#' + $(this).parent().attr('id');
         $(setting_id).toggleClass('loading');
@@ -382,7 +401,7 @@ jQuery(function($){
     });
 
     ////////  ////////
-    $('#setting_section_entities').on('click', ' .entities_field', function (e){
+    $('#setting-section-entities').on('click', ' .entities_field', function (e){
         $('.entities_field.active').each(function(){
             $(this).removeClass('active');
         })
@@ -416,7 +435,7 @@ jQuery(function($){
     });
  
 	//////// expand entity tab ////////
-    $('#setting_section_entities').on('click', ' .expand_entity_container', function (e){
+    $('#setting-section-entities').on('click', ' .expand_entity_container', function (e){
         $(this).parent().parent().toggleClass('active');
         var text = $(this).text() == 'expand' ? 'collapse' : 'expand';
         $(this).text(text);

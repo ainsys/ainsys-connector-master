@@ -173,7 +173,8 @@ do_action( 'qm/info', $status_addons );
 				</div>
 
 				<div class="ainsys-settings-block--status--addons ainsys-overline">
-					<h2><?php _e( 'Add-ons and plugin status', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></h2>
+					<h2><?php _e( 'Add-ons and plugin status', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></h2>
+
 					<ul class="ainsys-status-items ainsys-li-overline">
 						<?php foreach ( $status_addons as $status_key => $status_item ) : ?>
 							<li class="ainsys-status">
@@ -242,8 +243,9 @@ do_action( 'qm/info', $status_addons );
 			</div>
 
 			<div class="ainsys-settings-block ainsys-settings-block--connect-status">
-			</div>
-			<li>
+
+				<h2><?php _e( 'Test connection', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></h2>
+
 				<span class="ainsys-status-title"><?php _e( 'Conection', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></span>
 				<?php
 				if ( ! empty( $status ) && 'success' === $status['status'] ) :
@@ -262,7 +264,7 @@ do_action( 'qm/info', $status_addons );
 				<?php
 				endif;
 				?>
-			</li>
+			</div>
 
 		</div>
 

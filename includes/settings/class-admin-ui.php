@@ -339,13 +339,6 @@ class Admin_UI implements Hooked {
 			AINSYS_CONNECTOR_VERSION
 		);
 
-		/*wp_enqueue_style(
-			'font-awesome_style_handle',
-			'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css',
-			[],
-			AINSYS_CONNECTOR_VERSION
-		);*/
-
 		wp_enqueue_script(
 			'ainsys_connector_admin_handle',
 			plugins_url( 'assets/js/ainsys_connector_admin.js', AINSYS_CONNECTOR_PLUGIN ),
@@ -400,36 +393,6 @@ class Admin_UI implements Hooked {
 			if ( ! empty( $response ) && isset( $webhook_data->webhook_url ) ) {
 				$this->settings::set_option( 'webhook_url', $webhook_data->webhook_url );
 			}
-
-			// old connector
-			//          $connectors = ainsys_settings::get_option('connectors');
-			//            if (empty($connectors)){
-			//                $server_url = empty(ainsys_settings::get_option('server')) ? 'https://user-api.ainsys.com/' : ainsys_settings::get_option('server');
-			//                $workspace = empty(ainsys_settings::get_option('workspace')) ? 14 : ainsys_settings::get_option('workspace');
-			//                $url = $server_url . 'api/v0/workspace-management/workspaces/' . $workspace . '/connectors/';
-			//                $sys_id = empty((int)ainsys_settings::get_option('sys_id')) ? 3 : (int)ainsys_settings::get_option('sys_id');
-			//                $post_fields = array(
-			//                    "name" => 'string',
-			//                    "system" => $sys_id,
-			//                    "workspace" => 14,
-			//                    "created_by" => 0);
-			//                $connectors_responce = self::curl_exec_func( $post_fields, $url );
-			//                $connectors_array = !empty($connectors_responce) ? json_decode($connectors_responce) : '';
-			//                if ( !empty($connectors_array) && isset($connectors_array->id) ){
-			//                    ainsys_settings::set_option('connectors', $connectors_array->id);
-			//                    $url = $server_url . 'api/v0/workspace-management/workspaces/'. $workspace . '/connectors/'. $connectors_array->id . '/handshake-url/';
-			//                    $url_responce = self::curl_exec_func('', $url );
-			//                    $url_array = !empty($url_responce) ? json_decode($url_responce) : '';
-			//                    if ( !empty($url_array) && isset($url_array->url) ){
-			//                        ainsys_settings::set_option('handshake_url', $url_array->url);
-			//                        $webhook_call = self::curl_exec_func( ['webhook_url' => ainsys_settings::get_option('hook_url')], $url_array->url );
-			//                        $webhook_array = !empty($webhook_call) ? json_decode($webhook_call) : '';
-			//                        if (! empty($webhook_call) && isset($webhook_array->webhook_url)){
-			//                            ainsys_settings::set_option('webhook_url', $webhook_array->webhook_url);
-			//                        }
-			//                    }
-			//                }
-			//            }
 		}
 	}
 
@@ -471,24 +434,6 @@ class Admin_UI implements Hooked {
 		$this->check_connection_to_server();
 
 		$webhook_url = $this->settings::get_option( 'ansys_api_key' );
-
-		// TODO check commented out code -  it's legacy copied as is.
-		//      if ( ! empty( $webhook_url ) && ! empty( get_option( 'ainsys-webhook_url' ) ) ) {
-		//          return array( 'status' => 'success' );
-		//      }
-		//
-		//      $request_to_ainsys = wp_remote_post( $webhook_url, [
-		//          'sslverify' => false,
-		//          'body'      => [
-		//              'webhook_url' => get_option( 'ansys_connector_woocommerce_hook_url' )
-		//          ]
-		//      ] );
-
-		//      if ( is_wp_error( $request_to_ainsys ) ) {
-		//          return array( 'status' => 'none' );
-		//      }
-
-		//      $parsed_response = json_decode( $request_to_ainsys['body'] );
 
 		if ( $webhook_url ) {
 			$this->add_admin_notice( 'Соединение с сервером Ainsys установлено. Webhook_url получен.' );
@@ -611,11 +556,6 @@ class Admin_UI implements Hooked {
 	 * @return array
 	 */
 	public function sanitise_fields_to_save( $fields ) {
-		// clear empty fields
-		//        foreach ($fields as $field => $val){
-		//            if (empty($val))
-		//                unset($fields[$field]);
-		//        }
 		unset( $fields['action'], $fields['entity'], $fields['nonce'], $fields['seting_name'], $fields['id'] );
 
 		/// exclude 'constant' variables

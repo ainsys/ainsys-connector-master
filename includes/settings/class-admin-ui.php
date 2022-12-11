@@ -280,8 +280,8 @@ class Admin_UI implements Hooked {
 			'acf'   => [
 				'title'         => 'AINSYS connector ACF Integration',
 				'slug'         => 'ainsys-connector-acf',
-				'active'        => $this->is_plugin_active( 'ainsys-connector-acf/plugin.php' ),
-				'install'        => $this->is_plugin_install( 'ainsys-connector-acf/plugin.php' ),
+				'active'        => $this->is_plugin_active( '1ainsys-connector-acf/plugin.php' ),
+				'install'        => $this->is_plugin_install( '1ainsys-connector-acf/plugin.php' ),
 			],
 			'wpcf7'   => [
 				'title'         => 'AINSYS connector WPCF7 Integration',

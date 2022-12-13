@@ -19,73 +19,77 @@ class Settings implements Hooked {
 	 */
 	public static string $ainsys_entities_settings_table = 'ainsys_entities_settings';
 
+	protected static array $settings_tables;
+
 	/**
 	 * AINSYS options and their default values.
 	 */
-	public static array $ainsys_options = array(
-		'ansys_api_key'          => '',
-		'handshake_url'          => '',
-		'webhook_url'            => '',
-		'server'                 => 'https://user-api.ainsys.com/',
-		'sys_id'                 => '',
-		'connectors'             => '',
-		'workspace'              => 14,
-		'backup_email'           => '',
-		'backup_email_1'         => '',
-		'backup_email_2'         => '',
-		'backup_email_3'         => '',
-		'backup_email_4'         => '',
-		'backup_email_5'         => '',
-		'backup_email_6'         => '',
-		'backup_email_7'         => '',
-		'backup_email_8'         => '',
-		'backup_email_9'         => '',
-		'do_log_transactions'    => 1,
-		'log_transactions_since' => '',
-		'log_until_certain_time' => '',
-		'log_select_value'       => -1,
-		'full_uninstall'         => 0,
-		'connector_id'           => '',
-		'client_full_name'       => '',
-		'client_company_name'    => '',
-		'client_tin'             => '',
-		'debug_log'              => '',
-	);
+	public static array $settings_options;
+
+
+	/**
+	 * @return array|string[]
+	 */
+	public static function get_settings_tables(): array {
+
+		self::$settings_tables = [
+			'logs'     => 'ainsys_log',
+			'entities' => 'ainsys_entities_settings',
+		];
+
+		return apply_filters( 'ainsys_settings_tables', self::$settings_tables );
+	}
+
+
+	/**
+	 * @return array
+	 */
+	public static function get_settings_options(): array {
+
+		self::$settings_options = [
+			'ansys_api_key'          => '',
+			'handshake_url'          => '',
+			'webhook_url'            => '',
+			'server'                 => 'https://user-api.ainsys.com/',
+			'sys_id'                 => '',
+			'connectors'             => '',
+			'workspace'              => 14,
+			'backup_email'           => '',
+			'backup_email_1'         => '',
+			'backup_email_2'         => '',
+			'backup_email_3'         => '',
+			'backup_email_4'         => '',
+			'backup_email_5'         => '',
+			'backup_email_6'         => '',
+			'backup_email_7'         => '',
+			'backup_email_8'         => '',
+			'backup_email_9'         => '',
+			'do_log_transactions'    => 0,
+			'log_transactions_since' => '',
+			'log_until_certain_time' => 0,
+			'log_select_value'       => - 1,
+			'full_uninstall'         => 0,
+			'connector_id'           => '',
+			'client_full_name'       => '',
+			'client_company_name'    => '',
+			'client_tin'             => '',
+			'debug_log'              => '',
+			'check_connection'       => '',
+		];
+
+		return apply_filters( 'ainsys_settings_options', self::$settings_options );
+	}
+
 
 	/**
 	 * Init hooks.
 	 */
 	public function init_hooks() {
 
-		add_action( 'admin_init', array( $this, 'register_options' ) );
-		add_action( 'init', array( $this, 'check_to_auto_disable_logging' ) );
-
+		add_action( 'admin_init', [ $this, 'register_options' ] );
+		//add_action( 'register_setting', array( $this, 'sanitize_update_settings' ) );
 	}
 
-
-	/**
-	 * Autodisables logging.
-	 *
-	 * @return void
-	 */
-	public function check_to_auto_disable_logging(): void {
-		$logging_enabled = (int) self::get_option( 'do_log_transactions' );
-		// Generate log until time settings
-		$current_time = time();
-		$limit_time   = (int) self::get_option( 'log_until_certain_time' );
-
-		// make it really infinite as in select infinite option is -1;
-		if ( $limit_time < 0 ) {
-			return;
-		}
-
-		if ( $logging_enabled && $limit_time && ( $current_time < $limit_time ) ) {
-			self::set_option( 'do_log_transactions', 1 );
-		} else {
-			self::set_option( 'do_log_transactions', 0 );
-			self::set_option( 'log_until_certain_time', -1 );
-		}
-	}
 
 	/**
 	 * Gets options value by name.
@@ -95,6 +99,7 @@ class Settings implements Hooked {
 	 * @return mixed|void
 	 */
 	public static function get_option( $name ) {
+
 		return get_option( self::get_option_name( $name ) );
 	}
 
@@ -110,7 +115,16 @@ class Settings implements Hooked {
 
 		return self::get_plugin_name() . '_' . $name;
 	}
-
+	/**
+	 * Gets full option name.
+	 *
+	 * @param  string $name
+	 *
+	 * @return string
+	 */
+	/*	public static function get_setting_name( string $name ): string {
+			return self::get_plugin_name() . '_' . $name;
+		}*/
 
 	/**
 	 * Gets plugin uniq name to show on the settings page.
@@ -124,14 +138,29 @@ class Settings implements Hooked {
 
 
 	/**
+	 * Updates an option.
+	 *
+	 * @param  string $name
+	 * @param         $value
+	 *
+	 * @return bool
+	 */
+	public static function set_option( string $name, $value ): bool {
+
+		return update_option( self::get_option_name( $name ), $value, 'no' );
+	}
+
+
+	/**
 	 * Activates plugin
 	 *
 	 * @return void
 	 */
 	public static function activate(): void {
+
 		global $wpdb;
 
-		update_option( self::get_plugin_name(), AINSYS_CONNECTOR_VERSION , false);
+		update_option( self::get_plugin_name(), AINSYS_CONNECTOR_VERSION, false );
 
 		flush_rewrite_rules();
 		ob_start();
@@ -140,7 +169,7 @@ class Settings implements Hooked {
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		dbDelta( self::get_schema() );
 
-		update_option( self::get_plugin_name() . '_db_version', AINSYS_CONNECTOR_VERSION, false);
+		update_option( self::get_plugin_name() . '_db_version', AINSYS_CONNECTOR_VERSION, false );
 
 		ob_get_clean();
 
@@ -184,39 +213,17 @@ class Settings implements Hooked {
             ) $collate;";
 	}
 
+
 	/**
 	 * Deactivates plugin. Removes logs, settings, etc. if the option 'full_uninstall' is on.
 	 *
 	 * @return void
 	 */
 	public static function deactivate(): void {
+
 		if ( (int) self::get_option( 'full_uninstall' ) ) {
 			self::uninstall();
 		}
-	}
-
-	/**
-	 * Gets full option name.
-	 *
-	 * @param  string $name
-	 *
-	 * @return string
-	 */
-	public static function get_setting_name( string $name ): string {
-		return self::get_plugin_name() . '_' . $name;
-	}
-
-
-	/**
-	 * Updates an option.
-	 *
-	 * @param  string $name
-	 * @param         $value
-	 *
-	 * @return bool
-	 */
-	public static function set_option( string $name, $value ): bool {
-		return update_option( self::get_option_name( $name ), $value, 'no' );
 	}
 
 
@@ -226,7 +233,8 @@ class Settings implements Hooked {
 	 * @return bool|mixed|void
 	 */
 	public static function get_backup_email( $mail = '' ) {
-		$field  = 'backup_email';
+
+		$field = 'backup_email';
 		$field .= $mail ? '_' . $mail : '';
 		if ( ! empty( self::get_option( $field ) ) ) {
 			return self::get_option( $field );
@@ -246,14 +254,16 @@ class Settings implements Hooked {
 	 * @return array
 	 */
 	public static function get_entities(): array {
+
 		/// Get WordPress pre installed entities.
-		$entities = array(
+		$entities = [
 			'user'     => __( 'User / fields', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 			'comments' => __( 'Comments / fields', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
-		);
+		];
 
 		return apply_filters( 'ainsys_get_entities_list', $entities );
 	}
+
 
 	/**
 	 * Gives an ability to provide specific to entity type fields getters supplied by child plugins.
@@ -261,10 +271,11 @@ class Settings implements Hooked {
 	 * @return array
 	 */
 	public static function get_entity_fields_handlers(): array {
-		$field_getters = array(
-			'user'     => array( static::class, 'get_user_fields' ),
-			'comments' => array( static::class, 'get_comments_fields' ),
-		);
+
+		$field_getters = [
+			'user'     => [ static::class, 'get_user_fields' ],
+			'comments' => [ static::class, 'get_comments_fields' ],
+		];
 
 		return apply_filters( 'ainsys_get_entity_fields_handlers', $field_getters );
 	}
@@ -282,64 +293,65 @@ class Settings implements Hooked {
 
 		$default_apis = apply_filters(
 			'ainsys_default_apis_for_entities',
-			array(
+			[
 				'wordpress' => '',
-			)
+			]
 		);
 
-		return array(
-			'id'          => array(
+		return [
+			'id'          => [
 				'nice_name' => __( 'Id', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'default'   => '',
 				'type'      => 'constant',
-			),
-			'api'         => array(
+			],
+			'api'         => [
 				'nice_name' => __( 'API', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'default'   => $default_apis,
 				'type'      => 'constant',
-			),
-			'read'        => array(
+			],
+			'read'        => [
 				'nice_name' => __( 'Read', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'default'   => '1',
 				'type'      => 'bool',
-			),
-			'write'       => array(
+			],
+			'write'       => [
 				'nice_name' => __( 'Write', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'default'   => '0',
 				'type'      => 'bool',
-			),
-			'required'    => array(
+			],
+			'required'    => [
 				'nice_name' => __( 'Required', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'default'   => '0',
 				'type'      => 'bool',
-			),
-			'unique'      => array(
+			],
+			'unique'      => [
 				'nice_name' => __( 'Unique', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'default'   => '0',
 				'type'      => 'bool',
-			),
-			'data_type'   => array(
+			],
+			'data_type'   => [
 				'nice_name' => __( 'Data type', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
-				'default'   => array(
+				'default'   => [
 					'string' => '1',
 					'int'    => '',
 					'bool'   => '',
 					'mixed'  => '',
-				),
+				],
 				'type'      => 'acf' === $entity ? 'constant' : 'select',
-			),
-			'description' => array(
+			],
+			'description' => [
 				'nice_name' => __( 'Description', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'default'   => '',
 				'type'      => 'string',
-			),
-			'sample'      => array(
+			],
+			'sample'      => [
 				'nice_name' => __( 'Sample', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'default'   => '',
 				'type'      => 'string',
-			),
-		);
+			],
+		];
 	}
+
 
 	/**
 	 * Gets entity field settings from DB.
@@ -350,10 +362,11 @@ class Settings implements Hooked {
 	 * @return array
 	 */
 	public static function get_saved_entity_settings_from_db( string $where = '', bool $single = true ): array {
+
 		global $wpdb;
 
-		$query    = sprintf( "SELECT * FROM $wpdb->prefix%s %s" , self::$ainsys_entities_settings_table, $where );
-		$result   = $wpdb->get_results( $query, ARRAY_A );
+		$query  = sprintf( "SELECT * FROM $wpdb->prefix%s %s", self::$ainsys_entities_settings_table, $where );
+		$result = $wpdb->get_results( $query, ARRAY_A );
 
 		if ( isset( $result[0]['value'] ) && $single ) {
 			$keys = array_column( $result, 'setting_key' );
@@ -369,7 +382,7 @@ class Settings implements Hooked {
 			$data = $result;
 		}
 
-		return $data ?? array();
+		return $data ?? [];
 	}
 
 
@@ -379,85 +392,87 @@ class Settings implements Hooked {
 	 * @return array
 	 */
 	public static function get_comments_fields(): array {
-		$prepered_fields = array(
-			'comment_ID'           => array(
-				'nice_name' => '',
-				'api'       => 'wordpress',
-			),
-			'comment_post_ID'      => array(
-				'nice_name' => '',
-				'api'       => 'wordpress',
-			),
-			'comment_author'       => array(
-				'nice_name' => '',
-				'api'       => 'wordpress',
-			),
-			'comment_author_email' => array(
-				'nice_name' => '',
-				'api'       => 'wordpress',
-			),
-			'comment_author_url'   => array(
-				'nice_name' => '',
-				'api'       => 'wordpress',
-			),
-			'comment_author_IP'    => array(
-				'nice_name' => '',
-				'api'       => 'wordpress',
-			),
-			'comment_date'         => array(
-				'nice_name' => '',
-				'api'       => 'wordpress',
-			),
-			'comment_date_gmt'     => array(
-				'nice_name' => '',
-				'api'       => 'wordpress',
-			),
-			'comment_content'      => array(
-				'nice_name' => '',
-				'api'       => 'wordpress',
-			),
-			'comment_karma'        => array(
-				'nice_name' => '',
-				'api'       => 'wordpress',
-			),
-			'comment_approved'     => array(
-				'nice_name' => '',
-				'api'       => 'wordpress',
-			),
-			'comment_agent'        => array(
-				'nice_name' => '',
-				'api'       => 'wordpress',
-			),
-			'comment_type'         => array(
-				'nice_name' => '',
-				'api'       => 'wordpress',
-			),
-			'comment_parent'       => array(
-				'nice_name' => '',
-				'api'       => 'wordpress',
-			),
-			'user_id'              => array(
-				'nice_name' => '',
-				'api'       => 'wordpress',
-			),
-			'children'             => array(
-				'nice_name' => '',
-				'api'       => 'wordpress',
-			),
-			'populated_children'   => array(
-				'nice_name' => '',
-				'api'       => 'wordpress',
-			),
-			'post_fields'          => array(
-				'nice_name' => '',
-				'api'       => 'wordpress',
-			),
-		);
 
-		$extra_fields = apply_filters( 'ainsys_prepare_extra_comment_fields', array() );
+		$prepered_fields = [
+			'comment_ID'           => [
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			],
+			'comment_post_ID'      => [
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			],
+			'comment_author'       => [
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			],
+			'comment_author_email' => [
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			],
+			'comment_author_url'   => [
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			],
+			'comment_author_IP'    => [
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			],
+			'comment_date'         => [
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			],
+			'comment_date_gmt'     => [
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			],
+			'comment_content'      => [
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			],
+			'comment_karma'        => [
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			],
+			'comment_approved'     => [
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			],
+			'comment_agent'        => [
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			],
+			'comment_type'         => [
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			],
+			'comment_parent'       => [
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			],
+			'user_id'              => [
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			],
+			'children'             => [
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			],
+			'populated_children'   => [
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			],
+			'post_fields'          => [
+				'nice_name' => '',
+				'api'       => 'wordpress',
+			],
+		];
+
+		$extra_fields = apply_filters( 'ainsys_prepare_extra_comment_fields', [] );
 
 		return array_merge( $prepered_fields, $extra_fields );
 	}
+
 
 	/**
 	 * Generates fields for USER entity
@@ -465,103 +480,131 @@ class Settings implements Hooked {
 	 * @return array
 	 */
 	public static function get_user_fields(): array {
-		$prepered_fields = array(
-			'ID'                   => array(
+
+		$prepered_fields = [
+			'ID'                   => [
 				'nice_name' => __( '{ID}', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'api'       => 'wordpress',
-			),
-			'user_login'           => array(
+			],
+			'user_login'           => [
 				'nice_name' => __( 'User login', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'api'       => 'wordpress',
-			),
-			'user_nicename'        => array(
+			],
+			'user_nicename'        => [
 				'nice_name' => __( 'Readable name', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'api'       => 'wordpress',
-			),
-			'user_email'           => array(
+			],
+			'user_email'           => [
 				'nice_name' => __( 'User mail', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 				'api'       => 'wordpress',
-				'children'  => array(
-					'primary'   => array(
+				'children'  => [
+					'primary'   => [
 						'nice_name' => __( 'Main email', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 						'api'       => 'wordpress',
-					),
-					'secondary' => array(
+					],
+					'secondary' => [
 						'nice_name' => '',
 						'api'       => 'wordpress',
-					),
-				),
-			),
-			'user_url'             => array(
+					],
+				],
+			],
+			'user_url'             => [
 				'nice_name' => '',
 				'api'       => 'wordpress',
-			),
-			'user_registered'      => array(
+			],
+			'user_registered'      => [
 				'nice_name' => '',
 				'api'       => 'wordpress',
-			),
-			'user_activation_key'  => array(
+			],
+			'user_activation_key'  => [
 				'nice_name' => '',
 				'api'       => 'wordpress',
-			),
-			'user_status'          => array(
+			],
+			'user_status'          => [
 				'nice_name' => '',
 				'api'       => 'wordpress',
-			),
-			'display_name'         => array(
+			],
+			'display_name'         => [
 				'nice_name' => '',
 				'api'       => 'wordpress',
-			),
-			'first_name'           => array(
+			],
+			'first_name'           => [
 				'nice_name' => '',
 				'api'       => 'wordpress',
-			),
-			'last_name'            => array(
+			],
+			'last_name'            => [
 				'nice_name' => '',
 				'api'       => 'wordpress',
-			),
-			'nickname'             => array(
+			],
+			'nickname'             => [
 				'nice_name' => '',
 				'api'       => 'wordpress',
-			),
-			'nice_name'            => array(
+			],
+			'nice_name'            => [
 				'nice_name' => '',
 				'api'       => 'wordpress',
-			),
-			'rich_editing'         => array(
+			],
+			'rich_editing'         => [
 				'nice_name' => '',
 				'api'       => 'wordpress',
-			),
-			'syntax_highlighting'  => array(
+			],
+			'syntax_highlighting'  => [
 				'nice_name' => '',
 				'api'       => 'wordpress',
-			),
-			'comment_shortcuts'    => array(
+			],
+			'comment_shortcuts'    => [
 				'nice_name' => '',
 				'api'       => 'wordpress',
-			),
-			'admin_color'          => array(
+			],
+			'admin_color'          => [
 				'nice_name' => '',
 				'api'       => 'wordpress',
-			),
-			'use_ssl'              => array(
+			],
+			'use_ssl'              => [
 				'nice_name' => '',
 				'api'       => 'wordpress',
-			),
-			'show_admin_bar_front' => array(
+			],
+			'show_admin_bar_front' => [
 				'nice_name' => '',
 				'api'       => 'wordpress',
-			),
-			'locale'               => array(
+			],
+			'locale'               => [
 				'nice_name' => '',
 				'api'       => 'wordpress',
-			),
-		);
+			],
+		];
 
-		$extra_fields = apply_filters( 'ainsys_prepare_extra_user_fields', array() );
+		$extra_fields = apply_filters( 'ainsys_prepare_extra_user_fields', [] );
 
 		return array_merge( $prepered_fields, $extra_fields );
 	}
+
+
+	/**
+	 * Autodisables logging.
+	 *
+	 * @return void
+	 */
+	public static function check_to_auto_disable_logging(): void {
+
+		$logging_enabled = (int) self::get_option( 'do_log_transactions' );
+		// Generate log until time settings
+		$current_time = time();
+		$limit_time   = (int) self::get_option( 'log_until_certain_time' );
+
+		// make it really infinite as in select infinite option is -1;
+		if ( $limit_time < 0 ) {
+			return;
+		}
+
+		if ( $logging_enabled && $limit_time && ( $current_time < $limit_time ) ) {
+			self::set_option( 'do_log_transactions', 1 );
+		} else {
+			self::set_option( 'do_log_transactions', 0 );
+			self::set_option( 'log_until_certain_time', - 1 );
+		}
+	}
+
 
 	/**
 	 * Registers options.
@@ -569,39 +612,107 @@ class Settings implements Hooked {
 	 */
 	public static function register_options(): void {
 
-		foreach ( self::$ainsys_options as $option_name => $option_value ) {
-			if ( ! empty( $option_value ) ) {
-				register_setting( self::get_setting_name( 'group' ), self::get_setting_name( $option_name ), array( 'default' => $option_value ) );
-			} else {
-				register_setting( self::get_setting_name( 'group' ), self::get_setting_name( $option_name ) );
-			}
+		foreach ( self::get_settings_options() as $option_name => $option_value ) {
+			register_setting(
+				self::get_option_name( 'group' ),
+				self::get_option_name( $option_name ),
+				[
+					'default'           => $option_value,
+					//'sanitize_callback' => [ self::class, 'sanitize_update_settings' ],
+				]
+			);
 		}
 
 		register_setting(
-			self::get_setting_name( 'group' ),
-			self::get_setting_name( 'hook_url' ),
-			array(
-				Webhook_Listener::class,
-				'get_webhook_url',
-			)
+			self::get_option_name( 'group' ),
+			self::get_option_name( 'webhook_url' ),
+			[
+				'default'           => self::get_option( 'webhook_url' ),
+				'sanitize_callback' => [ Webhook_Listener::class, 'get_webhook_url' ],
+			]
 		);
+
+		self::check_to_auto_disable_logging();
 	}
+
+
+	public static function sanitize_update_settings( $options ) {
+
+		// Detect multiple sanitizing passes.
+		// Accomodates bug: https://core.trac.wordpress.org/ticket/21989
+		static $pass_count = 0;
+
+		$pass_count ++;
+
+		if ( $pass_count <= 1 ) {
+			foreach ( self::get_settings_options() as $option_name => $option_value ) {
+				update_option( self::get_option_name( $option_name ), $options, 'no' );
+			}
+		}
+
+		return $options;
+
+	}
+
 
 	/**
 	 * Uninstalls plugin.
 	 */
 	public static function uninstall(): void {
 
-		foreach ( self::$ainsys_options as $option_name => $option_value ) {
-			delete_option( self::get_setting_name( $option_name ) );
+		if ( (int) self::get_option( 'full_uninstall' ) ) {
+			self::delete_options();
+			self::drop_tables();
 		}
+	}
 
-		delete_option( self::get_setting_name( 'hook_url' ) );
+
+	/**
+	 * Uninstalls plugin.
+	 */
+	public static function truncate(): void {
+
+		self::delete_options();
+		self::truncate_tables();
+	}
+
+
+	/**
+	 *
+	 * @return void
+	 */
+	protected static function drop_tables(): void {
 
 		global $wpdb;
 
-		$wpdb->query( sprintf( 'DROP TABLE IF EXISTS %s', $wpdb->prefix . self::$ainsys_entities_settings_table ) );
+		foreach ( self::get_settings_tables() as $key_table => $value_table ) {
+			$wpdb->query( sprintf( "DROP TABLE IF EXISTS %s", $wpdb->prefix . $value_table ) );
+		}
+	}
 
+
+	/**
+	 *
+	 * @return void
+	 */
+	protected static function truncate_tables(): void {
+
+		global $wpdb;
+
+		foreach ( self::get_settings_tables() as $key_table => $value_table ) {
+			$wpdb->query( sprintf( "TRUNCATE TABLE %s", $wpdb->prefix . $value_table ) );
+		}
+	}
+
+
+	/**
+	 * @return void
+	 */
+	protected static function delete_options(): void {
+
+		foreach ( self::get_settings_options() as $option_name => $option_value ) {
+			delete_option( self::get_option_name( $option_name ) );
+		}
 	}
 
 }

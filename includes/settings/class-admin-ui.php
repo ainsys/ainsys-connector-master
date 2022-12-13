@@ -7,6 +7,7 @@ use Ainsys\Connector\Master\Core;
 use Ainsys\Connector\Master\Hooked;
 use Ainsys\Connector\Master\Logger;
 use Ainsys\Connector\Master\Plugin_Common;
+use Ainsys\Connector\Master\Webhook_Listener;
 use Ainsys\Connector\Master\WP\Process_Users;
 use Ainsys\Connector\Master\WP\Process_Comments;
 
@@ -46,7 +47,7 @@ class Admin_UI implements Hooked {
 	 */
 	public Process_Comments $process_comments;
 
-	public function __construct( Settings $settings, Core $core, Logger $logger, Process_Users $process_users, Process_Comments $process_comments ) {
+	public function __construct( Settings $settings, Core $core, Logger $logger, Process_Users $process_users, Process_Comments $process_comments) {
 		$this->settings         = $settings;
 		$this->core             = $core;
 		$this->logger           = $logger;
@@ -72,7 +73,7 @@ class Admin_UI implements Hooked {
 			add_filter( 'option_page_capability_' . 'ainsys-connector', array( $this, 'ainsys_page_capability' ) );
 		}
 		// let's register ajax handlers as it's a part of admin UI. NB: they were a part of Core originally.
-		add_action( 'wp_ajax_remove_ainsys_integration', array( $this, 'remove_ainsys_integration' ) );
+		//add_action( 'wp_ajax_remove_ainsys_integration', array( $this, 'remove_ainsys_integration' ) );
 
 		add_action( 'wp_ajax_save_entity_settings', array( $this, 'save_entities_settings' ) );
 
@@ -161,7 +162,7 @@ class Admin_UI implements Hooked {
 
 		uasort( $settings_nav_tabs, [ $this, 'fields_uasort_comparison' ] );
 
-		return apply_filters( 'ainsys_get_nav_fields', $settings_nav_tabs );
+		return apply_filters( 'ainsys_settings_tabs', $settings_nav_tabs );
 	}
 
 
@@ -193,106 +194,10 @@ class Admin_UI implements Hooked {
 
 		uasort( $settings_content_tabs, [ $this, 'fields_uasort_comparison' ] );
 
-		return apply_filters( 'ainsys_get_nav_content_fields', $settings_content_tabs );
+		return apply_filters( 'ainsys_settings_tabs_content', $settings_content_tabs );
 	}
 
 
-	public function get_statuses_system() {
-
-		$status_system = [
-			'curl'   => [
-				'title'         => 'CURL',
-				'active'        => extension_loaded( 'curl' ),
-				'label_success' => __( 'Enabled', AINSYS_CONNECTOR_TEXTDOMAIN ),
-				'label_error'   => __( 'Disabled', AINSYS_CONNECTOR_TEXTDOMAIN ),
-			],
-			'ssl'    => [
-				'title'         => 'SSL',
-				'active'        => \is_ssl(),
-				'label_success' => __( 'Enabled', AINSYS_CONNECTOR_TEXTDOMAIN ),
-				'label_error'   => __( 'Disabled', AINSYS_CONNECTOR_TEXTDOMAIN ),
-			],
-			'php'    => [
-				'title'         => __( 'PHP version 7.2+', AINSYS_CONNECTOR_TEXTDOMAIN ),
-				'active'        => version_compare( PHP_VERSION, '7.2.0' ) > 0,
-				'label_success' => 'PHP ' . esc_html( PHP_VERSION ),
-				'label_error'   => sprintf( __( 'Bad PHP version %s Update on your hosting', AINSYS_CONNECTOR_TEXTDOMAIN ), esc_html( PHP_VERSION ) ),
-			],
-			'emails' => [
-				'title'         => sprintf(
-					__( 'Backup email: %s', AINSYS_CONNECTOR_TEXTDOMAIN ), esc_html(
-						$this->settings::get_backup_email()
-					)
-				),
-				'active'        => ! empty( $this->settings::get_backup_email() ) && filter_var( $this->settings::get_backup_email(), FILTER_VALIDATE_EMAIL ),
-				'label_success' => __( 'Valid', AINSYS_CONNECTOR_TEXTDOMAIN ),
-				'label_error'   => __( 'Invalid', AINSYS_CONNECTOR_TEXTDOMAIN ),
-			],
-		];
-
-		for ( $i = 1; $i < 10; $i ++ ) {
-
-			if ( empty( $this->settings::get_backup_email( $i ) ) ) {
-				continue;
-			}
-
-			$status_system[ 'emails_' . $i ] = [
-				'title'         => sprintf(
-					__( 'Backup email: %s', AINSYS_CONNECTOR_TEXTDOMAIN ),
-					esc_html( $this->settings::get_backup_email( $i ) )
-				),
-				'active'        => ! empty( $this->settings::get_backup_email( $i ) ) && filter_var( $this->settings::get_backup_email( $i ), FILTER_VALIDATE_EMAIL ),
-				'label_success' => __( 'Valid', AINSYS_CONNECTOR_TEXTDOMAIN ),
-				'label_error'   => __( 'Invalid', AINSYS_CONNECTOR_TEXTDOMAIN ),
-			];
-
-		}
-
-		return apply_filters( 'ainsys_status_system_list', $status_system );
-	}
-
-
-	public function get_statuses_addons() {
-
-		if (!$this->is_plugin_install('ainsys-connector-content/plugin.php')){
-			$la = __( 'Not installed', AINSYS_CONNECTOR_TEXTDOMAIN );
-		} elseif ($this->is_plugin_install('ainsys-connector-content/plugin.php') && ! $this->is_plugin_active( 'ainsys-connector-content/plugin.php' )){
-			$la = __( 'Not activated', AINSYS_CONNECTOR_TEXTDOMAIN );
-		} else {
-			$la = 'OK';
-		}
-
-
-
-		$status = [
-			'woocommerce'   => [
-				'title'         => 'AINSYS connector Woocommerce Integration',
-				'slug'         => 'ainsys-connector-woocommerce',
-				'active'        => $this->is_plugin_active( 'ainsys-connector-woocommerce/plugin.php' ),
-				'install'        => $this->is_plugin_install( 'ainsys-connector-woocommerce/plugin.php' ),
-			],
-			'content'   => [
-				'title'         => 'AINSYS Connector Headless CMS',
-				'slug'         => 'ainsys-connector-content',
-				'active'        => $this->is_plugin_active( 'ainsys-connector-content/plugin.php' ),
-				'install'        => $this->is_plugin_install( 'ainsys-connector-content/plugin.php' ),
-			],
-			'acf'   => [
-				'title'         => 'AINSYS connector ACF Integration',
-				'slug'         => 'ainsys-connector-acf',
-				'active'        => $this->is_plugin_active( '1ainsys-connector-acf/plugin.php' ),
-				'install'        => $this->is_plugin_install( '1ainsys-connector-acf/plugin.php' ),
-			],
-			'wpcf7'   => [
-				'title'         => 'AINSYS connector WPCF7 Integration',
-				'slug'         => 'ainsys-connector-wpcf7',
-				'active'        => $this->is_plugin_active( 'ainsys-connector-wpcf7/plugin.php' ),
-				'install'        => $this->is_plugin_install( 'ainsys-connector-wpcf7/plugin.php' ),
-			],
-		];
-
-		return apply_filters( 'ainsys_status_list', $status );
-	}
 	/**
 	 * Includes settings page
 	 *
@@ -368,33 +273,14 @@ class Admin_UI implements Hooked {
 			[
 				'ajax_url' => admin_url( 'admin-ajax.php' ),
 				'nonce'    => wp_create_nonce( self::$nonce_title ),
+				'remove_ainsys_integration'    => __('Are you sure this action is irreversible, all settings values will be cleared?', AINSYS_CONNECTOR_TEXTDOMAIN),
 			]
 		);
 
 	}
 
 
-	/**
-	 * Handshake with server, implements AINSYS integration
-	 */
-	public function check_connection_to_server() {
 
-		$ainsys_url = $this->settings::get_option( 'ansys_api_key' ); //https://user-api.ainsys.com/api/v0/workspace-management/workspaces/13/connectors/144/handshake/5ec1a0c99d428601ce42b407ae9c675e0836a8ba591c8ca6e2a2cf5563d97ff0/
-
-		if ( ! empty( $ainsys_url ) && empty( $this->settings::get_option( 'webhook_url' ) ) ) {
-			//new connector
-			$response = '';
-			try {
-				$response = $this->core->curl_exec_func( array( 'hook_url' => $this->settings::get_option( 'ansys_api_key' ) ) );
-			} catch ( \Exception $exception ) {
-
-			}
-			$webhook_data = ! empty( $response ) ? json_decode( $response ) : array();
-			if ( ! empty( $response ) && isset( $webhook_data->webhook_url ) ) {
-				$this->settings::set_option( 'webhook_url', $webhook_data->webhook_url );
-			}
-		}
-	}
 
 	/**
 	 * Renders admin notices
@@ -422,46 +308,10 @@ class Admin_UI implements Hooked {
 	}
 
 
-	/**
-	 * Check if AINSYS integration is active.
-	 *
-	 * @param string $actions
-	 *
-	 * @return array
-	 */
-	public function is_ainsys_integration_active( $actions = '' ) {
 
-		$this->check_connection_to_server();
 
-		$webhook_url = $this->settings::get_option( 'ansys_api_key' );
 
-		if ( $webhook_url ) {
-			$this->add_admin_notice( 'Соединение с сервером Ainsys установлено. Webhook_url получен.' );
 
-			return array( 'status' => 'success' );
-		}
-
-		return array( 'status' => 'none' );
-	}
-
-	/**
-	 * Removes ainsys integration information
-	 *
-	 * @return
-	 */
-	public function remove_ainsys_integration() {
-		if ( isset( $_POST['action'], $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
-			$this->settings::set_option( 'connectors', '' );
-			$this->settings::set_option( 'ansys_api_key', '' );
-			$this->settings::set_option( 'handshake_url', '' );
-			$this->settings::set_option( 'webhook_url', '' );
-			$this->settings::set_option( 'debug_log', '' );
-
-			delete_option( 'ainsys-webhook_url' );
-		}
-
-		return;
-	}
 
 
 	/**

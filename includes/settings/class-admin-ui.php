@@ -80,7 +80,7 @@ class Admin_UI implements Hooked {
 		add_action( 'wp_ajax_reload_log_html', array( $this, 'reload_log_html' ) );
 		add_action( 'wp_ajax_toggle_logging', array( $this, 'toggle_logging' ) );
 		add_action( 'wp_ajax_clear_log', array( $this, 'clear_log' ) );
-		add_action( 'wp_ajax_test_entity_connection', array( $this, 'test_entity_connection' ) );
+
 
 	}
 
@@ -486,96 +486,10 @@ class Admin_UI implements Hooked {
 		die();
 	}
 
-	/**
-	 * Tests AINSYS connection for entities (for ajax).
-	 *
-	 */
-/*	public function test_entity_connection() {
-
-		if ( ! isset( $_POST['entity'], $_POST['nonce'] ) && ! wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
-			wp_die( 'Missing nonce' );
-		}
-
-		$make_request = false;
-
-		$entity = strip_tags( $_POST['entity'] );
-
-		if ( 'user' === $entity ) {
-			$make_request         = true;
-			$fields               = (array) wp_get_current_user();
-			$user_id              = get_current_user_id();
-			$test_result          = $this->process_users->send_user_details_update_to_ainsys( $user_id, $fields, $fields, true );
-			$test_result_request  = $test_result['request']; // array
-			$test_result_response = $test_result['response']; // string
-		}
-
-		if ( 'comments' === $entity ) {
-			$args     = [
-				'status' => 'approve',
-			];
-			$comments = get_comments( $args );
-			if ( ! empty( $comments ) ) {
-				foreach ( $comments as $comment ) {
-					$fields = (array) $comment;
-					break;
-				}
-
-				$comment_id           = $fields['comment_ID'];
-				$make_request         = true;
-				$test_result          = $this->process_comments->send_update_comment_to_ainsys( $comment_id, $fields, true );
-				$test_result_request  = $test_result['request']; // array
-				$test_result_response = $test_result['response']; // string
-			}
-		}
-
-		if ( $make_request ) {
-
-			$result = [
-				'short_request'  => mb_substr( serialize( $test_result_request ), 0, 80 ) . ' ... ',
-				'short_responce' => mb_substr( $test_result_response, 0, 80 ) . ' ... ',
-				'full_request'   => $this->logger::ainsys_render_json( $test_result_request ),
-				'full_responce'  => false === strpos( 'Error: ', $test_result_response ) ? [ $test_result_response ] :
-					$this->logger::ainsys_render_json( json_decode( $test_result_response ) ),
-			];
-		} else {
-			$result = [
-				'short_request'  => __( 'No entities found', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
-				'short_responce' => '',
-				'full_request'   => '',
-				'full_responce'  => '',
-			];
-		}
-
-		wp_send_json( $result );
-
-	}*/
 
 
-	/**
-	 * Generates test data HTML.
-	 *
-	 * @return string
-	 */
-	public function generate_test_html() {
 
-		$test_html        = '<div id="connection_test"><table class="ainsys-table">';
-		$test_html_header = '<th>' . __( 'Entity', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>' . __( 'Outgoing JSON', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th>' . __( 'SERVER RESPONCE', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</th><th></th><th>Status</th>'; // phpcs:ignore
-		$test_html_body   = '';
 
-		$entities_list = $this->settings::get_entities();
-		$wp_entities   = array( 'user', 'comments', 'post', 'page' );
-
-		foreach ( $entities_list as $entity => $title ) {
-			if ( in_array( $entity, $wp_entities, true ) ) {
-				$test_html_body .= '<tr><td class="ainsys_td_left">' . $title . '</td><td class="ainsys_td_left ainsys-test-json"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_left ainsys-test-responce"><div class="ainsys-responce-short"></div><div class="ainsys-responce-full"></div></td><td class="ainsys_td_btn"><a href="" class="btn btn-primary ainsys-test" data-entity-name="' . $entity . '">' . __( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</a></td><td><span class="ainsys-success"></span><span class="ainsys-failure"></span></td></tr>'; // phpcs:ignore
-			}
-		}
-
-		$test_html_body = apply_filters( 'ainsys_test_table', $test_html_body );
-
-		$test_html .= '<thead><tr>' . $test_html_header . '</tr></thead><tbody>' . $test_html_body . '</tbody></table> </div>';
-		return $test_html;
-	}
 
 	/**
 	 * Generates entities HTML placeholder.

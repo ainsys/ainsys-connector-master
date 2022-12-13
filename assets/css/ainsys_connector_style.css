@@ -61,6 +61,11 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	cursor: pointer;
 }
 
+.toplevel_page_ainsys-connector .btn.ainsys-check {
+	min-width: inherit;
+	margin: 0;
+}
+
 .toplevel_page_ainsys-connector .btn:hover,
 .toplevel_page_ainsys-connector .btn:active,
 .toplevel_page_ainsys-connector .btn:focus {
@@ -483,11 +488,11 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	white-space: nowrap;
 }
 
-.ainsys-settings-wrap .ainsys-responce-short {
+.ainsys-settings-wrap .ainsys-response-short {
 	cursor: pointer;
 }
 
-.ainsys-settings-wrap .ainsys-responce-full {
+.ainsys-settings-wrap .ainsys-response-short {
 	display: none;
 }
 
@@ -600,6 +605,18 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	width: 100%;
 }
 
+.ainsys-table--checking-entities thead {
+	text-transform: uppercase;
+}
+
+.ainsys-table--checking-entities thead th {
+	padding: 1.25rem 0;
+}
+
+.ainsys-table-table__cell {
+	padding: 1rem 0;
+}
+
 .ainsys-success,
 .ainsys-failure {
 	display: none;
@@ -622,6 +639,31 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 .ainsys-success.ainsys-test-finished,
 .ainsys-failure.ainsys-test-finished {
 	display: inline-block;
+}
+
+.ainsys-test-block .ainsys-table-table__cell-check {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.ainsys-test-block .btn.ainsys-check {
+
+}
+
+.ainsys-table-table__cell--entity {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.ainsys-table-table__cell--entity a {
+	display: flex;
+	align-items: center;
+}
+
+.ainsys-table-table__cell--entity svg {
+	width: 1rem;
 }
 
 /* Entities Settings */

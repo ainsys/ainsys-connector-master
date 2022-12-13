@@ -144,7 +144,7 @@ class Admin_UI implements Hooked {
 				'priority' => 10,
 			],
 			'test'     => [
-				'label'    => __( 'Test', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'label'    => __( 'Checking entities', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'active'   => false,
 				'priority' => 20,
 			],

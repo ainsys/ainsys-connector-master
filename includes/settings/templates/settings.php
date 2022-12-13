@@ -1,6 +1,12 @@
 <?php
-
-namespace Ainsys\Connector\Master\Settings;
+/**
+ * Settings Main File
+ *
+ * @package ainsys
+ *
+ * @global $args
+ * @global  Ainsys\Connector\Master\Settings\Admin_UI $this
+ */
 
 $settings_nav_tabs     = $this->get_nav_fields();
 $settings_content_tabs = $this->get_nav_content_fields();

@@ -131,7 +131,7 @@ class Logger implements Hooked {
             $log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN );
 
 					} else {
-						$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( serialize( $value ), 0, 40 ) . ' ... </div>';
+						$log_html_body .= '<div class="ainsys-response-short">' . mb_substr( serialize( $value ), 0, 40 ) . ' ... </div>';
 
 						if ( is_array( $value ) ) {
 							$value = wp_json_encode( $value );
@@ -143,7 +143,7 @@ class Logger implements Hooked {
 							$value_out = $value;
 						}
 
-						$log_html_body .= '<div class="ainsys-responce-full">';
+						$log_html_body .= '<div class="ainsys-response-full">';
 
 						if ( is_string( $value_out ) ) {
 							$log_html_body .= $value_out;

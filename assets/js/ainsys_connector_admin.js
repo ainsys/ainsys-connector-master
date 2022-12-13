@@ -69,6 +69,10 @@ jQuery(function($){
 			} );
 		},
 
+		reload: function ( ) {
+			window.location.reload();
+		},
+
 
 		removeAinsysIntegration: function ( event ) {
 			const data = {
@@ -88,10 +92,8 @@ jQuery(function($){
 				url:     ainsys_connector_params.ajax_url,
 				data:    data,
 				type:     'POST',
-				dataType: 'json',
 				success: function ( response ) {
 					$( '#remove_ainsys_integration' ).removeClass( 'ainsys-loading' );
-					console.log( response );
 					location.reload();
 				},
 				error:   function ( response ) {
@@ -163,6 +165,7 @@ jQuery(function($){
 					'#remove_ainsys_integration',
 					function ( event ) {
 						ainsys_settings.removeAinsysIntegration( event );
+
 					}
 				)
 				.on(

@@ -10,13 +10,21 @@ class Logger implements Hooked {
 
 	public static $clear_full_uninstall;
 
-	private static string $log_table_name = 'ainsys_log';
+	/**
+	 * @var array|string[]
+	 */
+	protected static array $settings_tables;
+
+	protected static string $log_table_name;
 
 
 	public function __construct( Settings $settings ) {
 
 		self::$do_log_transactions  = $settings::get_option( 'do_log_transactions' );
 		self::$clear_full_uninstall = $settings::get_option( 'full_uninstall' );
+
+		self::$settings_tables = $settings::get_settings_tables();
+		self::$log_table_name = self::$settings_tables['logs'];
 	}
 
 

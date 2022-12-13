@@ -141,6 +141,11 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	margin-right: -2rem;
 }
 
+.ainsys-settings-blocks form {
+	flex: 0 0 calc(60% - 2rem);
+	width: calc(60% - 2rem);
+}
+
 .ainsys-settings-block {
 	margin: 0 1.25rem 2.25rem;
 	padding: 1.25rem;
@@ -150,9 +155,11 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 }
 
 .ainsys-settings-block--connection {
-	flex: 0 0 calc(60% - 2rem);
-	width: calc(60% - 2rem);
 
+}
+
+.ainsys-settings-block--disconnection .btn {
+	margin-bottom: 0.5rem;
 }
 
 .ainsys-settings-block--sidebar {
@@ -282,6 +289,11 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	grid-template-columns: 1fr 30%;
 }
 
+.ainsys-status-items .ainsys-status--check-integration {
+	margin: 0;
+	padding: 0;
+}
+
 .ainsys-status-items .ainsys-li-underline {
 	margin-bottom: 0;
 	padding-bottom: 1.375rem;
@@ -325,6 +337,16 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 
 .ainsys-status--error {
 	color: #d5031e;
+}
+
+.ainsys-check-integration {
+	display: flex;
+	justify-content: center;
+	padding: 1.25rem 0;
+}
+
+.ainsys-check-integration .btn {
+	margin: 0 auto;
 }
 
 /* Ainsys Tabs - subtabs*/

@@ -113,9 +113,11 @@ $status_addons = $settings->get_statuses_addons();
 			</div>
 
 			<div class="ainsys-settings-block ainsys-settings-block--disconnection">
-				<button type="button"
-				        id="remove_ainsys_integration"
-				        class="btn btn-secondary"><?php _e( 'Disconect integration', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></button>
+				<?php if ( $admin_ui->settings::get_option( 'ansys_api_key' ) ) : ?>
+					<button type="button"
+					        id="remove_ainsys_integration"
+					        class="btn btn-secondary"><?php _e( 'Disconect integration', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></button>
+				<?php endif; ?>
 				<div class="ainsys-form-group ainsys-form-group-checkbox">
 					<div class="ainsys-form-input">
 						<input id="full-uninstall-checkbox"

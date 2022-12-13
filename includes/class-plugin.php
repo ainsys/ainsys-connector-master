@@ -4,6 +4,7 @@ namespace Ainsys\Connector\Master;
 
 use Ainsys\Connector\Master\Settings\Admin_UI;
 use Ainsys\Connector\Master\Settings\Settings;
+use Ainsys\Connector\Master\Settings\Admin_UI_General;
 use Ainsys\Connector\Master\Webhooks\Handle_Comment;
 use Ainsys\Connector\Master\Webhooks\Handle_User;
 use Ainsys\Connector\Master\WP\Process_Attachments;
@@ -55,6 +56,7 @@ class Plugin implements Hooked {
 		$this->components['settings']            = $this->di_container->resolve( Settings::class );
 		$this->components['logger']              = $this->di_container->resolve( Logger::class );
 		$this->components['settings_admin_ui']   = $this->di_container->resolve( Admin_UI::class );
+		$this->components['settings_admin_ui_general']   = $this->di_container->resolve( Admin_UI_General::class );
 		$this->components['core']                = $this->di_container->resolve( Core::class );
 		$this->components['utm_handler']         = $this->di_container->resolve( UTM_Handler::class );
 		$this->components['process_users']       = $this->di_container->resolve( Process_Users::class );

@@ -9,24 +9,6 @@ use Ainsys\Connector\Master\Logger;
 class Process_Users implements Hooked {
 
 	/**
-	 * @var Core
-	 */
-	private Core $core;
-
-	/**
-	 * @var Logger
-	 */
-	private Logger $logger;
-
-
-	public function __construct( Core $core, Logger $logger ) {
-
-		$this->core   = $core;
-		$this->logger = $logger;
-	}
-
-
-	/**
 	 * Initializes WordPress hooks for plugin/components.
 	 *
 	 * @return void
@@ -120,11 +102,11 @@ class Process_Users implements Hooked {
 		];
 
 		try {
-			$server_response = $this->core->curl_exec_func( $request_data );
+			$server_response = Core::curl_exec_func( $request_data );
 		} catch ( \Exception $e ) {
 			$server_response = 'Error: ' . $e->getMessage();
 
-			$this->logger::save_log_information(
+			Logger::save_log_information(
 				[
 					'object_id'       => 0,
 					'entity'          => 'user',
@@ -136,10 +118,10 @@ class Process_Users implements Hooked {
 				]
 			);
 
-			$this->core->send_error_email( $server_response );
+			Core::send_error_email( $server_response );
 		}
 
-		$this->logger::save_log_information(
+		Logger::save_log_information(
 			[
 				'object_id'       => $user_id,
 				'entity'          => 'user',

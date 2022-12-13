@@ -69,6 +69,63 @@ jQuery(function($){
 			} );
 		},
 
+
+		removeAinsysIntegration: function ( event ) {
+			const data = {
+				action:    'remove_ainsys_integration',
+				flush_all: $( event.target ).closest( '#setting-section-general' ).find( '#full-uninstall-checkbox' ).val()
+			};
+
+			const isConfirm = confirm( ainsys_connector_params.remove_ainsys_integration );
+
+			if ( false === isConfirm ) {
+				return;
+			}
+
+			$( event.target ).addClass( 'ainsys-loading' );
+
+			$.ajax( {
+				url:     ainsys_connector_params.ajax_url,
+				data:    data,
+				type:     'POST',
+				dataType: 'json',
+				success: function ( response ) {
+					$( '#remove_ainsys_integration' ).removeClass( 'ainsys-loading' );
+					console.log( response );
+					location.reload();
+				},
+				error:   function ( response ) {
+					$( '#remove_ainsys_integration' ).removeClass( 'ainsys-loading' );
+					console.log( response );
+				}
+			} );
+		},
+
+
+		checkAinsysIntegration: function ( event ) {
+			const data = {
+				action:    'check_ainsys_integration',
+				check_integration: true
+			};
+
+			$( event.target ).addClass( 'ainsys-loading' );
+
+			$.ajax( {
+				url:     ainsys_connector_params.ajax_url,
+				data:    data,
+				type:     'POST',
+				dataType: 'json',
+				success: function ( response ) {
+					$( '#check_ainsys_integration' ).removeClass( 'ainsys-loading' );
+					console.log( response );
+				},
+				error:   function ( response ) {
+					$( '#check_ainsys_integration' ).removeClass( 'ainsys-loading' );
+					console.log( response );
+				}
+			} );
+		},
+
 		init:      function () {
 
 			$( '#connection_log .ainsys-table' ).DataTable();
@@ -101,6 +158,20 @@ jQuery(function($){
 						ainsys_settings.toggleMinus( event );
 					}
 				)
+				.on(
+					'click',
+					'#remove_ainsys_integration',
+					function ( event ) {
+						ainsys_settings.removeAinsysIntegration( event );
+					}
+				)
+				.on(
+					'click',
+					'#check_ainsys_integration',
+					function ( event ) {
+						ainsys_settings.checkAinsysIntegration( event );
+					}
+				)
 		},
 
 	};
@@ -109,7 +180,7 @@ jQuery(function($){
 
 
 
-	$('.ainsys-tabs').on('click', '.ainsys-nav-tab', function(event){
+/*	$('.ainsys-tabs').on('click', '.ainsys-nav-tab', function(event){
 
         event.preventDefault();
 
@@ -119,7 +190,7 @@ jQuery(function($){
 		$( this).closest('.ainsys-tabs').find('.ainsys-tab-target').removeClass('ainsys-tab-target-active');
         $(this).addClass('ainsys-nav-tab-active');
         $('#'+targ).addClass('ainsys-tab-target-active');
-	});
+	});*/
 
 
 	/////////////////////////////////
@@ -322,15 +393,33 @@ jQuery(function($){
 	} );
 
     //////// Ajax remove ainsys integration ////////
-    $('#setting-section-general').on('click', '#remove_ainsys_integration', function (e){
-        var data = {
-            action: "remove_ainsys_integration",
-            nonce: ainsys_connector_params.nonce
-        };
-        jQuery.post(ainsys_connector_params.ajax_url, data, function (value) {
-            location.reload();
-        });
-    });
+	/*$( '#setting-section-general' ).on( 'click', '#remove_ainsys_integration', function ( e ) {
+		const data = {
+			action:    'remove_ainsys_integration',
+			flush_all: $( e.target ).closest( '#setting-section-general' ).find( '#full-uninstall-checkbox' ).val()
+		};
+
+		const isConfirm = confirm( ainsys_connector_params.remove_ainsys_integration );
+
+		if ( false === isConfirm ) {
+			return;
+		}
+
+		$( this ).addClass( 'ainsys-loading' );
+
+		$.ajax( {
+			url:     ainsys_connector_params.ajax_url,
+			data:    data,
+			success: function ( response ) {
+				$( '#remove_ainsys_integration' ).removeClass( 'ainsys-loading' );
+				location.reload();
+			},
+			error:   function ( response ) {
+				$( '#remove_ainsys_integration' ).removeClass( 'ainsys-loading' );
+				console.log( response );
+			}
+		} );
+	} );*/
 
     //////// Expand/collapse data container ////////
     $('#setting-section-log').on('click', '.expand_data_container', function (e){

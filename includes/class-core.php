@@ -44,16 +44,24 @@ class Core implements Hooked {
 	 * @param  string $url
 	 *
 	 * @return string
-	 * @throws \Exception
 	 */
-	public function curl_exec_func( array $post_fields = [], string $url = '' ) {
+	public function curl_exec_func( array $post_fields = [], string $url = '' ): string {
 		$url = $url ? : (string) $this->settings::get_option( 'ansys_api_key' );
 
 		if ( empty( $url ) ) {
-			/// Save curl requests for debug
-			$this->settings::set_option( 'debug_log', $this->settings::get_option( 'debug_log' ) . 'cURL Error: No url provided<br>' );
 
-			throw new \RuntimeException( 'No url provided' );
+			$this->logger::save_log_information(
+				[
+					'object_id'       => 0,
+					'entity'          => 'cURL',
+					'request_action'  => 'curl_exec_func',
+					'request_type'    => 'outgoing',
+					'request_data'    => '',
+					'server_response' => serialize( 'No url provided' ),
+					'error'           => 1,
+				]
+			);
+
 		}
 
 		$response = wp_remote_post(
@@ -70,25 +78,22 @@ class Core implements Hooked {
 			)
 		);
 
-		/// Save curl requests for debug
-		$logged_string = is_wp_error( $response ) ? $response->get_error_message() : wp_json_encode( $response );
-		$this->log( $logged_string );
-
 		if ( is_wp_error( $response ) ) {
-			//throw new \Exception( $response->get_error_message(), $response->get_error_code() );
-			throw new \Exception( $response->get_error_message() . ' Error code: ' . $response->get_error_code() );
+
+			$this->logger::save_log_information(
+				[
+					'object_id'       => 0,
+					'entity'          => 'cURL',
+					'request_action'  => 'curl_exec_func',
+					'request_type'    => 'outgoing',
+					'request_data'    => '',
+					'server_response' => serialize( sprintf( '%s Error code: %s', $response->get_error_message(), $response->get_error_code() ) ),
+					'error'           => 1,
+				]
+			);
 		}
 
 		return $response['body'] ?? '';
-	}
-
-	/**
-	 * Log any errors.
-	 *
-	 * @param string $log The log message.
-	 */
-	public function log( $log ) {
-		$this->settings::set_option( 'debug_log', $this->settings::get_option( 'debug_log' ) . $log . '<br>' );
 	}
 
 	/**

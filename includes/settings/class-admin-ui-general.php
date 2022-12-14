@@ -30,7 +30,6 @@ class Admin_UI_General implements Hooked {
 			return;
 		}
 
-		// let's register ajax handlers as it's a part of admin UI. NB: they were a part of Core originally.
 		add_action( 'wp_ajax_remove_ainsys_integration', [ $this, 'remove_ainsys_integration' ] );
 		add_action( 'wp_ajax_check_ainsys_integration', [ $this, 'check_ainsys_integration' ] );
 	}
@@ -152,6 +151,38 @@ class Admin_UI_General implements Hooked {
 
 		$check_response = $this->check_connection_to_server();
 
+		if ( false !== strpos( $check_response, 'Error:' ) ) {
+			$this->get_connect_error( $check_response );
+		} else {
+			$this->get_connect_success( $check_response );
+		}
+
+	}
+
+
+	/**
+	 * Handshake with server, implements AINSYS integration
+	 *
+	 */
+	public function check_connection_to_server(): string {
+
+		try {
+			$response = Core::curl_exec_func();
+		} catch ( \Exception $e ) {
+			$response = esc_html( $e->getMessage() );
+		}
+
+		return $response;
+	}
+
+
+	/**
+	 * @param  string $check_response
+	 *
+	 * @return void
+	 */
+	private function get_connect_error( string $check_response ): void {
+
 		$result = [
 			'response' => $check_response,
 			'time'     => current_time( 'mysql' ),
@@ -166,62 +197,51 @@ class Admin_UI_General implements Hooked {
 				'request_action'  => 'Checking Connected',
 				'request_type'    => 'outgoing',
 				'request_data'    => '',
-				'server_response' => serialize( $check ),
+				'server_response' => serialize( $check_response ),
+				'error'           => 1,
 			]
 		);
-		//error_log( print_r( $check, 1 ) );
 
-		wp_die();
+		wp_send_json_error(
+			[
+				'result'  => $result,
+				'message' => __( 'An error occurred while checking the connection', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			]
+		);
+
 	}
 
 
 	/**
-	 * Handshake with server, implements AINSYS integration
+	 * @param  string $check_response
 	 *
+	 * @return void
 	 */
-	public function check_connection_to_server() {
+	private function get_connect_success( string $check_response ): void {
 
-		$ainsys_url = Settings::get_option( 'ansys_api_key' );
+		$result = [
+			'response' => $check_response,
 
-		if ( ! empty( $ainsys_url ) ) {
-			$response = Core::curl_exec_func();
+			'time' => current_time( 'mysql' ),
+		];
 
-			try {
-				$webhook_data = ! empty( $response ) ? json_decode( $response, false, 512, JSON_THROW_ON_ERROR ) : [];
-			} catch ( \Exception $e ) {
-				return esc_html( $e->getMessage() );
-			}
+		Settings::set_option( 'check_connection', $result );
 
-			if ( ! empty( $response ) ) {
-				return $response;
-			}
+		Logger::save_log_information(
+			[
+				'object_id'       => 0,
+				'entity'          => 'settings',
+				'request_action'  => 'Checking Connected',
+				'request_type'    => 'outgoing',
+				'request_data'    => '',
+				'server_response' => serialize( $check_response ),
+			]
+		);
 
-		}
-
-		return false;
-	}
-
-
-	/**
-	 * Check if AINSYS integration is active.
-	 *
-	 * @param  string $actions
-	 *
-	 * @return array
-	 */
-	public function is_ainsys_integration_active( $actions = '' ) {
-
-		//$this->check_connection_to_server();
-
-		$webhook_url = Settings::get_option( 'ansys_api_key' );
-
-		if ( $webhook_url ) {
-			$this->admin_ui->add_admin_notice( 'Соединение с сервером Ainsys установлено. Webhook_url получен.' );
-
-			return [ 'status' => 'success' ];
-		}
-
-		return [ 'status' => 'none' ];
+		wp_send_json_success( [
+			'result'  => $result,
+			'message' => __( 'The connection has been successfully set up', AINSYS_CONNECTOR_TEXTDOMAIN ),
+		] );
 	}
 
 }

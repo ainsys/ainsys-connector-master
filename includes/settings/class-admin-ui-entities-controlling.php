@@ -3,7 +3,6 @@
 namespace Ainsys\Connector\Master\Settings;
 
 use Ainsys\Connector\Master\Hooked;
-use Ainsys\Connector\Master\Logger;
 
 class Admin_UI_Entities_Controlling implements Hooked {
 
@@ -25,6 +24,10 @@ class Admin_UI_Entities_Controlling implements Hooked {
 	 * Init plugin hooks.
 	 */
 	public function init_hooks() {
+
+		if ( ! is_admin() ) {
+			return;
+		}
 
 		add_action( 'wp_ajax_save_entities_controlling', [ $this, 'save_entities_controlling' ] );
 	}

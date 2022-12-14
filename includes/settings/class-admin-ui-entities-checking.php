@@ -13,6 +13,10 @@ class Admin_UI_Entities_Checking implements Hooked {
 
 	public function __construct( Admin_UI $admin_ui ) {
 
+		if ( ! is_admin() ) {
+			return;
+		}
+
 		$this->admin_ui = $admin_ui;
 	}
 
@@ -21,6 +25,10 @@ class Admin_UI_Entities_Checking implements Hooked {
 	 * Init plugin hooks.
 	 */
 	public function init_hooks() {
+
+		if ( ! is_admin() ) {
+			return;
+		}
 
 		add_action( 'wp_ajax_test_entity_connection', [ $this, 'check_connection_entity' ] );
 	}
@@ -170,15 +178,15 @@ class Admin_UI_Entities_Checking implements Hooked {
 	protected function get_result_entity( array $result_test, $result_entity, $entity ) {
 
 		$result_entity[ $entity ] = [
-			'request'  => $result_test['request'],
-			'response' => $result_test['response'],
+			'request'        => $result_test['request'],
+			'response'       => $result_test['response'],
 			'short_request'  => mb_substr( serialize( $result_test['request'] ), 0, 40 ) . ' ... ',
 			'short_response' => mb_substr( $result_test['response'], 0, 40 ) . ' ... ',
 			'full_request'   => $this->admin_ui->logger::ainsys_render_json( $result_test['request'] ),
 			'full_response'  => false !== strpos( 'Error: ', $result_test['response'] ) ? [ $result_test['response'] ] :
 				$this->admin_ui->logger::ainsys_render_json( json_decode( $result_test['response'] ) ),
-			'time'     => current_time( 'mysql' ),
-			'status'   => true,
+			'time'           => current_time( 'mysql' ),
+			'status'         => true,
 		];
 
 		Settings::set_option( 'check_connection_entity', $result_entity );

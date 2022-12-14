@@ -12,6 +12,10 @@ class Admin_UI_General implements Hooked {
 
 	public function __construct( Admin_UI $admin_ui ) {
 
+		if ( ! is_admin() ) {
+			return;
+		}
+
 		$this->admin_ui = $admin_ui;
 	}
 
@@ -20,6 +24,10 @@ class Admin_UI_General implements Hooked {
 	 * Init plugin hooks.
 	 */
 	public function init_hooks() {
+
+		if ( ! is_admin() ) {
+			return;
+		}
 
 		// let's register ajax handlers as it's a part of admin UI. NB: they were a part of Core originally.
 		add_action( 'wp_ajax_remove_ainsys_integration', [ $this, 'remove_ainsys_integration' ] );
@@ -122,9 +130,11 @@ class Admin_UI_General implements Hooked {
 	 * Removes ainsys integration information
 	 */
 	public function remove_ainsys_integration(): void {
+
 		$this->admin_ui->settings::truncate();
 		wp_die();
 	}
+
 
 	/**
 	 * Removes ainsys integration information
@@ -150,7 +160,6 @@ class Admin_UI_General implements Hooked {
 			//error_log( print_r( $check, 1 ) );
 
 		}
-
 
 		wp_die();
 	}
@@ -186,7 +195,7 @@ class Admin_UI_General implements Hooked {
 	/**
 	 * Check if AINSYS integration is active.
 	 *
-	 * @param string $actions
+	 * @param  string $actions
 	 *
 	 * @return array
 	 */
@@ -199,9 +208,10 @@ class Admin_UI_General implements Hooked {
 		if ( $webhook_url ) {
 			$this->admin_ui->add_admin_notice( 'Соединение с сервером Ainsys установлено. Webhook_url получен.' );
 
-			return array( 'status' => 'success' );
+			return [ 'status' => 'success' ];
 		}
 
-		return array( 'status' => 'none' );
+		return [ 'status' => 'none' ];
 	}
+
 }

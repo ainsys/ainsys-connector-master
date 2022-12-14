@@ -2,105 +2,89 @@
 
 namespace Ainsys\Connector\Master\Settings;
 
-
-use Ainsys\Connector\Master\Core;
 use Ainsys\Connector\Master\Hooked;
-use Ainsys\Connector\Master\Logger;
 use Ainsys\Connector\Master\Plugin_Common;
-use Ainsys\Connector\Master\Webhook_Listener;
-use Ainsys\Connector\Master\WP\Process_Users;
-use Ainsys\Connector\Master\WP\Process_Comments;
 
 class Admin_UI implements Hooked {
+
 	use Plugin_Common;
+
 	/**
 	 * Storage for admin notices.
 	 *
 	 * @var array
 	 */
-	public static array $notices = array();
-
-	public static string $nonce_title = 'ainsys_admin_menu_nonce';
+	public static array $notices = [];
 
 	/**
 	 * @var Settings
 	 */
 	public Settings $settings;
 
-	/**
-	 * @var Core
-	 */
-	public Core $core;
 
-	/**
-	 * @var Logger
-	 */
-	public Logger $logger;
+	public function __construct( Settings $settings ) {
 
-	/**
-	 * @var Process_Users
-	 */
-	public Process_Users $process_users;
+		if ( ! is_admin() ) {
+			return;
+		}
 
-	/**
-	 * @var Process_Comments
-	 */
-	public Process_Comments $process_comments;
-
-	public function __construct( Settings $settings, Core $core, Logger $logger, Process_Users $process_users, Process_Comments $process_comments) {
-		$this->settings         = $settings;
-		$this->core             = $core;
-		$this->logger           = $logger;
-		$this->process_users    = $process_users;
-		$this->process_comments = $process_comments;
+		$this->settings = $settings;
 	}
+
 
 	/**
 	 * Init plugin hooks.
 	 */
 	public function init_hooks() {
-		if ( is_admin() ) {
-			add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
-			add_filter(
-				'plugin_action_links_ainsys-connector-master/plugin.php',
-				array(
-					$this,
-					'generate_links_to_plugin_bar',
-				)
-			);
-			add_action( 'admin_enqueue_scripts', array( $this, 'ainsys_enqueue_scripts' ) );
-			add_action( 'admin_notices', array( $this, 'admin_notices' ) );
-			add_filter( 'option_page_capability_' . 'ainsys-connector', array( $this, 'ainsys_page_capability' ) );
+
+		if ( ! is_admin() ) {
+			return;
 		}
 
-		add_action( 'wp_ajax_reload_log_html', array( $this, 'reload_log_html' ) );
-		add_action( 'wp_ajax_toggle_logging', array( $this, 'toggle_logging' ) );
-		add_action( 'wp_ajax_clear_log', array( $this, 'clear_log' ) );
+		add_action( 'admin_menu', [ $this, 'add_admin_menu' ] );
+		add_filter(
+			'plugin_action_links_ainsys-connector-master/plugin.php',
+			[
+				$this,
+				'generate_links_to_plugin_bar',
+			]
+		);
 
+		add_action( 'admin_enqueue_scripts', [ $this, 'ainsys_enqueue_scripts' ] );
+		add_action( 'admin_notices', [ $this, 'admin_notices' ] );
+		add_filter( 'option_page_capability_' . 'ainsys-connector', [ $this, 'ainsys_page_capability' ] );
+
+		add_action( 'wp_ajax_reload_log_html', [ $this, 'reload_log_html' ] );
+		add_action( 'wp_ajax_toggle_logging', [ $this, 'toggle_logging' ] );
+		add_action( 'wp_ajax_clear_log', [ $this, 'clear_log' ] );
 
 	}
+
 
 	/**
 	 * Registers the plugin settings page in WP menu
 	 *
 	 */
 	public function add_admin_menu() {
+
 		add_menu_page(
 			__( 'AINSYS connector integration', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 			__( 'AINSYS connector', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 			'administrator',
 			'ainsys-connector',
-			array( $this, 'include_setting_page' ),
+			[ $this, 'include_setting_page' ],
 			'dashicons-randomize',
 			55
 		);
 	}
+
 
 	/**
 	 * Gives rights to edit ainsys-connector page
 	 *
 	 */
 	function ainsys_page_capability( $capability ) {
+
 		return 'administrator';
 	}
 
@@ -167,22 +151,22 @@ class Admin_UI implements Hooked {
 
 		$settings_content_tabs = [
 			'general'  => [
-				'template'    => '/includes/settings/templates/tabs/general.php',
+				'template' => '/includes/settings/templates/tabs/general.php',
 				'active'   => false,
 				'priority' => 10,
 			],
 			'test'     => [
-				'template'    => '/includes/settings/templates/tabs/tests.php',
+				'template' => '/includes/settings/templates/tabs/tests.php',
 				'active'   => false,
 				'priority' => 20,
 			],
 			'log'      => [
-				'template'    => '/includes/settings/templates/tabs/logs.php',
+				'template' => '/includes/settings/templates/tabs/logs.php',
 				'active'   => false,
 				'priority' => 30,
 			],
 			'entities' => [
-				'template'    => '/includes/settings/templates/tabs/entities.php',
+				'template' => '/includes/settings/templates/tabs/entities.php',
 				'active'   => false,
 				'priority' => 40,
 			],
@@ -199,9 +183,11 @@ class Admin_UI implements Hooked {
 	 *
 	 */
 	public function include_setting_page() {
+
 		// NB: inside template we inherit $this which gives access to it's deps.
 		include_once __DIR__ . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'settings.php';
 	}
+
 
 	/**
 	 * Adds a link to ainsys portal to the settings page.
@@ -211,7 +197,8 @@ class Admin_UI implements Hooked {
 	 * @return mixed
 	 */
 	public function generate_links_to_plugin_bar( $links ) {
-		$settings_url = esc_url( add_query_arg( array( 'page' => 'ainsys-connector' ), get_admin_url() . 'options-general.php' ) );
+
+		$settings_url = esc_url( add_query_arg( [ 'page' => 'ainsys-connector' ], get_admin_url() . 'options-general.php' ) );
 
 		$settings_link = '<a href="' . $settings_url . '">' . __( 'Settings' ) . '</a>';
 		$plugin_link   = '<a target="_blank" href="https://app.ainsys.com/en/settings/workspaces">AINSYS dashboard</a>';
@@ -267,23 +254,22 @@ class Admin_UI implements Hooked {
 			'ainsys_connector_admin_handle',
 			'ainsys_connector_params',
 			[
-				'ajax_url' => admin_url( 'admin-ajax.php' ),
-				'nonce'    => wp_create_nonce( self::$nonce_title ),
-				'remove_ainsys_integration'    => __('Are you sure this action is irreversible, all settings values will be cleared?', AINSYS_CONNECTOR_TEXTDOMAIN),
-				'check_connection_entity_connect'    => __( 'Connection', AINSYS_CONNECTOR_TEXTDOMAIN ) ,
-				'check_connection_entity_no_connect'    => __( 'No connection', AINSYS_CONNECTOR_TEXTDOMAIN ) ,
+				'ajax_url'                           => admin_url( 'admin-ajax.php' ),
+				'nonce'                              => wp_create_nonce( self::$nonce_title ),
+				'remove_ainsys_integration'          => __( 'Are you sure this action is irreversible, all settings values will be cleared?', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'check_connection_entity_connect'    => __( 'Connection', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'check_connection_entity_no_connect' => __( 'No connection', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			]
 		);
 
 	}
 
 
-
-
 	/**
 	 * Renders admin notices
 	 */
 	public function admin_notices( $message, $status = 'success' ) {
+
 		if ( self::$notices ) {
 			foreach ( self::$notices as $notice ) {
 				?>
@@ -295,23 +281,17 @@ class Admin_UI implements Hooked {
 		}
 	}
 
+
 	/**
 	 * Adds a notice to the notices array.
 	 */
 	public function add_admin_notice( $message, $status = 'success' ) {
-		self::$notices[] = array(
+
+		self::$notices[] = [
 			'message' => $message,
 			'status'  => $status,
-		);
+		];
 	}
-
-
-
-
-
-
-
-
 
 
 	/**
@@ -327,11 +307,13 @@ class Admin_UI implements Hooked {
 		die();
 	}
 
+
 	/**
 	 * Toggles logging on/off. Set up time till log is saved (for ajax).
 	 *
 	 */
 	public function toggle_logging() {
+
 		if ( isset( $_POST['command'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
 
 			$logging_time = 0;
@@ -356,17 +338,18 @@ class Admin_UI implements Hooked {
 			} else {
 				$this->settings::set_option( 'do_log_transactions', 0 );
 				$this->settings::set_option( 'log_transactions_since', '' );
-				$this->settings::set_option( 'log_select_value', -1 );
+				$this->settings::set_option( 'log_select_value', - 1 );
 				$logging_since = '';
 			}
-			$result = array(
+			$result = [
 				'logging_time'  => $logging_time,
 				'logging_since' => $logging_since,
-			);
+			];
 			echo json_encode( $result );
 		}
 		die();
 	}
+
 
 	/**
 	 * Clears log DB table (for ajax).
@@ -381,7 +364,5 @@ class Admin_UI implements Hooked {
 
 		die();
 	}
-
-
 
 }

@@ -108,7 +108,7 @@ class Logger implements Hooked {
 		$output = $wpdb->get_results( $query, ARRAY_A );
 
 		if ( empty( $output ) ) {
-			return '<div class="empty_tab"><h3>' . __( 'No transactions to display', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</h3></div>'; // phpcs:ignore
+			return '<div id="connection_log"><div class="empty_tab"><h3>' . __( 'No transactions to display', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</h3></div></div>'; // phpcs:ignore
 		}
 
 		foreach ( $output as $item ) {

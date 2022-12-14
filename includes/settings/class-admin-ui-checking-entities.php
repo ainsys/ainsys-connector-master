@@ -68,7 +68,7 @@ class Admin_UI_Checking_Entities implements Hooked {
 
 		}
 
-		do_action( 'ainsys_check_connection_request', $entity, $result_entity, $make_request );
+		$result_entity = apply_filters( 'ainsys_check_connection_request', $result_entity, $entity, $make_request );
 
 		if ( $make_request ) {
 

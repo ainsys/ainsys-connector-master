@@ -42,6 +42,7 @@ $option      = Settings::get_option( 'check_controlling_entity' );
 						$option_item        = ! empty( $option[ $entity_id ]['general'][ $column_id ] ) ? $option[ $entity_id ]['general'][ $column_id ] : 0;
 						$option_name_column = sprintf( '-%s', $column_id );
 						$option_name_item   = sprintf( '-%s%s', $entity_id, $option_name_column );
+						$option_on_off = !empty( $option[ $entity_id ]['general']['on_off'] ) ? $option[ $entity_id ]['general']['on_off'] : 0;
 
 						switch ( $column_id ):
 							case 'arrow' :
@@ -128,7 +129,7 @@ $option      = Settings::get_option( 'check_controlling_entity' );
 											       data-toggle-checkbox-entity-id="<?php echo esc_attr( $entity_id ); ?>"
 											       data-toggle-checkbox-column-id="<?php echo esc_attr( $column_id ); ?>"
 												<?php checked( 1, esc_html( $option_item ) ); ?>
-												<?php disabled( 0, $option[ $entity_id ]['general']['on_off'] ); ?>
+												<?php disabled( 0, $option_on_off); ?>
 											>
 											<span class="toggle-switch"></span>
 											<span class="toggle-label"><?php echo esc_attr( $column_name ); ?></span>

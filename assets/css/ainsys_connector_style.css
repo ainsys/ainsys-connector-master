@@ -291,7 +291,7 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	padding: 0;
 	font-size: 0.875rem;
 	line-height: 1.4;
-	grid-template-columns: 1fr 30%;
+	grid-template-columns: minmax(50%, 70%) minmax(50%, 50%);
 }
 
 .ainsys-status-items .ainsys-status--check-integration {

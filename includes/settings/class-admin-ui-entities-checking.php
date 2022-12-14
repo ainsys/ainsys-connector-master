@@ -6,7 +6,7 @@ use Ainsys\Connector\Master\Hooked;
 use Ainsys\Connector\Master\WP\Process_Comments;
 use Ainsys\Connector\Master\WP\Process_Users;
 
-class Admin_UI_Checking_Entities implements Hooked {
+class Admin_UI_Entities_Checking implements Hooked {
 
 	protected Admin_UI $admin_ui;
 

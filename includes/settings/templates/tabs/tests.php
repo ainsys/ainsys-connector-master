@@ -9,11 +9,11 @@
  * @global  Ainsys\Connector\Master\Settings\Admin_UI $admin_ui
  */
 
-use Ainsys\Connector\Master\Settings\Admin_UI_Checking_Entities;
+use Ainsys\Connector\Master\Settings\Admin_UI_Entities_Checking;
 
 $admin_ui = $args['admin_ui'];
 $active = $args['active'];
-$settings = new Admin_UI_Checking_Entities( $admin_ui );
+$settings = new Admin_UI_Entities_Checking( $admin_ui );
 $check_entity = $admin_ui->settings::get_option( 'check_connection_entity' );
 
 ?>

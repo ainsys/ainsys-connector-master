@@ -488,25 +488,45 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 .ainsys-settings-wrap .ainsys-table thead th {
 	white-space: nowrap;
 }
+.ainsys-table--controlling-entities thead,
+.ainsys-table--checking-entities thead {
+	text-transform: uppercase;
+}
 
+.ainsys-table--controlling-entities thead th,
+.ainsys-table--checking-entities thead th {
+	padding: 1.25rem 0;
+}
+
+.ainsys-table-table__cell {
+	padding: 1rem 1rem;
+	text-align: center;
+}
+.ainsys-settings-wrap .ainsys-table.ainsys-table--controlling-entities tr,
 .ainsys-settings-wrap .ainsys-table.ainsys-table--checking-entities tr {
 	border-bottom: none;
 }
 
+.ainsys-table--controlling-entities th,
+.ainsys-table--controlling-entities td,
 .ainsys-table--checking-entities td,
 .ainsys-table--checking-entities th {
 	border-right: solid 2px #e2e2e2;
 }
 
+.ainsys-table--controlling-entities td:last-child,
+.ainsys-table--controlling-entities th:last-child,
 .ainsys-table--checking-entities td:last-child,
 .ainsys-table--checking-entities th:last-child {
 	border-right: none;
 }
 
+.ainsys-table--controlling-entities tbody tr:nth-child(even),
 .ainsys-table--checking-entities tbody tr:nth-child(even) {
 	background: #fff;
 }
 
+.ainsys-table--controlling-entities tbody tr:nth-child(odd),
 .ainsys-table--checking-entities tbody tr:nth-child(odd) {
 	background: #F7F7F7;
 }
@@ -628,18 +648,7 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	width: 100%;
 }
 
-.ainsys-table--checking-entities thead {
-	text-transform: uppercase;
-}
 
-.ainsys-table--checking-entities thead th {
-	padding: 1.25rem 0;
-}
-
-.ainsys-table-table__cell {
-	padding: 1rem 1rem;
-	text-align: center;
-}
 
 .ainsys-success,
 .ainsys-failure {
@@ -705,6 +714,104 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	width: 100%;
 	text-align: center;
 }
+
+
+.ainsys-table--controlling-entities .ainsys-form-group {
+	margin: 0;
+}
+
+.ainsys-table--controlling-entities .toggle {
+	cursor: pointer;
+	display: inline-block;
+}
+
+.ainsys-table--controlling-entities .toggle-switch {
+	display: inline-block;
+	background: #667085;
+	border-radius: 16px;
+	width: 44px;
+	height: 25px;
+	position: relative;
+	vertical-align: middle;
+	transition: background 0.25s;
+}
+
+.toggle-switch--disabled {
+	background: #667085;
+}
+
+.ainsys-table--controlling-entities .toggle-switch:before, .toggle-switch:after {
+	content: "";
+}
+.ainsys-table--controlling-entities .toggle-switch:before {
+	display: block;
+	background: linear-gradient(to bottom, #fff 0%, #eee 100%);
+	border-radius: 50%;
+	width: 19px;
+	height: 19px;
+	position: absolute;
+	top: 3px;
+	left: 4px;
+	transition: left 0.25s;
+}
+.ainsys-table--controlling-entities .toggle:hover .toggle-switch:before {
+	background: linear-gradient(to bottom, #fff 0%, #fff 100%);
+	}
+.ainsys-table--controlling-entities .toggle-checkbox:checked + .toggle-switch {
+	background: #AB47BC;
+}
+.ainsys-table--controlling-entities .toggle-checkbox:disabled + .toggle-switch{
+	background: #ccc;
+}
+.ainsys-table--controlling-entities .toggle-checkbox:checked + .toggle-switch:before {
+	left: 22px;
+}
+
+.ainsys-table--controlling-entities .toggle-checkbox {
+	position: absolute;
+	visibility: hidden;
+}
+
+.ainsys-table--controlling-entities .toggle-label {
+	text-indent: -9999px;
+	margin-left: 5px;
+	position: absolute;
+	top: -9999px;
+	left: -9999px;
+
+}
+
+.ainsys-table--controlling-entities .ainsys-loading {
+	opacity: 0.5;
+}
+
+
+.ainsys-table--controlling-entities .toggle-label {
+	text-indent: -9999px;
+	margin-left: 5px;
+	position: absolute;
+	top: -9999px;
+	left: -9999px;
+
+}
+
+.ainsys-table-table__cell--arrow--inside button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: transparent;
+	outline: none;
+	border: none;
+	margin: 0 auto;
+	padding: 0;
+}
+
+.ainsys-table-table__cell--arrow--inside svg {
+	width: 1.5rem;
+}
+
+
+
 
 .ainsys-settings-wrap #setting-section-entities {
 	flex-direction: column;

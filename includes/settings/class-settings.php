@@ -76,6 +76,7 @@ class Settings implements Hooked {
 			'debug_log'               => '',
 			'check_connection'        => '',
 			'check_connection_entity' => [],
+			'check_controlling_entity' => [],
 		];
 
 		return apply_filters( 'ainsys_settings_options', self::$settings_options );

@@ -20,7 +20,6 @@ $option      = $admin_ui->settings::get_option( 'check_controlling_entity' );
 ?>
 
 <div id="setting-section-entities" class="tab-target">
-	<?php echo $settings->generate_entities_html(); ?>
 	<table class="ainsys-table ainsys-table--controlling-entities">
 		<thead>
 			<?php foreach ( $settings->columns_entities_controlling() as $column_id => $column_name ) : ?>
@@ -171,7 +170,4 @@ $option      = $admin_ui->settings::get_option( 'check_controlling_entity' );
 		</tbody>
 
 	</table>
-	<p><?php _e( 'Detailed', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?> <a href="https://github.com/ainsys/ainsys-wp-connector"> <?php _e(
-				' API integration', AINSYS_CONNECTOR_TEXTDOMAIN
-			); // phpcs:ignore ?></a> <?php _e( ' documentation.', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></p>
 </div>

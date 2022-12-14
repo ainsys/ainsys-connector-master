@@ -274,6 +274,8 @@ class Admin_UI implements Hooked {
 				'ajax_url' => admin_url( 'admin-ajax.php' ),
 				'nonce'    => wp_create_nonce( self::$nonce_title ),
 				'remove_ainsys_integration'    => __('Are you sure this action is irreversible, all settings values will be cleared?', AINSYS_CONNECTOR_TEXTDOMAIN),
+				'check_connection_entity_connect'    => __( 'Connection', AINSYS_CONNECTOR_TEXTDOMAIN ) ,
+				'check_connection_entity_no_connect'    => __( 'No connection', AINSYS_CONNECTOR_TEXTDOMAIN ) ,
 			]
 		);
 

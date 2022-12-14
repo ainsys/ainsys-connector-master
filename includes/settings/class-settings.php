@@ -47,34 +47,35 @@ class Settings implements Hooked {
 	public static function get_settings_options(): array {
 
 		self::$settings_options = [
-			'ansys_api_key'          => '',
-			'handshake_url'          => '',
-			'webhook_url'            => '',
-			'server'                 => 'https://user-api.ainsys.com/',
-			'sys_id'                 => '',
-			'connectors'             => '',
-			'workspace'              => 14,
-			'backup_email'           => '',
-			'backup_email_1'         => '',
-			'backup_email_2'         => '',
-			'backup_email_3'         => '',
-			'backup_email_4'         => '',
-			'backup_email_5'         => '',
-			'backup_email_6'         => '',
-			'backup_email_7'         => '',
-			'backup_email_8'         => '',
-			'backup_email_9'         => '',
-			'do_log_transactions'    => 0,
-			'log_transactions_since' => '',
-			'log_until_certain_time' => 0,
-			'log_select_value'       => - 1,
-			'full_uninstall'         => 0,
-			'connector_id'           => '',
-			'client_full_name'       => '',
-			'client_company_name'    => '',
-			'client_tin'             => '',
-			'debug_log'              => '',
-			'check_connection'       => '',
+			'ansys_api_key'           => '',
+			'handshake_url'           => '',
+			'webhook_url'             => '',
+			'server'                  => 'https://user-api.ainsys.com/',
+			'sys_id'                  => '',
+			'connectors'              => '',
+			'workspace'               => 14,
+			'backup_email'            => '',
+			'backup_email_1'          => '',
+			'backup_email_2'          => '',
+			'backup_email_3'          => '',
+			'backup_email_4'          => '',
+			'backup_email_5'          => '',
+			'backup_email_6'          => '',
+			'backup_email_7'          => '',
+			'backup_email_8'          => '',
+			'backup_email_9'          => '',
+			'do_log_transactions'     => 0,
+			'log_transactions_since'  => '',
+			'log_until_certain_time'  => 0,
+			'log_select_value'        => - 1,
+			'full_uninstall'          => 0,
+			'connector_id'            => '',
+			'client_full_name'        => '',
+			'client_company_name'     => '',
+			'client_tin'              => '',
+			'debug_log'               => '',
+			'check_connection'        => '',
+			'check_connection_entity' => [],
 		];
 
 		return apply_filters( 'ainsys_settings_options', self::$settings_options );
@@ -258,7 +259,7 @@ class Settings implements Hooked {
 		/// Get WordPress pre installed entities.
 		$entities = [
 			'user'     => __( 'User / fields', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
-			'comments' => __( 'Comments / fields', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
+			'comment' => __( 'Comments / fields', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
 		];
 
 		return apply_filters( 'ainsys_get_entities_list', $entities );
@@ -274,7 +275,7 @@ class Settings implements Hooked {
 
 		$field_getters = [
 			'user'     => [ static::class, 'get_user_fields' ],
-			'comments' => [ static::class, 'get_comments_fields' ],
+			'comment' => [ static::class, 'get_comments_fields' ],
 		];
 
 		return apply_filters( 'ainsys_get_entity_fields_handlers', $field_getters );

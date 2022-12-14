@@ -3,7 +3,8 @@
 namespace Ainsys\Connector\Master\Settings;
 
 use Ainsys\Connector\Master\Hooked;
-use Ainsys\Connector\Master\Logger;
+use Ainsys\Connector\Master\WP\Process_Comments;
+use Ainsys\Connector\Master\WP\Process_Users;
 
 class Admin_UI_Checking_Entities implements Hooked {
 
@@ -21,93 +22,168 @@ class Admin_UI_Checking_Entities implements Hooked {
 	 */
 	public function init_hooks() {
 
-		add_action( 'wp_ajax_test_entity_connection', [ $this, 'test_entity_connection' ] );
+		add_action( 'wp_ajax_test_entity_connection', [ $this, 'check_connection_entity' ] );
 	}
 
 
 	/**
 	 * Tests AINSYS connection for entities (for ajax).
-	 *
 	 */
-	public function test_entity_connection() {
+	public function check_connection_entity(): void {
 
-		if ( ! isset( $_POST['entity'] ) ) {
-			wp_send_json_error( [
-				'error' => __( 'Entity ID is missing', AINSYS_CONNECTOR_TEXTDOMAIN ),
-			] );
+		if ( empty( $_POST['entity'] ) ) {
+			wp_send_json_error(
+				[
+					'error' => __( 'Entity ID is missing', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				]
+			);
 		}
 
-		$make_request = false;
+		$make_request = apply_filters( 'ainsys_before_check_connection_make_request', false );
 
-		$entity = strip_tags( $_POST['entity'] );
+		$entity = sanitize_text_field( $_POST['entity'] );
+
+		$result_entity = [];
+
+		if ( empty( Settings::get_option( 'check_connection_entity' ) ) ) {
+
+			Settings::set_option( 'check_connection_entity', $result_entity );
+		}
 
 		if ( 'user' === $entity ) {
-			$make_request         = true;
-			$fields               = (array) wp_get_current_user();
-			$user_id              = get_current_user_id();
-			$test_result          = $this->process_users->send_user_details_update_to_ainsys( $user_id, $fields, $fields, true );
-			$test_result_request  = $test_result['request']; // array
-			$test_result_response = $test_result['response']; // string
+			$make_request  = true;
+			$result_test   = $this->get_user_for_test();
+			$result_entity = Settings::get_option( 'check_connection_entity' );
+			$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
+
 		}
 
-		if ( 'comments' === $entity ) {
-			$args     = [
-				'status' => 'approve',
-			];
-			$comments = get_comments( $args );
-			if ( ! empty( $comments ) ) {
-				foreach ( $comments as $comment ) {
-					$fields = (array) $comment;
-					break;
-				}
+		if ( 'comment' === $entity ) {
 
-				$comment_id           = $fields['comment_ID'];
-				$make_request         = true;
-				$test_result          = $this->process_comments->send_update_comment_to_ainsys( $comment_id, $fields, true );
-				$test_result_request  = $test_result['request']; // array
-				$test_result_response = $test_result['response']; // string
-			}
+			$make_request = true;
+
+			$result_test   = $this->get_comment_for_test();
+			$result_entity = Settings::get_option( 'check_connection_entity' );
+			$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
+
 		}
+
+		do_action( 'ainsys_check_connection_request', $entity, $result_entity, $make_request );
 
 		if ( $make_request ) {
 
-			$result = [
-				'short_request'  => mb_substr( serialize( $test_result_request ), 0, 80 ) . ' ... ',
-				'short_responce' => mb_substr( $test_result_response, 0, 80 ) . ' ... ',
-				'full_request'   => $this->logger::ainsys_render_json( $test_result_request ),
-				'full_responce'  => false === strpos( 'Error: ', $test_result_response ) ? [ $test_result_response ] :
-					$this->logger::ainsys_render_json( json_decode( $test_result_response ) ),
-			];
-		} else {
-			$result = [
-				'short_request'  => __( 'No entities found', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
-				'short_responce' => '',
-				'full_request'   => '',
-				'full_responce'  => '',
-			];
+			wp_send_json_success(
+				[
+					'result'  => $result_entity,
+					'message' => __( 'The connection has been successfully set up', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				]
+			);
+
 		}
 
-		wp_send_json( $result );
+		wp_send_json_error(
+			[
+				'result'  => [],
+				'message' => __( 'An error occurred while checking the connection', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			],
+		);
 
 	}
 
 
 	public function columns_checking_entities(): array {
 
-		return apply_filters( 'ainsys_columns_checking_entities', [
-			'entity'          => __( 'Entity', AINSYS_CONNECTOR_TEXTDOMAIN ),
-			'outgoing'        => __( 'Outgoing JSON', AINSYS_CONNECTOR_TEXTDOMAIN ),
-			'server_response' => __( 'SERVER RESPONSE', AINSYS_CONNECTOR_TEXTDOMAIN ),
-			'time'            => __( 'Time and date', AINSYS_CONNECTOR_TEXTDOMAIN ),
-			'check'           => __( 'Check entity', AINSYS_CONNECTOR_TEXTDOMAIN ),
-			'status'          => __( 'Status', AINSYS_CONNECTOR_TEXTDOMAIN ),
-		] );
+		return apply_filters(
+			'ainsys_columns_checking_entities',
+			[
+				'entity'          => __( 'Entity', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'outgoing'        => __( 'Outgoing JSON', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'server_response' => __( 'SERVER RESPONSE', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'time'            => __( 'Time and date', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'check'           => __( 'Check entity', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'status'          => __( 'Status', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			]
+		);
 	}
 
 
 	public function entities_list(): array {
 
 		return $this->admin_ui->settings::get_entities();
+	}
+
+
+	/**
+	 * @return array
+	 */
+	protected function get_user_for_test(): array {
+
+		$users_args = [
+			'fields' => 'all',
+		];
+
+		if ( is_multisite() ) {
+			$users_args['blog_id'] = get_current_blog_id();
+		}
+
+		$users     = get_users( $users_args );
+		$user_test = end( $users );
+
+		return ( new Process_Users )->send_user_details_update_to_ainsys(
+			(int) $user_test->ID,
+			(array) $user_test->data,
+			(array) $user_test->data,
+			true
+		);
+	}
+
+
+	/**
+	 * @return array
+	 */
+	protected function get_comment_for_test(): array {
+
+		$comments = get_comments( [
+			'status' => 'approve',
+			'type'   => 'comment',
+		] );
+
+		if ( empty( $comments ) ) {
+			return [];
+		}
+
+		$comment    = (array) reset( $comments );
+		$comment_id = $comment['comment_ID'];
+		unset( $comment['comment_ID'] );
+
+		return ( new Process_Comments )->send_update_comment_to_ainsys( (int) $comment_id, $comment, true );
+	}
+
+
+	/**
+	 * @param  array $result_test
+	 * @param        $result_entity
+	 * @param        $entity
+	 *
+	 * @return mixed|void
+	 */
+	protected function get_result_entity( array $result_test, $result_entity, $entity ) {
+
+		$result_entity[ $entity ] = [
+			'request'  => $result_test['request'],
+			'response' => $result_test['response'],
+			'short_request'  => mb_substr( serialize( $result_test['request'] ), 0, 40 ) . ' ... ',
+			'short_response' => mb_substr( $result_test['response'], 0, 40 ) . ' ... ',
+			'full_request'   => $this->admin_ui->logger::ainsys_render_json( $result_test['request'] ),
+			'full_response'  => false !== strpos( 'Error: ', $result_test['response'] ) ? [ $result_test['response'] ] :
+				$this->admin_ui->logger::ainsys_render_json( json_decode( $result_test['response'] ) ),
+			'time'     => current_time( 'mysql' ),
+			'status'   => true,
+		];
+
+		Settings::set_option( 'check_connection_entity', $result_entity );
+
+		return $result_entity;
 	}
 
 }

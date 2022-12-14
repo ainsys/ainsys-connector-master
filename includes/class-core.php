@@ -37,15 +37,16 @@ class Core implements Hooked {
 			Logger::save_log_information(
 				[
 					'object_id'       => 0,
-					'entity'          => 'cURL',
+					'entity'          => 'check_url',
 					'request_action'  => 'curl_exec_func',
 					'request_type'    => 'outgoing',
 					'request_data'    => '',
-					'server_response' => serialize( 'No url provided' ),
+					'server_response' => serialize( 'Error: No url provided' ),
 					'error'           => 1,
 				]
 			);
 
+			return 'Error: The URL is missing. Specify the required URL in the plugin settings on the General tab' ;
 		}
 
 		$response = wp_remote_post(
@@ -75,9 +76,11 @@ class Core implements Hooked {
 					'error'           => 1,
 				]
 			);
+
+			return $response->get_error_message();
 		}
 
-		return $response['body'] ?? '';
+		return $response['body'] ? : '';
 	}
 
 

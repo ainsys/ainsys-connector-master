@@ -336,11 +336,6 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	font-weight: 500;
 }
 
-/*.ainsys-status--title + span {
-	width: 5.5rem;
-}*/
-
-
 .ainsys-status--error {
 	color: #d5031e;
 }
@@ -353,6 +348,13 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 
 .ainsys-check-integration .btn {
 	margin: 0 auto;
+}
+
+.ainsys-settings-block--connect-status--last-operation {
+	display: flex;
+	justify-content: center;
+	padding-top: 1.25rem;
+	font-size: 1rem;
 }
 
 /* Ainsys Tabs - subtabs*/
@@ -488,6 +490,7 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 .ainsys-settings-wrap .ainsys-table thead th {
 	white-space: nowrap;
 }
+
 .ainsys-table--controlling-entities thead,
 .ainsys-table--checking-entities thead {
 	text-transform: uppercase;
@@ -502,6 +505,7 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	padding: 1rem 1rem;
 	text-align: center;
 }
+
 .ainsys-settings-wrap .ainsys-table.ainsys-table--controlling-entities tr,
 .ainsys-settings-wrap .ainsys-table.ainsys-table--checking-entities tr {
 	border-bottom: none;
@@ -649,7 +653,6 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 }
 
 
-
 .ainsys-success,
 .ainsys-failure {
 	display: none;
@@ -743,6 +746,7 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 .ainsys-table--controlling-entities .toggle-switch:before, .toggle-switch:after {
 	content: "";
 }
+
 .ainsys-table--controlling-entities .toggle-switch:before {
 	display: block;
 	background: linear-gradient(to bottom, #fff 0%, #eee 100%);
@@ -754,15 +758,19 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	left: 4px;
 	transition: left 0.25s;
 }
+
 .ainsys-table--controlling-entities .toggle:hover .toggle-switch:before {
 	background: linear-gradient(to bottom, #fff 0%, #fff 100%);
-	}
+}
+
 .ainsys-table--controlling-entities .toggle-checkbox:checked + .toggle-switch {
 	background: #AB47BC;
 }
-.ainsys-table--controlling-entities .toggle-checkbox:disabled + .toggle-switch{
+
+.ainsys-table--controlling-entities .toggle-checkbox:disabled + .toggle-switch {
 	background: #ccc;
 }
+
 .ainsys-table--controlling-entities .toggle-checkbox:checked + .toggle-switch:before {
 	left: 22px;
 }
@@ -778,7 +786,7 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	position: absolute;
 	top: -9999px;
 	left: -9999px;
-
+	
 }
 
 .ainsys-table--controlling-entities .ainsys-loading {
@@ -792,7 +800,7 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	position: absolute;
 	top: -9999px;
 	left: -9999px;
-
+	
 }
 
 .ainsys-table-table__cell--arrow--inside button {
@@ -809,8 +817,6 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 .ainsys-table-table__cell--arrow--inside svg {
 	width: 1.5rem;
 }
-
-
 
 
 .ainsys-settings-wrap #setting-section-entities {

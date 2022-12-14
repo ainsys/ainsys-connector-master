@@ -266,12 +266,15 @@ $status_addons = $settings->get_statuses_addons();
 						<?php endif; ?>
 					</li>
 				</ul>
+				<div class="ainsys-settings-block--connect-status--last-operation">
+					<?php
+					$last_operation = empty( Settings::get_option( 'check_connection' )['time'] )
+						? __( 'No data', AINSYS_CONNECTOR_TEXTDOMAIN )
+						: Settings::get_option( 'check_connection' )['time'];
 
-				<?php if ( Settings::get_option( 'check_connection' ) ) : ?>
-					<div class="ainsys-settings-block--connect-status--last-operation">
-						<a href="#" class="">Last operation: <span><?php echo esc_html( Settings::get_option( 'check_connection' )['time'] ); ?></span></a>
-					</div>
-				<?php endif; ?>
+					?>
+					<a href="#" class="">Last operation: <span><?php echo esc_html( $last_operation ); ?></span></a>
+				</div>
 				<div class="ainsys-check-integration">
 					<button type="button"
 					        id="check_ainsys_integration"

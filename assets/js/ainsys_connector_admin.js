@@ -112,6 +112,8 @@ jQuery( function ( $ ) {
 
 			$( event.target ).addClass( 'ainsys-loading' );
 
+			let lastOperation = $(event.target).closest('.ainsys-settings-block').find('.ainsys-settings-block--connect-status--last-operation a span');
+
 			$.ajax( {
 				url:      ainsys_connector_params.ajax_url,
 				data:     data,
@@ -119,11 +121,12 @@ jQuery( function ( $ ) {
 				dataType: 'json',
 				success:  function ( response ) {
 					$( '#check_ainsys_integration' ).removeClass( 'ainsys-loading' );
-					console.log( response );
+
+					lastOperation.text(response.data.result.time);
 				},
-				error:    function ( response ) {
+				error:    function ( e ) {
 					$( '#check_ainsys_integration' ).removeClass( 'ainsys-loading' );
-					console.log( response );
+					console.log( 'Error: ' + e.message );
 				}
 			} );
 		},

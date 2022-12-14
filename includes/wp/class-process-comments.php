@@ -62,21 +62,18 @@ class Process_Comments implements Hooked {
 	 *
 	 * @param  int   $comment_id
 	 * @param  array $data
-	 * @param  bool  $test
+	 * @param  bool  $checking_connected
 	 *
-	 * @return array|void
+	 * @return array
 	 */
-	public function send_update_comment_to_ainsys( $comment_id, $data, $test = false ) {
+	public function send_update_comment_to_ainsys( $comment_id, $data, $checking_connected = false ): array {
 
-		$request_action = 'UPDATE';
+		$request_action = $checking_connected ? 'Checking Connected' : 'UPDATE';
 
 		$fields = apply_filters( 'ainsys_update_comment_fields', $this->prepare_comment_data( $comment_id, $data ), $data );
 
-		$request_test = $this->send_data( $comment_id, $request_action, $fields );
+		return $this->send_data( $comment_id, $request_action, $fields );
 
-		if ( $test ) {
-			return $request_test;
-		}
 	}
 
 

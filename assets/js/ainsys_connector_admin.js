@@ -182,19 +182,6 @@ jQuery( function ( $ ) {
 	ainsys_settings.init();
 
 
-	/*	$('.ainsys-tabs').on('click', '.ainsys-nav-tab', function(event){
-
-	 event.preventDefault();
-
-	 const targ = $(this).data('target');
-
-	 $( this).closest('.ainsys-tabs').find('.ainsys-nav-tab').removeClass('ainsys-nav-tab-active');
-	 $( this).closest('.ainsys-tabs').find('.ainsys-tab-target').removeClass('ainsys-tab-target-active');
-	 $(this).addClass('ainsys-nav-tab-active');
-	 $('#'+targ).addClass('ainsys-tab-target-active');
-	 });*/
-
-
 	/////////////////////////////////
 	////////////   Test tab   ///////
 
@@ -212,13 +199,6 @@ jQuery( function ( $ ) {
 		const responseTdFull  = $( this ).closest( 'tr' ).find( '.ainsys-table-table__cell-server_response' ).find( '.ainsys-response-full' );
 		const responseTime    = $( this ).closest( 'tr' ).find( '.ainsys-table-table__cell--time--inside' );
 		const responseStatus  = $( this ).closest( 'tr' ).find( '.ainsys-table-table__cell--status--inside' );
-		const testSuccess     = $( this ).closest( 'tr' ).find( '.ainsys-success' );
-		const testFailure     = $( this ).closest( 'tr' ).find( '.ainsys-failure' );
-		console.log( responseTime );
-		console.log( requestTdShort );
-		console.log( requestTdFull );
-		console.log( responseTdShort );
-		console.log( responseTdFull );
 
 		$( this ).addClass( 'ainsys-loading' );
 
@@ -237,8 +217,6 @@ jQuery( function ( $ ) {
 
 				let result       = response.data.result;
 				let resultEntity = result[ entity ];
-
-				console.log( resultEntity );
 
 				responseTime.text( resultEntity.time )
 				requestTdShort.text( resultEntity.short_request );
@@ -278,9 +256,8 @@ jQuery( function ( $ ) {
 
 		let valueEntity = $( event.target ).val();
 
-		let entity         = $( event.target ).data( 'toggle-checkbox-entity-id' );
-		let column         = $( event.target ).data( 'toggle-checkbox-column-id' );
-
+		let entity = $( event.target ).data( 'toggle-checkbox-entity-id' );
+		let column = $( event.target ).data( 'toggle-checkbox-column-id' );
 
 
 		if ( column === 'on_off' ) {
@@ -488,142 +465,4 @@ jQuery( function ( $ ) {
 		$temp.remove();
 	} );
 
-	//////// Ajax remove ainsys integration ////////
-	/*$( '#setting-section-general' ).on( 'click', '#remove_ainsys_integration', function ( e ) {
-	 const data = {
-	 action:    'remove_ainsys_integration',
-	 flush_all: $( e.target ).closest( '#setting-section-general' ).find( '#full-uninstall-checkbox' ).val()
-	 };
-
-	 const isConfirm = confirm( ainsys_connector_params.remove_ainsys_integration );
-
-	 if ( false === isConfirm ) {
-	 return;
-	 }
-
-	 $( this ).addClass( 'ainsys-loading' );
-
-	 $.ajax( {
-	 url:     ainsys_connector_params.ajax_url,
-	 data:    data,
-	 success: function ( response ) {
-	 $( '#remove_ainsys_integration' ).removeClass( 'ainsys-loading' );
-	 location.reload();
-	 },
-	 error:   function ( response ) {
-	 $( '#remove_ainsys_integration' ).removeClass( 'ainsys-loading' );
-	 console.log( response );
-	 }
-	 } );
-	 } );*/
-
-	//////// Expand/collapse data container ////////
-	/*$( '#setting-section-log' ).on( 'click', '.expand_data_container', function ( e ) {
-	 $( this ).parent().toggleClass( 'expand_tab' );
-
-	 var text = $( this ).text() == 'less' ? 'more' : 'less';
-	 $( this ).text( text );
-
-	 } )*/
-
-	/////////////////////////////////
-	////////////Settings tabs///////
-
-	/*	let auto_update = false;
-
-	 $( '.entities_field .properties_field' ).on( 'change', '.entiti_settings_value', function () {
-	 if ( ! auto_update ) {
-	 let setting_id = '#' + $( this ).parent().parent().attr( 'id' );
-	 let new_value  = $( this ).val();
-
-	 if ( $( this ).attr( "type" ) == 'checkbox' ) {
-	 new_value = $( this ).val() == 1 ? 'On' : 'Off';
-	 }
-
-	 $( setting_id + ' i' ).addClass( 'active' );
-	 $( setting_id ).attr( 'data-' + $( this ).attr( "id" ), $( this ).val() ).data( $( this ).attr( "id" ), $( this ).val() );
-	 if ( $( this ).attr( "id" ) == 'api' ) {
-	 $( this ).parent().find( 'div' ).attr( 'class', '' );
-	 $( this ).parent().find( 'div' ).addClass( 'entiti_settings_value' ).addClass( new_value );
-	 } else {
-	 $( this ).parent().find( 'div' ).html( new_value );
-	 }
-	 //$('#save_entiti_properties').attr('disable', false);
-	 }
-	 } )
-
-	 $( '.entities_field .properties_field input' ).on( 'click', function () {
-	 if ( $( this ).attr( "type" ) == 'checkbox' ) {
-	 let val = $( this ).val() == 1 ? 0 : 1;
-	 $( this ).attr( 'value', val );
-	 }
-	 } );*/
-
-	//////// Ajax clear log ////////
-	/*	$( '#setting-section-entities .entities_field' ).on( 'click', '.fa.active', function ( e ) {
-
-	 let setting_id = '#' + $( this ).parent().attr( 'id' );
-	 $( setting_id ).toggleClass( 'loading' );
-	 let data = {
-	 action: "save_entity_settings",
-	 nonce:  ainsys_connector_params.nonce,
-	 };
-	 // let temp = $(setting_id).data();
-
-	 $.each( $( setting_id ).data(), function ( key, value ) {
-	 data[ key ] = value;
-	 } )
-
-	 jQuery.post( ainsys_connector_params.ajax_url, data, function ( value ) {
-	 if ( value ) {
-	 //console.log($(setting_id + ' .fa'));
-	 $( setting_id + ' .fa' ).removeClass( 'active' );
-	 $( setting_id + ' #id' ).val( value );
-	 $( setting_id + ' #id' ).parent().find( 'div' ).html( value );
-	 }
-	 $( setting_id ).toggleClass( 'loading' );
-	 } );
-	 } );*/
-
-
-	////////  ////////
-	/*$( '#setting-section-entities' ).on( 'click', ' .entities_field', function ( e ) {
-	 $( '.entities_field.active' ).each( function () {
-	 $( this ).removeClass( 'active' );
-	 } )
-
-	 let obj_id = $( this ).attr( "id" );
-	 $( '.properties_data #setting_name' ).html( $( this ).data( 'seting_name' ) );
-	 $( '.properties_data #setting_name' ).attr( 'data-seting_name', $( this ).data( 'seting_name' ) ).attr( 'data-entiti', $( this ).data( 'entiti' ) );
-
-	 auto_update = true;
-	 $.each( $( this ).data(), function ( key, value ) {
-	 let input_obj  = $( '.properties_data .properties_field #' + key );
-	 let input_type = $( '.properties_data .properties_field #' + key ).attr( "type" );
-	 if ( input_obj.is( "select" ) ) input_type = 'select';
-	 switch ( input_type ) {
-	 case 'text':
-	 $( input_obj ).val( value );
-	 break;
-	 case 'checkbox':
-	 $( input_obj ).attr( 'value', value );
-	 $( input_obj ).prop( 'checked', Boolean( value ) );
-	 break;
-	 case 'select':
-	 $( input_obj ).val( value ).change();
-	 default:
-	 $( input_obj ).val( value );
-	 break;
-	 }
-	 } );
-	 auto_update = false;
-	 $( this ).addClass( 'active' );
-	 } );*/
-
-	//////// expand entity tab ////////
-	/*$( '#setting-section-entities' ).on( 'click', ' .expand_entity_container', function ( e ) {
-	 $( this ).parent().parent().toggleClass( 'active' );
-	 var text = $( this ).text() == 'expand' ? 'collapse' : 'expand';
-	 $( this ).text( text );
-	 } );*/
 } );

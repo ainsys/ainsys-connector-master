@@ -174,7 +174,7 @@ class Logger implements Hooked {
 	 * Truncate log table.
 	 *
 	 */
-	public function truncate_log_table(): void {
+	public static function truncate_log_table(): void {
 
 		global $wpdb;
 

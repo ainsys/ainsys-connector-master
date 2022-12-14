@@ -3,6 +3,7 @@
 namespace Ainsys\Connector\Master\Settings;
 
 use Ainsys\Connector\Master\Hooked;
+use Ainsys\Connector\Master\Logger;
 use Ainsys\Connector\Master\Plugin_Common;
 
 class Admin_UI implements Hooked {
@@ -255,7 +256,7 @@ class Admin_UI implements Hooked {
 			'ainsys_connector_params',
 			[
 				'ajax_url'                           => admin_url( 'admin-ajax.php' ),
-				'nonce'                              => wp_create_nonce( self::$nonce_title ),
+				'nonce'                              => wp_create_nonce( 'ainsys_admin_menu_nonce' ),
 				'remove_ainsys_integration'          => __( 'Are you sure this action is irreversible, all settings values will be cleared?', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'check_connection_entity_connect'    => __( 'Connection', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'check_connection_entity_no_connect' => __( 'No connection', AINSYS_CONNECTOR_TEXTDOMAIN ),
@@ -300,8 +301,8 @@ class Admin_UI implements Hooked {
 	 */
 	public function reload_log_html() {
 
-		if ( isset( $_POST['action'], $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
-			echo $this->logger::generate_log_html();
+		if ( isset( $_POST['action'] ) ) {
+			echo Logger::generate_log_html();
 		}
 
 		die();
@@ -314,7 +315,7 @@ class Admin_UI implements Hooked {
 	 */
 	public function toggle_logging() {
 
-		if ( isset( $_POST['command'] ) && isset( $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
+		if ( isset( $_POST['command'] )  ) {
 
 			$logging_time = 0;
 			if ( isset( $_POST['time'] ) ) {
@@ -325,20 +326,20 @@ class Admin_UI implements Hooked {
 				if ( $time > 0 ) {
 					$end_time = $current_time + $time * 60 * 60;
 				}
-				$this->settings::set_option( 'log_until_certain_time', $end_time );
-				$this->settings::set_option( 'log_select_value', $time );
+				Settings::set_option( 'log_until_certain_time', $end_time );
+				Settings::set_option( 'log_select_value', $time );
 				$logging_time = $end_time;
 			}
 
 			$logging_since = '';
 			if ( 'start_loging' === $_POST['command'] ) {
-				$this->settings::set_option( 'do_log_transactions', 1 );
-				$this->settings::set_option( 'log_transactions_since', htmlspecialchars( strip_tags( $_POST['startat'] ) ) );
-				$logging_since = $this->settings::get_option( 'log_transactions_since' );
+				Settings::set_option( 'do_log_transactions', 1 );
+				Settings::set_option( 'log_transactions_since', htmlspecialchars( strip_tags( $_POST['startat'] ) ) );
+				$logging_since = Settings::get_option( 'log_transactions_since' );
 			} else {
-				$this->settings::set_option( 'do_log_transactions', 0 );
-				$this->settings::set_option( 'log_transactions_since', '' );
-				$this->settings::set_option( 'log_select_value', - 1 );
+				Settings::set_option( 'do_log_transactions', 0 );
+				Settings::set_option( 'log_transactions_since', '' );
+				Settings::set_option( 'log_select_value', - 1 );
 				$logging_since = '';
 			}
 			$result = [
@@ -357,9 +358,9 @@ class Admin_UI implements Hooked {
 	 */
 	public function clear_log(): void {
 
-		if ( isset( $_POST['action'], $_POST['nonce'] ) && wp_verify_nonce( $_POST['nonce'], self::$nonce_title ) ) {
-			$this->logger->truncate_log_table();
-			echo $this->logger::generate_log_html();
+		if ( isset( $_POST['action']) ) {
+			Logger::truncate_log_table();
+			echo Logger::generate_log_html();
 		}
 
 		die();

@@ -9,12 +9,14 @@
  * @global  Ainsys\Connector\Master\Settings\Admin_UI $admin_ui
  */
 
+use Ainsys\Connector\Master\Logger;
 use Ainsys\Connector\Master\Settings\Admin_UI_Entities_Checking;
+use Ainsys\Connector\Master\Settings\Settings;
 
 $admin_ui = $args['admin_ui'];
 $active = $args['active'];
-$settings = new Admin_UI_Entities_Checking( $admin_ui );
-$check_entity = $admin_ui->settings::get_option( 'check_connection_entity' );
+$settings = new Admin_UI_Entities_Checking();
+$check_entity = Settings::get_option( 'check_connection_entity' );
 
 ?>
 
@@ -31,7 +33,7 @@ $check_entity = $admin_ui->settings::get_option( 'check_connection_entity' );
 					<?php endforeach; ?>
 				</thead>
 
-				<?php foreach ( $settings->entities_list() as $entity_id => $entity_label ) : ?>
+				<?php foreach ( Settings::get_entities() as $entity_id => $entity_label ) : ?>
 
 					<tr class="ainsys-table-table__row ainsys-table__row--id-<?php echo esc_attr( $entity_id ); ?> ">
 						<?php foreach ( $settings->columns_checking_entities() as $column_id => $column_name ) : ?>
@@ -71,7 +73,7 @@ $check_entity = $admin_ui->settings::get_option( 'check_connection_entity' );
 											</div>
 											<div class="ainsys-response-full">
 
-												<?php echo $admin_ui->logger::ainsys_render_json( $check_entity[ $entity_id ]['request'] ) ?>
+												<?php echo Logger::ainsys_render_json( $check_entity[ $entity_id ]['request'] ) ?>
 											</div>
 										<?php endif; ?>
 
@@ -99,7 +101,7 @@ $check_entity = $admin_ui->settings::get_option( 'check_connection_entity' );
 
 													}
 
-													echo $admin_ui->logger::ainsys_render_json( $convert_to_json );
+													echo Logger::ainsys_render_json( $convert_to_json );
 												endif; ?>
 
 											</div>

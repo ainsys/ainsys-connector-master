@@ -3,23 +3,11 @@
 namespace Ainsys\Connector\Master\Settings;
 
 use Ainsys\Connector\Master\Hooked;
+use Ainsys\Connector\Master\Logger;
 use Ainsys\Connector\Master\WP\Process_Comments;
 use Ainsys\Connector\Master\WP\Process_Users;
 
 class Admin_UI_Entities_Checking implements Hooked {
-
-	protected Admin_UI $admin_ui;
-
-
-	public function __construct( Admin_UI $admin_ui ) {
-
-		if ( ! is_admin() ) {
-			return;
-		}
-
-		$this->admin_ui = $admin_ui;
-	}
-
 
 	/**
 	 * Init plugin hooks.
@@ -115,12 +103,6 @@ class Admin_UI_Entities_Checking implements Hooked {
 	}
 
 
-	public function entities_list(): array {
-
-		return $this->admin_ui->settings::get_entities();
-	}
-
-
 	/**
 	 * @return array
 	 */
@@ -182,9 +164,9 @@ class Admin_UI_Entities_Checking implements Hooked {
 			'response'       => $result_test['response'],
 			'short_request'  => mb_substr( serialize( $result_test['request'] ), 0, 40 ) . ' ... ',
 			'short_response' => mb_substr( $result_test['response'], 0, 40 ) . ' ... ',
-			'full_request'   => $this->admin_ui->logger::ainsys_render_json( $result_test['request'] ),
+			'full_request'   => Logger::ainsys_render_json( $result_test['request'] ),
 			'full_response'  => false !== strpos( 'Error: ', $result_test['response'] ) ? [ $result_test['response'] ] :
-				$this->admin_ui->logger::ainsys_render_json( json_decode( $result_test['response'] ) ),
+				Logger::ainsys_render_json( json_decode( $result_test['response'] ) ),
 			'time'           => current_time( 'mysql' ),
 			'status'         => true,
 		];

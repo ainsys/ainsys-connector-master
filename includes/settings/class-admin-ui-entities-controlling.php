@@ -6,20 +6,6 @@ use Ainsys\Connector\Master\Hooked;
 
 class Admin_UI_Entities_Controlling implements Hooked {
 
-	protected Admin_UI $admin_ui;
-
-
-	public function __construct( Admin_UI $admin_ui ) {
-
-		if ( ! is_admin() ) {
-			return;
-		}
-
-		$this->admin_ui = $admin_ui;
-
-	}
-
-
 	/**
 	 * Init plugin hooks.
 	 */

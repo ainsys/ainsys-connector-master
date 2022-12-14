@@ -2,6 +2,7 @@
 
 namespace Ainsys\Connector\Master\Settings;
 
+use Ainsys\Connector\Master\Core;
 use Ainsys\Connector\Master\Hooked;
 use Ainsys\Connector\Master\Logger;
 
@@ -59,10 +60,10 @@ class Admin_UI_General implements Hooked {
 			'emails' => [
 				'title'         => sprintf(
 					__( 'Backup email: %s', AINSYS_CONNECTOR_TEXTDOMAIN ), esc_html(
-						$this->admin_ui->settings::get_backup_email()
+						Settings::get_backup_email()
 					)
 				),
-				'active'        => ! empty( $this->admin_ui->settings::get_backup_email() ) && filter_var( $this->admin_ui->settings::get_backup_email(), FILTER_VALIDATE_EMAIL ),
+				'active'        => ! empty( Settings::get_backup_email() ) && filter_var( Settings::get_backup_email(), FILTER_VALIDATE_EMAIL ),
 				'label_success' => __( 'Valid', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'label_error'   => __( 'Invalid', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			],
@@ -70,18 +71,18 @@ class Admin_UI_General implements Hooked {
 
 		for ( $i = 1; $i < 10; $i ++ ) {
 
-			if ( empty( $this->admin_ui->settings::get_backup_email( $i ) ) ) {
+			if ( empty( Settings::get_backup_email( $i ) ) ) {
 				continue;
 			}
 
 			$status_system[ 'emails_' . $i ] = [
 				'title'         => sprintf(
 					__( 'Backup email: %s', AINSYS_CONNECTOR_TEXTDOMAIN ),
-					esc_html( $this->admin_ui->settings::get_backup_email( $i ) )
+					esc_html( Settings::get_backup_email( $i ) )
 				),
-				'active'        => ! empty( $this->admin_ui->settings::get_backup_email( $i ) )
+				'active'        => ! empty( Settings::get_backup_email( $i ) )
 				                   && filter_var(
-					                   $this->admin_ui->settings::get_backup_email( $i ), FILTER_VALIDATE_EMAIL
+					                   Settings::get_backup_email( $i ), FILTER_VALIDATE_EMAIL
 				                   ),
 				'label_success' => __( 'Valid', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'label_error'   => __( 'Invalid', AINSYS_CONNECTOR_TEXTDOMAIN ),
@@ -131,7 +132,7 @@ class Admin_UI_General implements Hooked {
 	 */
 	public function remove_ainsys_integration(): void {
 
-		$this->admin_ui->settings::truncate();
+		Settings::truncate();
 		wp_die();
 	}
 
@@ -141,25 +142,34 @@ class Admin_UI_General implements Hooked {
 	 */
 	public function check_ainsys_integration(): void {
 
-		if ( $_POST['check_integration'] ) {
-
-			$check = $this->check_connection_to_server();
-
-			$this->admin_ui->settings::set_option( 'check_connection', $check );
-
-			Logger::save_log_information(
+		if ( empty( $_POST['check_integration'] ) ) {
+			wp_send_json_error(
 				[
-					'object_id'       => 0,
-					'entity'          => 'settings',
-					'request_action'  => 'check_integration',
-					'request_type'    => 'outgoing',
-					'request_data'    => '',
-					'server_response' => serialize( $check ),
+					'error' => __( 'Entity ID is missing', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				]
 			);
-			//error_log( print_r( $check, 1 ) );
-
 		}
+
+		$check_response = $this->check_connection_to_server();
+
+		$result = [
+			'response' => $check_response,
+			'time'     => current_time( 'mysql' ),
+		];
+
+		Settings::set_option( 'check_connection', $result );
+
+		Logger::save_log_information(
+			[
+				'object_id'       => 0,
+				'entity'          => 'settings',
+				'request_action'  => 'Checking Connected',
+				'request_type'    => 'outgoing',
+				'request_data'    => '',
+				'server_response' => serialize( $check ),
+			]
+		);
+		//error_log( print_r( $check, 1 ) );
 
 		wp_die();
 	}
@@ -171,10 +181,10 @@ class Admin_UI_General implements Hooked {
 	 */
 	public function check_connection_to_server() {
 
-		$ainsys_url = $this->admin_ui->settings::get_option( 'ansys_api_key' );
+		$ainsys_url = Settings::get_option( 'ansys_api_key' );
 
 		if ( ! empty( $ainsys_url ) ) {
-			$response = $this->admin_ui->core->curl_exec_func();
+			$response = Core::curl_exec_func();
 
 			try {
 				$webhook_data = ! empty( $response ) ? json_decode( $response, false, 512, JSON_THROW_ON_ERROR ) : [];
@@ -203,7 +213,7 @@ class Admin_UI_General implements Hooked {
 
 		//$this->check_connection_to_server();
 
-		$webhook_url = $this->admin_ui->settings::get_option( 'ansys_api_key' );
+		$webhook_url = Settings::get_option( 'ansys_api_key' );
 
 		if ( $webhook_url ) {
 			$this->admin_ui->add_admin_notice( 'Соединение с сервером Ainsys установлено. Webhook_url получен.' );

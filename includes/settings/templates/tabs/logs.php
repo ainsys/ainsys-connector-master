@@ -6,17 +6,21 @@
  *
  * @global $args
  */
+
+use Ainsys\Connector\Master\Logger;
+use Ainsys\Connector\Master\Settings\Settings;
+
 $admin_ui = $args['admin_ui'];
-$active = $args['active'];
+$active   = $args['active'];
 
 ?>
 <div id="setting-section-log" class="tab-target">
 	<?php
-	$start    = $admin_ui->settings::get_option( 'do_log_transactions' ) ? ' disabled' : '';
-	$stop     = $admin_ui->settings::get_option( 'do_log_transactions' ) ? '' : ' disabled';
-	$since    = $admin_ui->settings::get_option( 'log_transactions_since' ) ?? '';
-	$time     = $admin_ui->settings::get_option( 'log_until_certain_time' ) ?? 0;
-	$selected = $admin_ui->settings::get_option( 'log_select_value' ) ?? -1;
+	$start    = Settings::get_option( 'do_log_transactions' ) ? ' disabled' : '';
+	$stop     = Settings::get_option( 'do_log_transactions' ) ? '' : ' disabled';
+	$since    = Settings::get_option( 'log_transactions_since' ) ?? '';
+	$time     = Settings::get_option( 'log_until_certain_time' ) ?? 0;
+	$selected = Settings::get_option( 'log_select_value' ) ?? -1;
 	?>
 	<div class="ainsys-log-block">
 		<div class="ainsys-log-status">
@@ -25,7 +29,7 @@ $active = $args['active'];
 			<?php
 			$log_status_ok_style = '';
 			$log_status_no_style = '';
-			if ( $admin_ui->settings::get_option( 'do_log_transactions' ) ) {
+			if ( Settings::get_option( 'do_log_transactions' ) ) {
 				$log_status_ok_style = ' style="display: inline;"';
 				$log_status_no_style = ' style="display: none;"';
 			} else {
@@ -54,6 +58,6 @@ $active = $args['active'];
 
 			<a id="clear_log" class="btn btn-primary"><?php _e( 'Clear log', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></a>
 		</div>
-		<?php echo $admin_ui->logger::generate_log_html(); ?>
+		<?php echo Logger::generate_log_html(); ?>
 	</div>
 </div>

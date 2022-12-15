@@ -365,5 +365,4 @@ class Admin_UI implements Hooked {
 
 		die();
 	}
-
 }

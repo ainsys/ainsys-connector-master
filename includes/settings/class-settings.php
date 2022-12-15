@@ -16,6 +16,8 @@ class Settings implements Hooked {
 
 	protected static array $settings_tables;
 
+	protected static array $settings_tables;
+
 	/**
 	 * AINSYS options and their default values.
 	 */
@@ -110,7 +112,16 @@ class Settings implements Hooked {
 
 		return self::get_plugin_name() . '_' . $name;
 	}
-
+	/**
+	 * Gets full option name.
+	 *
+	 * @param  string $name
+	 *
+	 * @return string
+	 */
+	/*	public static function get_setting_name( string $name ): string {
+			return self::get_plugin_name() . '_' . $name;
+		}*/
 
 	/**
 	 * Gets plugin uniq name to show on the settings page.
@@ -268,7 +279,6 @@ class Settings implements Hooked {
 	 * @return void
 	 */
 	public static function deactivate(): void {
-
 		if ( (int) self::get_option( 'full_uninstall' ) ) {
 			self::uninstall();
 		}
@@ -309,7 +319,6 @@ class Settings implements Hooked {
 			$wpdb->query( sprintf( "DROP TABLE IF EXISTS %s", $wpdb->prefix . $value_table ) );
 		}
 	}
-
 
 	/**
 	 *

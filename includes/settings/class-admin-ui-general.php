@@ -70,6 +70,7 @@ class Admin_UI_General implements Hooked {
 
 		for ( $i = 1; $i < 10; $i ++ ) {
 
+
 			if ( empty( Settings::get_backup_email( $i ) ) ) {
 				continue;
 			}
@@ -130,11 +131,9 @@ class Admin_UI_General implements Hooked {
 	 * Removes ainsys integration information
 	 */
 	public function remove_ainsys_integration(): void {
-
 		Settings::truncate();
 		wp_die();
 	}
-
 
 	/**
 	 * Removes ainsys integration information

@@ -149,5 +149,4 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 			</table>
 		</div>
 	</div>
-
 </div>

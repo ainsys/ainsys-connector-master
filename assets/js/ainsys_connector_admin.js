@@ -184,7 +184,6 @@ jQuery( function ( $ ) {
 
 	ainsys_settings.init();
 
-
 	/////////////////////////////////
 	////////////   Test tab   ///////
 
@@ -344,6 +343,7 @@ jQuery( function ( $ ) {
 	} );
 
 
+
 	//////// Ajax start/stop loging  ////////
 	function checkToDisableLogging() {
 
@@ -443,6 +443,7 @@ jQuery( function ( $ ) {
 		} )
 	} );
 
+
 	$( '.ainsys-settings-wrap' ).on( 'click', '.ainsys-response-short', function ( e ) {
 		const fullResponse = $( this ).siblings( '.ainsys-response-full' ).html();
 		$( 'body' ).append( '<div class="ainsys-overlay"><div class="ainsys-popup"><div class="ainsys-popup-body"><div class="ainsys-popup-response">' + fullResponse
@@ -468,5 +469,6 @@ jQuery( function ( $ ) {
 		document.execCommand( 'copy' );
 		$temp.remove();
 	} );
+
 
 } );

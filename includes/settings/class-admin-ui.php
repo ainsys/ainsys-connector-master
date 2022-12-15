@@ -55,10 +55,6 @@ class Admin_UI implements Hooked {
 		add_action( 'admin_notices', [ $this, 'admin_notices' ] );
 		add_filter( 'option_page_capability_' . 'ainsys-connector', [ $this, 'ainsys_page_capability' ] );
 
-		add_action( 'wp_ajax_reload_log_html', [ $this, 'reload_log_html' ] );
-		add_action( 'wp_ajax_toggle_logging', [ $this, 'toggle_logging' ] );
-		add_action( 'wp_ajax_clear_log', [ $this, 'clear_log' ] );
-
 	}
 
 
@@ -294,75 +290,4 @@ class Admin_UI implements Hooked {
 		];
 	}
 
-
-	/**
-	 * Regenerates log HTML (for ajax).
-	 *
-	 */
-	public function reload_log_html() {
-
-		if ( isset( $_POST['action'] ) ) {
-			echo Logger::generate_log_html();
-		}
-
-		die();
-	}
-
-
-	/**
-	 * Toggles logging on/off. Set up time till log is saved (for ajax).
-	 *
-	 */
-	public function toggle_logging() {
-
-		if ( isset( $_POST['command'] )  ) {
-
-			$logging_time = 0;
-			if ( isset( $_POST['time'] ) ) {
-
-				$current_time = time();
-				$time         = floatval( $_POST['time'] ?? 0 ); //intval( $_POST['time'] ?? 0 );
-				$end_time     = $time;
-				if ( $time > 0 ) {
-					$end_time = $current_time + $time * 60 * 60;
-				}
-				Settings::set_option( 'log_until_certain_time', $end_time );
-				Settings::set_option( 'log_select_value', $time );
-				$logging_time = $end_time;
-			}
-
-			$logging_since = '';
-			if ( 'start_loging' === $_POST['command'] ) {
-				Settings::set_option( 'do_log_transactions', 1 );
-				Settings::set_option( 'log_transactions_since', htmlspecialchars( strip_tags( $_POST['startat'] ) ) );
-				$logging_since = Settings::get_option( 'log_transactions_since' );
-			} else {
-				Settings::set_option( 'do_log_transactions', 0 );
-				Settings::set_option( 'log_transactions_since', '' );
-				Settings::set_option( 'log_select_value', - 1 );
-				$logging_since = '';
-			}
-			$result = [
-				'logging_time'  => $logging_time,
-				'logging_since' => $logging_since,
-			];
-			echo json_encode( $result );
-		}
-		die();
-	}
-
-
-	/**
-	 * Clears log DB table (for ajax).
-	 *
-	 */
-	public function clear_log(): void {
-
-		if ( isset( $_POST['action']) ) {
-			Logger::truncate_log_table();
-			echo Logger::generate_log_html();
-		}
-
-		die();
-	}
 }

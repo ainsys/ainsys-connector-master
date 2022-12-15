@@ -269,8 +269,7 @@ class Settings implements Hooked {
 	public static function activate(): void {
 
 		self::set_schema_table_logs();
-		update_option( self::get_plugin_name(), AINSYS_CONNECTOR_VERSION, false );
-		update_option( self::get_plugin_name() . '_db_version', AINSYS_CONNECTOR_VERSION, false );
+		update_option( self::get_plugin_name() . '_version', AINSYS_CONNECTOR_VERSION, false );
 	}
 
 
@@ -323,13 +322,22 @@ class Settings implements Hooked {
 
 	/**
 	 *
+	 * @param  string $table_name
+	 *
 	 * @return void
 	 */
-	protected static function truncate_tables(): void {
+	public static function truncate_tables( string $table_name = '' ): void {
 
 		global $wpdb;
 
 		foreach ( self::get_settings_tables() as $key_table => $value_table ) {
+
+			if ( ! empty( $table_name ) && $value_table === $table_name ) {
+				$wpdb->query( sprintf( "TRUNCATE TABLE %s", $wpdb->prefix . $table_name ) );
+
+				break;
+			}
+
 			$wpdb->query( sprintf( "TRUNCATE TABLE %s", $wpdb->prefix . $value_table ) );
 		}
 	}
@@ -344,8 +352,7 @@ class Settings implements Hooked {
 			delete_option( self::get_option_name( $option_name ) );
 		}
 
-		delete_option( self::get_plugin_name() );
-		delete_option( self::get_plugin_name() . '_db_version');
+		delete_option( self::get_plugin_name() . '_version');
 	}
 
 

@@ -5,6 +5,7 @@ namespace Ainsys\Connector\Master;
 use Ainsys\Connector\Master\Settings\Admin_UI;
 use Ainsys\Connector\Master\Settings\Admin_UI_Entities_Checking;
 use Ainsys\Connector\Master\Settings\Admin_UI_Entities_Controlling;
+use Ainsys\Connector\Master\Settings\Admin_UI_Logs;
 use Ainsys\Connector\Master\Settings\Settings;
 use Ainsys\Connector\Master\Settings\Admin_UI_General;
 use Ainsys\Connector\Master\Webhooks\Handle_Comment;
@@ -68,6 +69,7 @@ class Plugin implements Hooked {
 
 		$this->components['settings_admin_ui']                      = $this->di_container->resolve( Admin_UI::class );
 		$this->components['settings_admin_ui_general']              = $this->di_container->resolve( Admin_UI_General::class );
+		$this->components['settings_admin_ui_logs']              = $this->di_container->resolve( Admin_UI_Logs::class );
 		$this->components['settings_admin_ui_entities_checking']    = $this->di_container->resolve( Admin_UI_Entities_Checking::class );
 		$this->components['settings_admin_ui_entities_controlling'] = $this->di_container->resolve( Admin_UI_Entities_Controlling::class );
 	}

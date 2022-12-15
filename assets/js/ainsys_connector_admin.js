@@ -402,15 +402,17 @@ jQuery( function ( $ ) {
 		};
 		jQuery.post( ainsys_connector_params.ajax_url, data, function ( response ) {
 			$( '.ainsys-log-status' ).removeClass( 'ainsys-loading' );
-			const result = JSON.parse( response );
 
-			if ( result.logging_since ) {
+			console.log(response);
+			//const result = JSON.parse( response );
+
+			if ( response.logging_since ) {
 				$( '#stop_loging' ).removeClass( 'disabled' );
 				$( '#start_loging_timeinterval' ).addClass( 'disabled' ).prop( 'disabled', true );
-				$( '.ainsys-log-time' ).text( result.logging_time );
+				$( '.ainsys-log-time' ).text( response.logging_time );
 				$( '.ainsys-log-status-ok' ).show();
 				$( '.ainsys-log-status-no' ).hide();
-				$( '.ainsys-log-since' ).text( result.logging_since );
+				$( '.ainsys-log-since' ).text( response.logging_since );
 				checkToDisableLogging();
 			} else {
 				$( '#start_loging' ).removeClass( 'disabled' );

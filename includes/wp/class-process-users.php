@@ -127,6 +127,7 @@ class Process_Users implements Hooked {
 				'request_type'    => 'outgoing',
 				'request_data'    => serialize( $request_data ),
 				'server_response' => serialize( $server_response ),
+				'error'           => false !== strpos( $server_response, 'Error:' ),
 			]
 		);
 

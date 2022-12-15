@@ -13,9 +13,9 @@ use Ainsys\Connector\Master\Logger;
 use Ainsys\Connector\Master\Settings\Admin_UI_Entities_Checking;
 use Ainsys\Connector\Master\Settings\Settings;
 
-$admin_ui = $args['admin_ui'];
-$active = $args['active'];
-$settings = new Admin_UI_Entities_Checking();
+$admin_ui     = $args['admin_ui'];
+$active       = $args['active'];
+$settings     = new Admin_UI_Entities_Checking();
 $check_entity = Settings::get_option( 'check_connection_entity' );
 
 ?>
@@ -91,19 +91,7 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 												<?php echo mb_substr( serialize( $check_entity[ $entity_id ]['response'] ), 0, 40 ) . ' ... ' ?>
 											</div>
 											<div class="ainsys-response-full">
-												<?php if ( false !== strpos( 'Error: ', $check_entity[ $entity_id ]['response'] ) ) :
-													echo $check_entity[ $entity_id ]['response'];
-												else :
-
-													try {
-														$convert_to_json = json_decode( $check_entity[ $entity_id ]['response'], true, 512, JSON_THROW_ON_ERROR );
-													} catch ( JsonException $e ) {
-
-													}
-
-													echo Logger::ainsys_render_json( $convert_to_json );
-												endif; ?>
-
+												<?php echo $check_entity[ $entity_id ]['response']; ?>
 											</div>
 										<?php endif; ?>
 									</div>

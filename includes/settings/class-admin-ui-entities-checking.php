@@ -159,21 +159,46 @@ class Admin_UI_Entities_Checking implements Hooked {
 	 */
 	protected function get_result_entity( array $result_test, $result_entity, $entity ) {
 
+		$full_response = $this->convert_response( $result_test['response'] );
+
+		//TODO: не меняется статус, не срабатывает strpos
 		$result_entity[ $entity ] = [
 			'request'        => $result_test['request'],
 			'response'       => $result_test['response'],
 			'short_request'  => mb_substr( serialize( $result_test['request'] ), 0, 40 ) . ' ... ',
-			'short_response' => mb_substr( $result_test['response'], 0, 40 ) . ' ... ',
 			'full_request'   => Logger::ainsys_render_json( $result_test['request'] ),
-			'full_response'  => false !== strpos( 'Error: ', $result_test['response'] ) ? [ $result_test['response'] ] :
-				Logger::ainsys_render_json( json_decode( $result_test['response'] ) ),
+			'short_response' => mb_substr( serialize( $result_test['response'] ), 0, 40 ) . ' ... ',
+			'full_response'  => $full_response,
 			'time'           => current_time( 'mysql' ),
-			'status'         => true,
+			'status'         => false === strpos( 'Error:', $result_test['response'] ),
 		];
 
 		Settings::set_option( 'check_connection_entity', $result_entity );
 
 		return $result_entity;
+	}
+
+
+	/**
+	 * @param $response
+	 *
+	 * @return string
+	 */
+	private function convert_response( $response ): string {
+
+		try {
+			$value_out = json_decode( $response, true, 512, JSON_THROW_ON_ERROR );
+		} catch ( \JsonException $exception ) {
+			$value_out = $response;
+		}
+
+		if ( is_string( $value_out ) ) {
+			$full_response = $value_out;
+		} else {
+			$full_response = Logger::ainsys_render_json( $value_out );
+		}
+
+		return $full_response;
 	}
 
 }

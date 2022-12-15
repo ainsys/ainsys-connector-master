@@ -189,7 +189,7 @@ class Admin_UI_General implements Hooked {
 
 		Settings::set_option( 'check_connection', $result );
 
-		Logger::save_log_information(
+		Logger::save(
 			[
 				'object_id'       => 0,
 				'entity'          => 'settings',
@@ -226,7 +226,7 @@ class Admin_UI_General implements Hooked {
 
 		Settings::set_option( 'check_connection', $result );
 
-		Logger::save_log_information(
+		Logger::save(
 			[
 				'object_id'       => 0,
 				'entity'          => 'settings',

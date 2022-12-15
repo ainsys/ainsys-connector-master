@@ -34,7 +34,7 @@ class Core implements Hooked {
 
 		if ( empty( $url ) ) {
 
-			Logger::save_log_information(
+			Logger::save(
 				[
 					'object_id'       => 0,
 					'entity'          => 'check_url',
@@ -42,13 +42,11 @@ class Core implements Hooked {
 					'request_type'    => 'outgoing',
 					'request_data'    => '',
 					'server_response' => serialize( 'Error: No url provided' ),
-
 					'error'           => 1,
 				]
 			);
 
 			return 'Error: The URL is missing. Specify the required URL in the plugin settings on the General tab' ;
-
 		}
 
 		$response = wp_remote_post(
@@ -67,8 +65,7 @@ class Core implements Hooked {
 
 		if ( is_wp_error( $response ) ) {
 
-
-			Logger::save_log_information(
+			Logger::save(
 				[
 					'object_id'       => 0,
 					'entity'          => 'cURL',

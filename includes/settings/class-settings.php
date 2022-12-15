@@ -268,6 +268,7 @@ class Settings implements Hooked {
 	 */
 	public static function activate(): void {
 
+		self::set_schema_table_logs();
 		update_option( self::get_plugin_name(), AINSYS_CONNECTOR_VERSION, false );
 		update_option( self::get_plugin_name() . '_db_version', AINSYS_CONNECTOR_VERSION, false );
 	}
@@ -342,6 +343,66 @@ class Settings implements Hooked {
 		foreach ( self::get_settings_options() as $option_name => $option_value ) {
 			delete_option( self::get_option_name( $option_name ) );
 		}
+
+		delete_option( self::get_plugin_name() );
+		delete_option( self::get_plugin_name() . '_db_version');
+	}
+
+
+	protected static function set_schema_table_logs(): void {
+
+		ob_start();
+		global $wpdb;
+
+		$wpdb->hide_errors();
+
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+		dbDelta( self::get_schema_table_logs() );
+
+		ob_get_clean();
+	}
+
+
+	/**
+	 * Get Table schema.
+	 *
+	 * @return string
+	 */
+	protected static function get_schema_table_logs(): string {
+
+		global $wpdb;
+
+		$collate = '';
+
+		if ( $wpdb->has_cap( 'collation' ) ) {
+			$collate = $wpdb->get_charset_collate();
+		}
+
+		/*
+		 * Indexes have a maximum size of 767 bytes. Historically, we haven't need to be concerned about that.
+		 * As of WordPress 4.2, however, we moved to utf8mb4, which uses 4 bytes per character. This means that an index which
+		 * used to have room for floor(767/3) = 255 characters, now only has room for floor(767/4) = 191 characters.
+		 *
+		 * This may cause duplicate index notices in logs due to https://core.trac.wordpress.org/ticket/34870 but dropping
+		 * indexes first causes too much load on some servers/larger DB.
+		 */
+		$table_log = $wpdb->prefix . self::get_settings_tables()['logs'];
+
+		return "CREATE TABLE $table_log (
+                `log_id` bigint unsigned NOT NULL AUTO_INCREMENT,
+                `creation_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                `object_id` bigint NOT NULL,
+                `entity` varchar(100) NOT NULL,
+                `request_action` varchar(100) NOT NULL,
+                `request_type` varchar(100) NOT NULL,
+                `request_data` text DEFAULT NULL,
+                `server_response` text DEFAULT NULL,
+                `error` smallint NOT NULL,
+                PRIMARY KEY  (log_id),
+                KEY object_id (object_id)
+            ) $collate;";
+
 	}
 
 }

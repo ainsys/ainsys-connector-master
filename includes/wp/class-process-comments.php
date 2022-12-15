@@ -100,7 +100,7 @@ class Process_Comments implements Hooked {
 		} catch ( \Exception $e ) {
 			$server_response = 'Error: ' . $e->getMessage();
 
-			Logger::save_log_information(
+			Logger::save(
 				[
 					'object_id'       => 0,
 					'entity'          => 'comment',
@@ -115,7 +115,7 @@ class Process_Comments implements Hooked {
 			Core::send_error_email( $server_response );
 		}
 
-		Logger::save_log_information(
+		Logger::save(
 			[
 				'object_id'       => $comment_id,
 				'entity'          => 'comment',

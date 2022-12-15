@@ -104,7 +104,7 @@ class Process_Users implements Hooked {
 		} catch ( \Exception $e ) {
 			$server_response = 'Error: ' . $e->getMessage();
 
-			Logger::save_log_information(
+			Logger::save(
 				[
 					'object_id'       => 0,
 					'entity'          => 'user',
@@ -119,7 +119,7 @@ class Process_Users implements Hooked {
 			Core::send_error_email( $server_response );
 		}
 
-		Logger::save_log_information(
+		Logger::save(
 			[
 				'object_id'       => $user_id,
 				'entity'          => 'user',

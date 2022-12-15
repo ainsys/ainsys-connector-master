@@ -59,7 +59,7 @@ class Webhook_Listener implements Hooked {
 			$response      = $exception->getMessage();
 			$response_code = 500;
 
-			$this->logger::save_log_information(
+			$this->logger::save(
 				[
 					'object_id'       => 0,
 					'entity'          => 'Webhook_Listener',
@@ -94,7 +94,7 @@ class Webhook_Listener implements Hooked {
 				$response      = $exception->getMessage();
 				$response_code = 500;
 
-				$this->logger::save_log_information(
+				$this->logger::save(
 					[
 						'object_id'       => 0,
 						'entity'          => 'Webhook_Listener',

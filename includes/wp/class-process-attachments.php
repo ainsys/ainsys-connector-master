@@ -181,7 +181,7 @@ class Process_Attachments implements Hooked {
 		} catch ( \Exception $e ) {
 			$server_response = 'Error: ' . $e->getMessage();
 
-			$this->logger::save_log_information(
+			$this->logger::save(
 				[
 					'object_id'       => 0,
 					'entity'          => 'attachment',
@@ -196,7 +196,7 @@ class Process_Attachments implements Hooked {
 			$this->core->send_error_email( $server_response );
 		}
 
-		$this->logger::save_log_information(
+		$this->logger::save(
 			[
 				'object_id'       => $attachment_id,
 				'entity'          => 'attachment',

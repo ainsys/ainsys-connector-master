@@ -6,25 +6,47 @@ use Ainsys\Connector\Master\Settings\Settings;
 
 class Logger implements Hooked {
 
-	public static $do_log_transactions = false;
+	//public static $do_log_transactions = false;
 
-	public static $clear_full_uninstall;
+//	public static $clear_full_uninstall;
 
 	/**
 	 * @var array|string[]
 	 */
-	protected static array $settings_tables;
+	//protected static array $settings_tables;
 
-	protected static string $log_table_name;
+	//protected static string $log_table_name;
 
 
-	public function __construct( Settings $settings ) {
+/*	public function __construct() {
 
-		self::$do_log_transactions  = $settings::get_option( 'do_log_transactions' );
-		self::$clear_full_uninstall = $settings::get_option( 'full_uninstall' );
+		//self::$do_log_transactions  ;
+		//self::$clear_full_uninstall = Settings::get_option( 'full_uninstall' );
 
-		self::$settings_tables = $settings::get_settings_tables();
-		self::$log_table_name = self::$settings_tables['logs'];
+		//self::$log_table_name = Settings::get_settings_tables()['logs'];
+		//self::$log_table_name = self::$settings_tables['logs'];
+	}*/
+
+
+	/**
+	 * @return bool|mixed|void
+	 */
+/*	public static function get_do_log_transactions() {
+		self::$do_log_transactions= ж
+		return self::$do_log_transactions;
+	}*/
+
+
+	/**
+	 * @return mixed|string
+	 */
+/*	public static function get_log_table_name() {
+		self::$log_table_name= Settings::get_settings_tables()['logs']
+		return self::$log_table_name;
+	}*/
+
+	protected static function table_name(){
+		return Settings::get_settings_tables()['logs'];
 	}
 
 
@@ -39,11 +61,11 @@ class Logger implements Hooked {
 	 *
 	 * @return bool|int|\mysqli_result|resource|null
 	 */
-	public static function save_log_information( $args ) {
+	public static function save( $args ) {
 
 		global $wpdb;
 
-		if ( ! self::$do_log_transactions ) {
+		if ( ! Settings::get_option( 'do_log_transactions' ) ) {
 			return false;
 		}
 
@@ -60,7 +82,7 @@ class Logger implements Hooked {
 		$args = wp_parse_args( $args, $defaults );
 
 		return $wpdb->insert(
-			$wpdb->prefix . self::$log_table_name,
+			$wpdb->prefix . self::table_name(),
 			$args
 		);
 	}
@@ -104,7 +126,7 @@ class Logger implements Hooked {
 		$log_html_body   = '';
 		$log_html_header = '';
 
-		$query  = sprintf( "SELECT * FROM %s %s", $wpdb->prefix . self::$log_table_name, $where );
+		$query  = sprintf( "SELECT * FROM %s %s", $wpdb->prefix . self::table_name(), $where );
 		$output = $wpdb->get_results( $query, ARRAY_A );
 
 		if ( empty( $output ) ) {
@@ -174,19 +196,19 @@ class Logger implements Hooked {
 	 * Truncate log table.
 	 *
 	 */
-	public static function truncate_log_table(): void {
+	/*public static function truncate_log_table(): void {
 
 		global $wpdb;
 
 		$wpdb->query( sprintf( "TRUNCATE TABLE %s", $wpdb->prefix . self::$log_table_name ) );
 
-	}
+	}*/
 
 
 	/**
 	 * Install tables
 	 */
-	public function activate(): void {
+	/*public function activate(): void {
 
 		ob_start();
 		global $wpdb;
@@ -215,49 +237,9 @@ class Logger implements Hooked {
 
 		$wpdb->query( sprintf( "DROP TABLE IF EXISTS %s", $wpdb->prefix . self::$log_table_name ) );
 
-	}
+	}*/
 
 
-	/**
-	 * Get Table schema.
-	 *
-	 * @return string
-	 */
-	private function get_schema(): string {
 
-		global $wpdb;
-
-		$collate = '';
-
-		if ( $wpdb->has_cap( 'collation' ) ) {
-			$collate = $wpdb->get_charset_collate();
-		}
-
-		/*
-		 * Indexes have a maximum size of 767 bytes. Historically, we haven't need to be concerned about that.
-		 * As of WordPress 4.2, however, we moved to utf8mb4, which uses 4 bytes per character. This means that an index which
-		 * used to have room for floor(767/3) = 255 characters, now only has room for floor(767/4) = 191 characters.
-		 *
-		 * This may cause duplicate index notices in logs due to https://core.trac.wordpress.org/ticket/34870 but dropping
-		 * indexes first causes too much load on some servers/larger DB.
-		 */
-
-		$table_log = $wpdb->prefix . self::$log_table_name;
-
-		return "CREATE TABLE $table_log (
-                `log_id` bigint unsigned NOT NULL AUTO_INCREMENT,
-                `creation_date` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                `object_id` bigint NOT NULL,
-                `entity` varchar(100) NOT NULL,
-                `request_action` varchar(100) NOT NULL,
-                `request_type` varchar(100) NOT NULL,
-                `request_data` text DEFAULT NULL,
-                `server_response` text DEFAULT NULL,
-                `error` smallint NOT NULL,
-                PRIMARY KEY  (log_id),
-                KEY object_id (object_id)
-            ) $collate;";
-
-	}
 
 }

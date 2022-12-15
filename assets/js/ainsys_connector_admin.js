@@ -230,6 +230,10 @@ jQuery( function ( $ ) {
 					responseStatus.html( '<span class="ainsys-status--ok ainsys-status--state"><svg fill="none" viewBox="0 0 24 24"><g clip-path="url(#a)"><path fill="#37B34A"'
 					                     + ' d="M16.59 7.58 10 14.17l-3.59-3.58L5 12l5 5 8-8-1.41-1.42ZM12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/></g><defs><clipPath id="a"><path fill="#fff" d="M0 0h24v24H0z"/></clipPath></defs></svg>'
 					                     + ainsys_connector_params.check_connection_entity_connect + '</span>' );
+
+				} else {
+					responseStatus.html( '<span class="ainsys-status--error ainsys-status--state"><svg class="ainsys-icon ainsys-icon--error"fill=none viewBox="0 0 24 24"><g clip-path=url(#a) fill=#D5031E><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/><path d="m17 8-1-1-4 4-4-4-1 1 4 4-4 4 1 1 4-4 4 4 1-1-4-4 4-4Z"stroke=#D5031E stroke-width=.5 /></g><defs><clipPath id=a><path d="M0 0h24v24H0z"fill=#fff /></clipPath></defs></svg>'
+					                     + ainsys_connector_params.check_connection_entity_no_connect + '</span>' );
 				}
 
 

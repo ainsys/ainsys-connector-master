@@ -161,7 +161,6 @@ class Admin_UI_Entities_Checking implements Hooked {
 
 		$full_response = $this->convert_response( $result_test['response'] );
 
-		//TODO: не меняется статус, не срабатывает strpos
 		$result_entity[ $entity ] = [
 			'request'        => $result_test['request'],
 			'response'       => $result_test['response'],
@@ -170,7 +169,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 			'short_response' => mb_substr( serialize( $result_test['response'] ), 0, 40 ) . ' ... ',
 			'full_response'  => $full_response,
 			'time'           => current_time( 'mysql' ),
-			'status'         => false === strpos( 'Error:', $result_test['response'] ),
+			'status'         => false === strpos( $result_test['response'], 'Error:' ),
 		];
 
 		Settings::set_option( 'check_connection_entity', $result_entity );

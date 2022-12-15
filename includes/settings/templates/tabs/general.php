@@ -9,6 +9,7 @@
  */
 
 use Ainsys\Connector\Master\Settings\Admin_UI_General;
+use Ainsys\Connector\Master\Settings\Settings;
 
 $admin_ui = $args['admin_ui'];
 $active   = $args['active'];
@@ -26,7 +27,7 @@ $status_addons = $settings->get_statuses_addons();
 				<h2><?php _e( 'Connection Settings', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></h2>
 
 
-				<?php settings_fields( $admin_ui->settings::get_option_name( 'group' ) ); ?>
+				<?php settings_fields( Settings::get_option_name( 'group' ) ); ?>
 				<div class="ainsys-form-group">
 					<label for="ansys-api-key" class="ainsys-form-label">
 						<?php _e( 'AINSYS handshake url for the connector. You can find it in your ', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?>
@@ -39,9 +40,9 @@ $status_addons = $settings->get_statuses_addons();
 						       type="text"
 						       size="50"
 						       required
-						       name="<?php echo esc_html( $admin_ui->settings::get_option_name( 'ansys_api_key' ) ); ?>"
+						       name="<?php echo esc_html( Settings::get_option_name( 'ansys_api_key' ) ); ?>"
 						       placeholder="XXXXXXXXXXXXXXXXXXXXX"
-						       value="<?php echo esc_html( $admin_ui->settings::get_option( 'ansys_api_key' ) ); ?>"/>
+						       value="<?php echo esc_html( Settings::get_option( 'ansys_api_key' ) ); ?>"/>
 					</div>
 				</div>
 				<div class="ainsys-form-group">
@@ -52,8 +53,8 @@ $status_addons = $settings->get_statuses_addons();
 						<input id="hook-url"
 						       type="text"
 						       size="50"
-						       name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'webhook_url' ) ); ?>"
-						       value="<?php echo esc_attr( $admin_ui->settings::get_option( 'webhook_url' ) ); ?>"
+						       name="<?php echo esc_attr( Settings::get_option_name( 'webhook_url' ) ); ?>"
+						       value="<?php echo esc_attr( Settings::get_option( 'webhook_url' ) ); ?>"
 						       disabled/>
 					</div>
 				</div>
@@ -65,16 +66,16 @@ $status_addons = $settings->get_statuses_addons();
 					<div class="ainsys-form-input">
 						<input id="backup-email"
 						       type="text"
-						       name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'backup_email' ) ); ?>"
+						       name="<?php echo esc_attr( Settings::get_option_name( 'backup_email' ) ); ?>"
 						       placeholder="backup@email.com"
-						       value="<?php echo esc_attr( $admin_ui->settings::get_backup_email() ); ?>"/>
+						       value="<?php echo esc_attr( Settings::get_backup_email() ); ?>"/>
 						<div class="ainsys-email-btn ainsys-plus" data-target="1">+</div>
 					</div>
 				</div>
 				<?php
 				for ( $i = 1; $i < 10; $i ++ ) {
 					?>
-					<div class="ainsys-form-group ainsys-email<?php echo ! empty( $admin_ui->settings::get_backup_email( $i ) ) ? ' ainsys-email-show' : ''; ?>"
+					<div class="ainsys-form-group ainsys-email<?php echo ! empty( Settings::get_backup_email( $i ) ) ? ' ainsys-email-show' : ''; ?>"
 					     data-block-id="<?php echo esc_attr( $i ); ?>">
 						<label for="backup-email-<?php echo esc_attr( $i ); ?>" class="ainsys-form-label">
 							<?php _e( 'E-mail for error reports', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
@@ -83,9 +84,9 @@ $status_addons = $settings->get_statuses_addons();
 						<div class="ainsys-form-input">
 							<input id="backup-email-<?php echo esc_attr( $i ); ?>"
 							       type="text"
-							       name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'backup_email_' . $i ) ); ?>"
+							       name="<?php echo esc_attr( Settings::get_option_name( 'backup_email_' . $i ) ); ?>"
 							       placeholder="backup@email.com"
-							       value="<?php echo esc_attr( $admin_ui->settings::get_backup_email( $i ) ); ?>"/>
+							       value="<?php echo esc_attr( Settings::get_backup_email( $i ) ); ?>"/>
 							<div class="ainsys-email-btn ainsys-plus" data-target="<?php echo $i + 1; ?>">+</div>
 							<div class="ainsys-email-btn ainsys-minus">–</div>
 						</div>
@@ -101,8 +102,8 @@ $status_addons = $settings->get_statuses_addons();
 						<input id="connector-id"
 						       type="text"
 						       size="50"
-						       name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'connector_id' ) ); ?>"
-						       value="<?php echo esc_attr( $admin_ui->settings::get_option( 'connector_id' ) ); ?>"/>
+						       name="<?php echo esc_attr( Settings::get_option_name( 'connector_id' ) ); ?>"
+						       value="<?php echo esc_attr( Settings::get_option( 'connector_id' ) ); ?>"/>
 					</div>
 				</div>
 
@@ -113,7 +114,7 @@ $status_addons = $settings->get_statuses_addons();
 			</div>
 
 			<div class="ainsys-settings-block ainsys-settings-block--disconnection">
-				<?php if ( $admin_ui->settings::get_option( 'ansys_api_key' ) ) : ?>
+				<?php if ( Settings::get_option( 'ansys_api_key' ) ) : ?>
 					<button type="button"
 					        id="remove_ainsys_integration"
 					        class="btn btn-secondary"><?php _e( 'Disconect integration', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></button>
@@ -122,9 +123,9 @@ $status_addons = $settings->get_statuses_addons();
 					<div class="ainsys-form-input">
 						<input id="full-uninstall-checkbox"
 						       type="checkbox"
-						       name="<?php echo esc_attr( $admin_ui->settings::get_option_name( 'full_uninstall' ) ); ?>"
-						       value="<?php echo esc_attr( $admin_ui->settings::get_option( 'full_uninstall' ) ); ?>" <?php checked(
-							1, esc_html( $admin_ui->settings::get_option( 'full_uninstall' ) ), true
+						       name="<?php echo esc_attr( Settings::get_option_name( 'full_uninstall' ) ); ?>"
+						       value="<?php echo esc_attr( Settings::get_option( 'full_uninstall' ) ); ?>" <?php checked(
+							1, esc_html( Settings::get_option( 'full_uninstall' ) ), true
 						); ?> />
 					</div>
 					<label for="full-uninstall-checkbox" class="ainsys-form-label">
@@ -156,7 +157,7 @@ $status_addons = $settings->get_statuses_addons();
 								</span>
 									<?php else : ?>
 										<span class="ainsys-status--error  ainsys-status--state">
-									<svg fill="none" viewBox="0 0 24 24"><g fill="#D5031E" clip-path="url(#a)"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/><path
+									<svg class="ainsys-icon ainsys-icon--error" fill="none" viewBox="0 0 24 24"><g fill="#D5031E" clip-path="url(#a)"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/><path
 												stroke="#D5031E"
 												stroke-width=".5"
 												d="m17 8-1-1-4 4-4-4-1 1 4 4-4 4 1 1 4-4 4 4 1-1-4-4 4-4Z"/></g><defs><clipPath id="a"><path fill="#fff"
@@ -183,13 +184,11 @@ $status_addons = $settings->get_statuses_addons();
 
 									<?php if ( ! $status_item['install'] ): ?>
 									<span class="ainsys-status--error  ainsys-status--state">
-									<svg fill="none" viewBox="0 0 24 24"><g fill="#D5031E" clip-path="url(#a)"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/><path
+									<svg class="ainsys-icon ainsys-icon--error" fill="none" viewBox="0 0 24 24"><g fill="#D5031E" clip-path="url(#a)"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/><path
 												stroke="#D5031E"
 												stroke-width=".5"
-												d="m17 8-1-1-4 4-4-4-1 1 4 4-4 4 1 1 4-4 4 4 1-1-4-4 4-4Z"/></g><defs><clipPath id="a">
-												<path fill="#fff"
-												      d="M0 0h24v24H0z"/></clipPath></defs>
-									</svg>
+												d="m17 8-1-1-4 4-4-4-1 1 4 4-4 4 1 1 4-4 4 4 1-1-4-4 4-4Z"/></g><defs><clipPath id="a"><path fill="#fff"
+									                                                                                                         d="M0 0h24v24H0z"/></clipPath></defs></svg>
 								<?php
 
 								printf(
@@ -202,13 +201,11 @@ $status_addons = $settings->get_statuses_addons();
 
 								?>
 							<span class="ainsys-status--error  ainsys-status--state">
-									<svg fill="none" viewBox="0 0 24 24"><g fill="#D5031E" clip-path="url(#a)"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/><path
+									<svg class="ainsys-icon ainsys-icon--error" fill="none" viewBox="0 0 24 24"><g fill="#D5031E" clip-path="url(#a)"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/><path
 												stroke="#D5031E"
 												stroke-width=".5"
-												d="m17 8-1-1-4 4-4-4-1 1 4 4-4 4 1 1 4-4 4 4 1-1-4-4 4-4Z"/></g><defs><clipPath id="a">
-												<path fill="#fff"
-												      d="M0 0h24v24H0z"/></clipPath></defs>
-									</svg>
+												d="m17 8-1-1-4 4-4-4-1 1 4 4-4 4 1 1 4-4 4 4 1-1-4-4 4-4Z"/></g><defs><clipPath id="a"><path fill="#fff"
+									                                                                                                         d="M0 0h24v24H0z"/></clipPath></defs></svg>
 								<?php
 								printf(
 									'%s <a href="%s" class="thickbox">%s</a>',
@@ -250,7 +247,7 @@ $status_addons = $settings->get_statuses_addons();
 				<ul class="ainsys-status-items ainsys-underline">
 					<li class="ainsys-status ainsys-status--check-integration">
 						<span class="ainsys-status--title"><?php esc_html_e( 'Conection', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></span>
-						<?php if ( $admin_ui->settings::get_option( 'ansys_api_key' ) ) : ?>
+						<?php if ( Settings::get_option( 'ansys_api_key' ) ) : ?>
 							<span class="ainsys-status--ok ainsys-status--state">
 									<svg fill="none" viewBox="0 0 24 24"><g clip-path="url(#a)"><path fill="#37B34A"
 									                                                                  d="M16.59 7.58 10 14.17l-3.59-3.58L5 12l5 5 8-8-1.41-1.42ZM12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/></g><defs><clipPath
@@ -259,7 +256,7 @@ $status_addons = $settings->get_statuses_addons();
 								</span>
 						<?php else : ?>
 							<span class="ainsys-status--error  ainsys-status--state">
-									<svg fill="none" viewBox="0 0 24 24"><g fill="#D5031E" clip-path="url(#a)"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/><path
+									<svg class="ainsys-icon ainsys-icon--error" fill="none" viewBox="0 0 24 24"><g fill="#D5031E" clip-path="url(#a)"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/><path
 												stroke="#D5031E"
 												stroke-width=".5"
 												d="m17 8-1-1-4 4-4-4-1 1 4 4-4 4 1 1 4-4 4 4 1-1-4-4 4-4Z"/></g><defs><clipPath id="a"><path fill="#fff"
@@ -269,6 +266,15 @@ $status_addons = $settings->get_statuses_addons();
 						<?php endif; ?>
 					</li>
 				</ul>
+				<div class="ainsys-settings-block--connect-status--last-operation">
+					<?php
+					$last_operation = empty( Settings::get_option( 'check_connection' )['time'] )
+						? __( 'No data', AINSYS_CONNECTOR_TEXTDOMAIN )
+						: Settings::get_option( 'check_connection' )['time'];
+
+					?>
+					<a href="#" class="">Last operation: <span><?php echo esc_html( $last_operation ); ?></span></a>
+				</div>
 				<div class="ainsys-check-integration">
 					<button type="button"
 					        id="check_ainsys_integration"

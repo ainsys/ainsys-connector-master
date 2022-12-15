@@ -108,7 +108,7 @@ class Logger implements Hooked {
 		$output = $wpdb->get_results( $query, ARRAY_A );
 
 		if ( empty( $output ) ) {
-			return '<div class="empty_tab"><h3>' . __( 'No transactions to display', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</h3></div>'; // phpcs:ignore
+			return '<div id="connection_log"><div class="empty_tab"><h3>' . __( 'No transactions to display', AINSYS_CONNECTOR_TEXTDOMAIN ) . '</h3></div></div>'; // phpcs:ignore
 		}
 
 		foreach ( $output as $item ) {
@@ -131,7 +131,7 @@ class Logger implements Hooked {
             $log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN );
 
 					} else {
-						$log_html_body .= '<div class="ainsys-responce-short">' . mb_substr( serialize( $value ), 0, 40 ) . ' ... </div>';
+						$log_html_body .= '<div class="ainsys-response-short">' . mb_substr( serialize( $value ), 0, 40 ) . ' ... </div>';
 
 						if ( is_array( $value ) ) {
 							$value = wp_json_encode( $value );
@@ -143,7 +143,7 @@ class Logger implements Hooked {
 							$value_out = $value;
 						}
 
-						$log_html_body .= '<div class="ainsys-responce-full">';
+						$log_html_body .= '<div class="ainsys-response-full">';
 
 						if ( is_string( $value_out ) ) {
 							$log_html_body .= $value_out;
@@ -174,7 +174,7 @@ class Logger implements Hooked {
 	 * Truncate log table.
 	 *
 	 */
-	public function truncate_log_table(): void {
+	public static function truncate_log_table(): void {
 
 		global $wpdb;
 

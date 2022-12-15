@@ -9,24 +9,6 @@ use Ainsys\Connector\Master\Logger;
 class Process_Comments implements Hooked {
 
 	/**
-	 * @var Core
-	 */
-	private Core $core;
-
-	/**
-	 * @var Logger
-	 */
-	private Logger $logger;
-
-
-	public function __construct( Core $core, Logger $logger ) {
-
-		$this->core   = $core;
-		$this->logger = $logger;
-	}
-
-
-	/**
 	 * Initializes WordPress hooks for plugin/components.
 	 *
 	 * @return void
@@ -80,21 +62,18 @@ class Process_Comments implements Hooked {
 	 *
 	 * @param  int   $comment_id
 	 * @param  array $data
-	 * @param  bool  $test
+	 * @param  bool  $checking_connected
 	 *
-	 * @return array|void
+	 * @return array
 	 */
-	public function send_update_comment_to_ainsys( $comment_id, $data, $test = false ) {
+	public function send_update_comment_to_ainsys( $comment_id, $data, $checking_connected = false ): array {
 
-		$request_action = 'UPDATE';
+		$request_action = $checking_connected ? 'Checking Connected' : 'UPDATE';
 
 		$fields = apply_filters( 'ainsys_update_comment_fields', $this->prepare_comment_data( $comment_id, $data ), $data );
 
-		$request_test = $this->send_data( $comment_id, $request_action, $fields );
+		return $this->send_data( $comment_id, $request_action, $fields );
 
-		if ( $test ) {
-			return $request_test;
-		}
 	}
 
 
@@ -117,11 +96,11 @@ class Process_Comments implements Hooked {
 		];
 
 		try {
-			$server_response = $this->core->curl_exec_func( $request_data );
+			$server_response = Core::curl_exec_func( $request_data );
 		} catch ( \Exception $e ) {
 			$server_response = 'Error: ' . $e->getMessage();
 
-			$this->logger::save_log_information(
+			Logger::save_log_information(
 				[
 					'object_id'       => 0,
 					'entity'          => 'comment',
@@ -133,10 +112,10 @@ class Process_Comments implements Hooked {
 				]
 			);
 
-			$this->core->send_error_email( $server_response );
+			Core::send_error_email( $server_response );
 		}
 
-		$this->logger::save_log_information(
+		Logger::save_log_information(
 			[
 				'object_id'       => $comment_id,
 				'entity'          => 'comment',

@@ -2,6 +2,7 @@
 
 namespace Ainsys\Connector\Master\Settings;
 
+use Ainsys\Connector\Master\Core;
 use Ainsys\Connector\Master\Hooked;
 use Ainsys\Connector\Master\Logger;
 
@@ -12,6 +13,10 @@ class Admin_UI_General implements Hooked {
 
 	public function __construct( Admin_UI $admin_ui ) {
 
+		if ( ! is_admin() ) {
+			return;
+		}
+
 		$this->admin_ui = $admin_ui;
 	}
 
@@ -21,7 +26,10 @@ class Admin_UI_General implements Hooked {
 	 */
 	public function init_hooks() {
 
-		// let's register ajax handlers as it's a part of admin UI. NB: they were a part of Core originally.
+		if ( ! is_admin() ) {
+			return;
+		}
+
 		add_action( 'wp_ajax_remove_ainsys_integration', [ $this, 'remove_ainsys_integration' ] );
 		add_action( 'wp_ajax_check_ainsys_integration', [ $this, 'check_ainsys_integration' ] );
 	}
@@ -51,10 +59,10 @@ class Admin_UI_General implements Hooked {
 			'emails' => [
 				'title'         => sprintf(
 					__( 'Backup email: %s', AINSYS_CONNECTOR_TEXTDOMAIN ), esc_html(
-						$this->admin_ui->settings::get_backup_email()
+						Settings::get_backup_email()
 					)
 				),
-				'active'        => ! empty( $this->admin_ui->settings::get_backup_email() ) && filter_var( $this->admin_ui->settings::get_backup_email(), FILTER_VALIDATE_EMAIL ),
+				'active'        => ! empty( Settings::get_backup_email() ) && filter_var( Settings::get_backup_email(), FILTER_VALIDATE_EMAIL ),
 				'label_success' => __( 'Valid', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'label_error'   => __( 'Invalid', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			],
@@ -62,18 +70,19 @@ class Admin_UI_General implements Hooked {
 
 		for ( $i = 1; $i < 10; $i ++ ) {
 
-			if ( empty( $this->admin_ui->settings::get_backup_email( $i ) ) ) {
+
+			if ( empty( Settings::get_backup_email( $i ) ) ) {
 				continue;
 			}
 
 			$status_system[ 'emails_' . $i ] = [
 				'title'         => sprintf(
 					__( 'Backup email: %s', AINSYS_CONNECTOR_TEXTDOMAIN ),
-					esc_html( $this->admin_ui->settings::get_backup_email( $i ) )
+					esc_html( Settings::get_backup_email( $i ) )
 				),
-				'active'        => ! empty( $this->admin_ui->settings::get_backup_email( $i ) )
+				'active'        => ! empty( Settings::get_backup_email( $i ) )
 				                   && filter_var(
-					                   $this->admin_ui->settings::get_backup_email( $i ), FILTER_VALIDATE_EMAIL
+					                   Settings::get_backup_email( $i ), FILTER_VALIDATE_EMAIL
 				                   ),
 				'label_success' => __( 'Valid', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'label_error'   => __( 'Invalid', AINSYS_CONNECTOR_TEXTDOMAIN ),
@@ -89,25 +98,25 @@ class Admin_UI_General implements Hooked {
 
 		$status = [
 			'woocommerce' => [
-				'title'   => 'AINSYS connector Woocommerce Integration',
+				'title'   => 'AINSYS Woocommerce Integration',
 				'slug'    => 'ainsys-connector-woocommerce',
 				'active'  => $this->admin_ui->is_plugin_active( 'ainsys-connector-woocommerce/plugin.php' ),
 				'install' => $this->admin_ui->is_plugin_install( 'ainsys-connector-woocommerce/plugin.php' ),
 			],
 			'content'     => [
-				'title'   => 'AINSYS Connector Headless CMS',
+				'title'   => 'AINSYS Headless CMS',
 				'slug'    => 'ainsys-connector-content',
 				'active'  => $this->admin_ui->is_plugin_active( 'ainsys-connector-content/plugin.php' ),
 				'install' => $this->admin_ui->is_plugin_install( 'ainsys-connector-content/plugin.php' ),
 			],
 			'acf'         => [
-				'title'   => 'AINSYS connector ACF Integration',
+				'title'   => 'AINSYS ACF Integration',
 				'slug'    => 'ainsys-connector-acf',
 				'active'  => $this->admin_ui->is_plugin_active( '1ainsys-connector-acf/plugin.php' ),
 				'install' => $this->admin_ui->is_plugin_install( '1ainsys-connector-acf/plugin.php' ),
 			],
 			'wpcf7'       => [
-				'title'   => 'AINSYS connector WPCF7 Integration',
+				'title'   => 'AINSYS WPCF7 Integration',
 				'slug'    => 'ainsys-connector-wpcf7',
 				'active'  => $this->admin_ui->is_plugin_active( 'ainsys-connector-wpcf7/plugin.php' ),
 				'install' => $this->admin_ui->is_plugin_install( 'ainsys-connector-wpcf7/plugin.php' ),
@@ -122,7 +131,7 @@ class Admin_UI_General implements Hooked {
 	 * Removes ainsys integration information
 	 */
 	public function remove_ainsys_integration(): void {
-		$this->admin_ui->settings::truncate();
+		Settings::truncate();
 		wp_die();
 	}
 
@@ -131,28 +140,22 @@ class Admin_UI_General implements Hooked {
 	 */
 	public function check_ainsys_integration(): void {
 
-		if ( $_POST['check_integration'] ) {
-
-			$check = $this->check_connection_to_server();
-
-			$this->admin_ui->settings::set_option( 'check_connection', $check );
-
-			Logger::save_log_information(
+		if ( empty( $_POST['check_integration'] ) ) {
+			wp_send_json_error(
 				[
-					'object_id'       => 0,
-					'entity'          => 'settings',
-					'request_action'  => 'check_integration',
-					'request_type'    => 'outgoing',
-					'request_data'    => '',
-					'server_response' => serialize( $check ),
+					'error' => __( 'Entity ID is missing', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				]
 			);
-			//error_log( print_r( $check, 1 ) );
-
 		}
 
+		$check_response = $this->check_connection_to_server();
 
-		wp_die();
+		if ( false !== strpos( $check_response, 'Error:' ) ) {
+			$this->get_connect_error( $check_response );
+		} else {
+			$this->get_connect_success( $check_response );
+		}
+
 	}
 
 
@@ -160,48 +163,84 @@ class Admin_UI_General implements Hooked {
 	 * Handshake with server, implements AINSYS integration
 	 *
 	 */
-	public function check_connection_to_server() {
+	public function check_connection_to_server(): string {
 
-		$ainsys_url = $this->admin_ui->settings::get_option( 'ansys_api_key' );
-
-		if ( ! empty( $ainsys_url ) ) {
-			$response = $this->admin_ui->core->curl_exec_func();
-
-			try {
-				$webhook_data = ! empty( $response ) ? json_decode( $response, false, 512, JSON_THROW_ON_ERROR ) : [];
-			} catch ( \Exception $e ) {
-				return esc_html( $e->getMessage() );
-			}
-
-			if ( ! empty( $response ) ) {
-				return $response;
-			}
-
+		try {
+			$response = Core::curl_exec_func();
+		} catch ( \Exception $e ) {
+			$response = esc_html( $e->getMessage() );
 		}
 
-		return false;
+		return $response;
 	}
 
 
 	/**
-	 * Check if AINSYS integration is active.
+	 * @param  string $check_response
 	 *
-	 * @param string $actions
-	 *
-	 * @return array
+	 * @return void
 	 */
-	public function is_ainsys_integration_active( $actions = '' ) {
+	private function get_connect_error( string $check_response ): void {
 
-		//$this->check_connection_to_server();
+		$result = [
+			'response' => $check_response,
+			'time'     => current_time( 'mysql' ),
+		];
 
-		$webhook_url = $this->admin_ui->settings::get_option( 'ansys_api_key' );
+		Settings::set_option( 'check_connection', $result );
 
-		if ( $webhook_url ) {
-			$this->admin_ui->add_admin_notice( 'Соединение с сервером Ainsys установлено. Webhook_url получен.' );
+		Logger::save_log_information(
+			[
+				'object_id'       => 0,
+				'entity'          => 'settings',
+				'request_action'  => 'Checking Connected',
+				'request_type'    => 'outgoing',
+				'request_data'    => '',
+				'server_response' => serialize( $check_response ),
+				'error'           => 1,
+			]
+		);
 
-			return array( 'status' => 'success' );
-		}
+		wp_send_json_error(
+			[
+				'result'  => $result,
+				'message' => __( 'An error occurred while checking the connection', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			]
+		);
 
-		return array( 'status' => 'none' );
 	}
+
+
+	/**
+	 * @param  string $check_response
+	 *
+	 * @return void
+	 */
+	private function get_connect_success( string $check_response ): void {
+
+		$result = [
+			'response' => $check_response,
+
+			'time' => current_time( 'mysql' ),
+		];
+
+		Settings::set_option( 'check_connection', $result );
+
+		Logger::save_log_information(
+			[
+				'object_id'       => 0,
+				'entity'          => 'settings',
+				'request_action'  => 'Checking Connected',
+				'request_type'    => 'outgoing',
+				'request_data'    => '',
+				'server_response' => serialize( $check_response ),
+			]
+		);
+
+		wp_send_json_success( [
+			'result'  => $result,
+			'message' => __( 'The connection has been successfully set up', AINSYS_CONNECTOR_TEXTDOMAIN ),
+		] );
+	}
+
 }

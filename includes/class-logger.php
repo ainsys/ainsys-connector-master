@@ -74,14 +74,14 @@ class Logger implements Hooked {
 	 *
 	 * @return string
 	 */
-	public static function ainsys_render_json( $json, string $result = '' ): string {
+	public static function render_json( $json, string $result = '' ): string {
 
 		foreach ( $json as $key => $val ) {
 
 			if ( ! is_object( $val ) && ! is_array( $val ) ) {
 				$result .= sprintf( '<div class="ainsys-json-inner">%s : %s</div>', $key, $val );
 			} else {
-				$result .= sprintf( '{<div class="ainsys-json-outer"> %s : %s</div>}<br>', $key, self::ainsys_render_json( $val ) );
+				$result .= sprintf( '{<div class="ainsys-json-outer"> %s : %s</div>}<br>', $key, self::render_json( $val ) );
 			}
 		}
 
@@ -148,7 +148,7 @@ class Logger implements Hooked {
 						if ( is_string( $value_out ) ) {
 							$log_html_body .= $value_out;
 						} else {
-							$log_html_body .= self::ainsys_render_json( $value_out );
+							$log_html_body .= self::render_json( $value_out );
 						}
 
 						$log_html_body .= '</div>';

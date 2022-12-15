@@ -165,7 +165,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 			'request'        => $result_test['request'],
 			'response'       => $result_test['response'],
 			'short_request'  => mb_substr( serialize( $result_test['request'] ), 0, 40 ) . ' ... ',
-			'full_request'   => Logger::ainsys_render_json( $result_test['request'] ),
+			'full_request'   => Logger::render_json( $result_test['request'] ),
 			'short_response' => mb_substr( serialize( $result_test['response'] ), 0, 40 ) . ' ... ',
 			'full_response'  => $full_response,
 			'time'           => current_time( 'mysql' ),
@@ -194,7 +194,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 		if ( is_string( $value_out ) ) {
 			$full_response = $value_out;
 		} else {
-			$full_response = Logger::ainsys_render_json( $value_out );
+			$full_response = Logger::render_json( $value_out );
 		}
 
 		return $full_response;

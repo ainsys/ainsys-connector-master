@@ -66,14 +66,13 @@ class Process_Comments extends Process implements Hooked {
 	 * @param  array $data
 	 * @param  bool  $checking_connected
 	 *
-	 * @return void
+	 * @return array
 	 */
-	public function send_update_comment_to_ainsys( $comment_id, $data, $checking_connected = false ): void {
+	public function send_update_comment_to_ainsys( $comment_id, $data, $checking_connected = false ): array {
 
 		$request_action = $checking_connected ? 'Checking Connected' : 'UPDATE';
 
 		if ( $this->has_entity_disable_update( 'comment', $request_action ) ) {
-
 			return [];
 		}
 

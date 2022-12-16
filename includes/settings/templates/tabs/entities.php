@@ -16,6 +16,7 @@ $active      = $args['active'];
 $columns     = Admin_UI_Entities_Controlling::columns_entities_controlling();
 $option_name = Settings::get_option_name( 'check_controlling_entity' );
 $option      = Settings::get_option( 'check_controlling_entity' );
+do_action( 'qm/info',$option);
 
 ?>
 

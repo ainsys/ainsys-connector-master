@@ -4,6 +4,7 @@ namespace Ainsys\Connector\Master\WP;
 
 use Ainsys\Connector\Master\Hooked;
 
+//TODO управления вложениями нет, так что могут быть траблы с логирование и отправкой данных
 class Process_Attachments extends Process implements Hooked {
 
 	/**
@@ -32,6 +33,10 @@ class Process_Attachments extends Process implements Hooked {
 	public function process_new_attachment( int $attachment_id ): void {
 
 		$request_action = 'CREATE';
+
+		if ( $this->has_entity_disable_create( 'attachment', $request_action ) ) {
+			return;
+		}
 
 		$fields = apply_filters(
 			'ainsys_new_attachment_fields',
@@ -76,11 +81,15 @@ class Process_Attachments extends Process implements Hooked {
 	 * @param       $attachment_before
 	 * @param  bool $test
 	 *
-	 * @return array|void
+	 * @return void
 	 */
-	public function process_edit_attachment( $attachment_id, $attachment_after, $attachment_before, bool $test = false ) {
+	public function process_edit_attachment( $attachment_id, $attachment_after, $attachment_before, bool $test = false ): void {
 
 		$request_action = 'UPDATE';
+
+		if ( $this->has_entity_disable_update( 'attachment', $request_action ) ) {
+			return;
+		}
 
 		$fields = apply_filters(
 			'ainsys_update_attachment_fields',
@@ -89,11 +98,7 @@ class Process_Attachments extends Process implements Hooked {
 			$attachment_before
 		);
 
-		$request_test = $this->send_data( $attachment_id, 'attachment', $request_action, $fields );
-
-		if ( $test ) {
-			return $request_test;
-		}
+		$this->send_data( $attachment_id, 'attachment', $request_action, $fields );
 	}
 
 

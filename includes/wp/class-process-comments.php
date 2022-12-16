@@ -79,7 +79,6 @@ class Process_Comments extends Process implements Hooked {
 		$fields = apply_filters( 'ainsys_update_comment_fields', $this->prepare_comment_data( $comment_id, $data ), $data );
 
 		$this->send_data( $comment_id, 'comment', $request_action, $fields );
-
 	}
 
 }

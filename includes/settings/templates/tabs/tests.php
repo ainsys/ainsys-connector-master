@@ -26,7 +26,6 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 			<table class="ainsys-table ainsys-table--checking-entities">
 				<thead>
 					<?php foreach ( $columns as $column_id => $column_name ) : ?>
-
 						<th class="ainsys-table--header ainsys-table--header--<?php echo esc_attr( $column_id ); ?>">
 							<span class="ainsys-table--header--title"><?php echo esc_html( $column_name ); ?></span>
 						</th>
@@ -72,7 +71,6 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 												<?php echo mb_substr( serialize( $check_entity[ $entity_id ]['request'] ), 0, 40 ) . ' ... ' ?>
 											</div>
 											<div class="ainsys-response-full">
-
 												<?php echo Logger::render_json( $check_entity[ $entity_id ]['request'] ) ?>
 											</div>
 										<?php endif; ?>

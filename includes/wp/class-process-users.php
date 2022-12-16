@@ -68,21 +68,21 @@ class Process_Users extends Process implements Hooked {
 	 * @param  array $old_user_data
 	 * @param  bool  $checking_connected
 	 *
-	 * @return void
+	 * @return array
 	 * @reference in multisite mode, users are created without a password,
 	 * a password is created automatically or when clicking on a link, because this hook triggers the user creation field
 	 */
-	public function send_user_details_update_to_ainsys( $user_id, $userdata, $old_user_data, $checking_connected = false ): void {
+	public function send_user_details_update_to_ainsys( $user_id, $userdata, $old_user_data, $checking_connected = false ): array {
 
 		$request_action = $checking_connected ? 'Checking Connected' : 'UPDATE';
 
 		if ( $this->has_entity_disable_update( 'user', $request_action ) ) {
-			return;
+			return [];
 		}
 
 		$fields = apply_filters( 'ainsys_user_details_update_fields', $this->prepare_user_data( $user_id, $userdata ), $userdata );
 
-		$this->send_data( $user_id, 'user', $request_action, $fields );
+		return $this->send_data( $user_id, 'user', $request_action, $fields );
 
 	}
 

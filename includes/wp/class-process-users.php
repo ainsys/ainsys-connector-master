@@ -77,12 +77,13 @@ class Process_Users extends Process implements Hooked {
 		$request_action = $checking_connected ? 'Checking Connected' : 'UPDATE';
 
 		if ( $this->has_entity_disable_update( 'user', $request_action ) ) {
-			return;
+
+			return [];
 		}
 
 		$fields = apply_filters( 'ainsys_user_details_update_fields', $this->prepare_user_data( $user_id, $userdata ), $userdata );
 
-		$this->send_data( $user_id, 'user', $request_action, $fields );
+		return $this->send_data( $user_id, 'user', $request_action, $fields );
 
 	}
 

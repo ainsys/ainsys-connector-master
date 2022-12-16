@@ -16,8 +16,6 @@ class Settings implements Hooked {
 
 	protected static array $settings_tables;
 
-	protected static array $settings_tables;
-
 	/**
 	 * AINSYS options and their default values.
 	 */

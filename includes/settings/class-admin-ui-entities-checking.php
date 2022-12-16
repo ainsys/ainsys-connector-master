@@ -87,7 +87,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 	}
 
 
-	public function columns_checking_entities(): array {
+	public static function columns_checking_entities(): array {
 
 		return apply_filters(
 			'ainsys_columns_checking_entities',
@@ -159,7 +159,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 	 */
 	protected function get_result_entity( array $result_test, $result_entity, $entity ) {
 
-		$full_response = $this->convert_response( $result_test['response'] );
+		$full_response = Logger::convert_response( $result_test['response'] );
 
 		$result_entity[ $entity ] = [
 			'request'        => $result_test['request'],
@@ -175,29 +175,6 @@ class Admin_UI_Entities_Checking implements Hooked {
 		Settings::set_option( 'check_connection_entity', $result_entity );
 
 		return $result_entity;
-	}
-
-
-	/**
-	 * @param $response
-	 *
-	 * @return string
-	 */
-	private function convert_response( $response ): string {
-
-		try {
-			$value_out = json_decode( $response, true, 512, JSON_THROW_ON_ERROR );
-		} catch ( \JsonException $exception ) {
-			$value_out = $response;
-		}
-
-		if ( is_string( $value_out ) ) {
-			$full_response = $value_out;
-		} else {
-			$full_response = Logger::render_json( $value_out );
-		}
-
-		return $full_response;
 	}
 
 }

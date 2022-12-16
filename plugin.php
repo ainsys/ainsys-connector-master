@@ -2,23 +2,23 @@
 
 namespace Ainsys\Connector\Master;
 
-
 /**
- * @link              https://github.com/ainsys/ainsys-wp-connector-plugin
- * @since             1.0.0
- * @package           ainsys-connector
- *
- * @wordpress-plugin
- * Plugin Name:       AINSYS connector
+ * Plugin Name:       AINSYS Integrations framework connector
  * Plugin URI: https://app.ainsys.com/
  * Description: AINSYS connector master.
- * Version:           4.2.3
+ * Version:           4.2.4
  * Author:            AINSYS
  * Author URI:        https://app.ainsys.com/
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:     ainsys_connector
  * Domain Path:     /languages
+ *
+ * @link              https://github.com/ainsys/ainsys-wp-connector-plugin
+ * @since             1.0.0
+ * @package           ainsys-connector
+ *
+ * @wordpress-plugin
  */
 
 defined( 'ABSPATH' ) || die();

@@ -2,11 +2,9 @@
 
 namespace Ainsys\Connector\Master\WP;
 
-use Ainsys\Connector\Master\Core;
 use Ainsys\Connector\Master\Hooked;
-use Ainsys\Connector\Master\Logger;
 
-class Process_Users implements Hooked {
+class Process_Users extends Process implements Hooked {
 
 	/**
 	 * Initializes WordPress hooks for plugin/components.
@@ -34,7 +32,7 @@ class Process_Users implements Hooked {
 
 		$fields = apply_filters( 'ainsys_new_user_fields', $this->prepare_user_data( $user_id, $userdata ), $userdata );
 
-		$this->send_data( $user_id, $request_action, $fields );
+		$this->send_data( $user_id, 'user', $request_action, $fields );
 
 	}
 
@@ -76,65 +74,8 @@ class Process_Users implements Hooked {
 
 		$fields = apply_filters( 'ainsys_user_details_update_fields', $this->prepare_user_data( $user_id, $userdata ), $userdata );
 
-		return $this->send_data( $user_id, $request_action, $fields );
+		return $this->send_data( $user_id, 'user', $request_action, $fields );
 
-	}
-
-
-	/**
-	 * @param  int    $user_id
-	 * @param  string $request_action
-	 * @param         $fields
-	 *
-	 * @return array
-	 */
-	protected function send_data( int $user_id, string $request_action, $fields ): array {
-
-		$request_data = [
-			'entity'  => [
-				'id'   => $user_id,
-				'name' => 'user',
-			],
-			'action'  => $request_action,
-			'payload' => $fields,
-		];
-
-		try {
-			$server_response = Core::curl_exec_func( $request_data );
-		} catch ( \Exception $e ) {
-			$server_response = 'Error: ' . $e->getMessage();
-
-			Logger::save(
-				[
-					'object_id'       => 0,
-					'entity'          => 'user',
-					'request_action'  => $request_action,
-					'request_type'    => 'outgoing',
-					'request_data'    => serialize( $request_data ),
-					'server_response' => serialize( $server_response ),
-					'error'           => 1,
-				]
-			);
-
-			Core::send_error_email( $server_response );
-		}
-
-		Logger::save(
-			[
-				'object_id'       => $user_id,
-				'entity'          => 'user',
-				'request_action'  => $request_action,
-				'request_type'    => 'outgoing',
-				'request_data'    => serialize( $request_data ),
-				'server_response' => serialize( $server_response ),
-				'error'           => false !== strpos( $server_response, 'Error:' ),
-			]
-		);
-
-		return [
-			'request'  => $request_data,
-			'response' => $server_response,
-		];
 	}
 
 }

@@ -2,11 +2,9 @@
 
 namespace Ainsys\Connector\Master\WP;
 
-use Ainsys\Connector\Master\Core;
 use Ainsys\Connector\Master\Hooked;
-use Ainsys\Connector\Master\Logger;
 
-class Process_Attachments implements Hooked {
+class Process_Attachments extends Process implements Hooked {
 
 	/**
 	 * Initializes WordPress hooks for plugin/components.
@@ -41,7 +39,7 @@ class Process_Attachments implements Hooked {
 			$attachment_id
 		);
 
-		$this->send_data( $attachment_id, $request_action, $fields );
+		$this->send_data( $attachment_id, 'attachment', $request_action, $fields );
 
 	}
 
@@ -65,7 +63,7 @@ class Process_Attachments implements Hooked {
 			$attachment
 		);
 
-		$this->send_data( $attachment_id, $request_action, $fields );
+		$this->send_data( $attachment_id, 'attachment', $request_action, $fields );
 
 	}
 
@@ -91,7 +89,7 @@ class Process_Attachments implements Hooked {
 			$attachment_before
 		);
 
-		$request_test = $this->send_data( $attachment_id, $request_action, $fields );
+		$request_test = $this->send_data( $attachment_id, 'attachment', $request_action, $fields );
 
 		if ( $test ) {
 			return $request_test;
@@ -137,63 +135,6 @@ class Process_Attachments implements Hooked {
 		$bulk_actions['update_attachments'] = 'Update attachments';
 
 		return $bulk_actions;
-	}
-
-
-	/**
-	 * @param  int    $attachment_id
-	 * @param  string $request_action
-	 * @param         $fields
-	 *
-	 * @return array
-	 */
-	protected function send_data( int $attachment_id, string $request_action, $fields ): array {
-
-		$request_data = [
-			'entity'  => [
-				'id'   => $attachment_id,
-				'name' => 'attachment',
-			],
-			'action'  => $request_action,
-			'payload' => $fields,
-		];
-
-		try {
-			$server_response = Core::curl_exec_func( $request_data );
-		} catch ( \Exception $e ) {
-			$server_response = 'Error: ' . $e->getMessage();
-
-			Logger::save(
-				[
-					'object_id'       => 0,
-					'entity'          => 'attachment',
-					'request_action'  => $request_action,
-					'request_type'    => 'outgoing',
-					'request_data'    => serialize( $request_data ),
-					'server_response' => serialize( $server_response ),
-					'error'           => 1,
-				]
-			);
-
-			Core::send_error_email( $server_response );
-		}
-
-		Logger::save(
-			[
-				'object_id'       => $attachment_id,
-				'entity'          => 'attachment',
-				'request_action'  => $request_action,
-				'request_type'    => 'outgoing',
-				'request_data'    => serialize( $request_data ),
-				'server_response' => serialize( $server_response ),
-				'error'           => false !== strpos( $server_response, 'Error:' ),
-			]
-		);
-
-		return [
-			'request'  => $request_data,
-			'response' => $server_response,
-		];
 	}
 
 

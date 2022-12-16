@@ -85,9 +85,10 @@ class Process_Attachments extends Process implements Hooked {
 	 */
 	public function process_edit_attachment( $attachment_id, $attachment_after, $attachment_before, bool $test = false ): array {
 
-		$request_action = 'UPDATE';
+$request_action = 'UPDATE';
 
 		if ( $this->has_entity_disable_update( 'attachment', $request_action ) ) {
+
 			return [];
 		}
 

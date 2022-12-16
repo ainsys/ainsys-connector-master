@@ -110,16 +110,6 @@ class Settings implements Hooked {
 
 		return self::get_plugin_name() . '_' . $name;
 	}
-	/**
-	 * Gets full option name.
-	 *
-	 * @param  string $name
-	 *
-	 * @return string
-	 */
-	/*	public static function get_setting_name( string $name ): string {
-			return self::get_plugin_name() . '_' . $name;
-		}*/
 
 	/**
 	 * Gets plugin uniq name to show on the settings page.
@@ -222,7 +212,6 @@ class Settings implements Hooked {
 				self::get_option_name( $option_name ),
 				[
 					'default' => $option_value,
-					//'sanitize_callback' => [ self::class, 'sanitize_update_settings' ],
 				]
 			);
 		}
@@ -237,25 +226,6 @@ class Settings implements Hooked {
 		);
 
 		self::check_to_auto_disable_logging();
-	}
-
-
-	public static function sanitize_update_settings( $options ) {
-
-		// Detect multiple sanitizing passes.
-		// Accomodates bug: https://core.trac.wordpress.org/ticket/21989
-		static $pass_count = 0;
-
-		$pass_count ++;
-
-		if ( $pass_count <= 1 ) {
-			foreach ( self::get_settings_options() as $option_name => $option_value ) {
-				update_option( self::get_option_name( $option_name ), $options, 'no' );
-			}
-		}
-
-		return $options;
-
 	}
 
 

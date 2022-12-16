@@ -83,7 +83,7 @@ class Handle_Comment implements Hooked, Webhook_Handler {
 		if ( ! $comment_id ) {
 			$message = $error;
 
-			$this->logger::save_log_information(
+			$this->logger::save(
 				[
 					'object_id'       => 0,
 					'entity'          => 'comment',
@@ -102,7 +102,7 @@ class Handle_Comment implements Hooked, Webhook_Handler {
 
 		$message = $success . $comment_id;
 
-		$this->logger::save_log_information(
+		$this->logger::save(
 			[
 				'object_id'       => $comment_id,
 				'entity'          => 'comment',
@@ -127,7 +127,7 @@ class Handle_Comment implements Hooked, Webhook_Handler {
 		if ( is_wp_error( $result ) ) {
 			$message = $error . $result->get_error_message();
 
-			$this->logger::save_log_information(
+			$this->logger::save(
 				[
 					'object_id'       => 0,
 					'entity'          => 'comment',
@@ -146,7 +146,7 @@ class Handle_Comment implements Hooked, Webhook_Handler {
 
 		$message = $success . $result;
 
-		$this->logger::save_log_information(
+		$this->logger::save(
 			[
 				'object_id'       => $result,
 				'entity'          => 'comment',

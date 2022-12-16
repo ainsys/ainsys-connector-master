@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Settings General Tab
+ * Settings Entities Checking Tab
  *
  * @package ainsys
  *
@@ -15,7 +15,7 @@ use Ainsys\Connector\Master\Settings\Settings;
 
 $admin_ui     = $args['admin_ui'];
 $active       = $args['active'];
-$settings     = new Admin_UI_Entities_Checking();
+$columns     = Admin_UI_Entities_Checking::columns_checking_entities();
 $check_entity = Settings::get_option( 'check_connection_entity' );
 
 ?>
@@ -25,8 +25,7 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 		<div id="connection_test">
 			<table class="ainsys-table ainsys-table--checking-entities">
 				<thead>
-					<?php foreach ( $settings->columns_checking_entities() as $column_id => $column_name ) : ?>
-
+					<?php foreach ( $columns as $column_id => $column_name ) : ?>
 						<th class="ainsys-table--header ainsys-table--header--<?php echo esc_attr( $column_id ); ?>">
 							<span class="ainsys-table--header--title"><?php echo esc_html( $column_name ); ?></span>
 						</th>
@@ -36,7 +35,7 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 				<?php foreach ( Settings::get_entities() as $entity_id => $entity_label ) : ?>
 
 					<tr class="ainsys-table-table__row ainsys-table__row--id-<?php echo esc_attr( $entity_id ); ?> ">
-						<?php foreach ( $settings->columns_checking_entities() as $column_id => $column_name ) : ?>
+						<?php foreach ( $columns as $column_id => $column_name ) : ?>
 							<td class="ainsys-table-table__cell ainsys-table-table__cell-<?php echo esc_attr( $column_id ); ?>"
 							    data-title="<?php echo esc_attr( $column_name ); ?>">
 
@@ -72,8 +71,7 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 												<?php echo mb_substr( serialize( $check_entity[ $entity_id ]['request'] ), 0, 40 ) . ' ... ' ?>
 											</div>
 											<div class="ainsys-response-full">
-
-												<?php echo Logger::ainsys_render_json( $check_entity[ $entity_id ]['request'] ) ?>
+												<?php echo Logger::render_json( $check_entity[ $entity_id ]['request'] ) ?>
 											</div>
 										<?php endif; ?>
 

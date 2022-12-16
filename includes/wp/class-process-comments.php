@@ -2,11 +2,9 @@
 
 namespace Ainsys\Connector\Master\WP;
 
-use Ainsys\Connector\Master\Core;
 use Ainsys\Connector\Master\Hooked;
-use Ainsys\Connector\Master\Logger;
 
-class Process_Comments implements Hooked {
+class Process_Comments extends Process implements Hooked {
 
 	/**
 	 * Initializes WordPress hooks for plugin/components.
@@ -32,9 +30,13 @@ class Process_Comments implements Hooked {
 
 		$request_action = 'CREATE';
 
+		if ( $this->has_entity_disable_create( 'comment', $request_action ) ) {
+			return;
+		}
+
 		$fields = apply_filters( 'ainsys_new_comment_fields', $this->prepare_comment_data( $comment_id, $data ), $data );
 
-		$this->send_data( $comment_id, $request_action, $fields );
+		$this->send_data( $comment_id, 'comment', $request_action, $fields );
 
 	}
 
@@ -64,72 +66,19 @@ class Process_Comments implements Hooked {
 	 * @param  array $data
 	 * @param  bool  $checking_connected
 	 *
-	 * @return array
+	 * @return void
 	 */
-	public function send_update_comment_to_ainsys( $comment_id, $data, $checking_connected = false ): array {
+	public function send_update_comment_to_ainsys( $comment_id, $data, $checking_connected = false ): void {
 
 		$request_action = $checking_connected ? 'Checking Connected' : 'UPDATE';
 
-		$fields = apply_filters( 'ainsys_update_comment_fields', $this->prepare_comment_data( $comment_id, $data ), $data );
-
-		return $this->send_data( $comment_id, $request_action, $fields );
-
-	}
-
-
-	/**
-	 * @param  int    $comment_id
-	 * @param  string $request_action
-	 * @param         $fields
-	 *
-	 * @return array
-	 */
-	protected function send_data( int $comment_id, string $request_action, $fields ): array {
-
-		$request_data = [
-			'entity'  => [
-				'id'   => $comment_id,
-				'name' => 'comment',
-			],
-			'action'  => $request_action,
-			'payload' => $fields,
-		];
-
-		try {
-			$server_response = Core::curl_exec_func( $request_data );
-		} catch ( \Exception $e ) {
-			$server_response = 'Error: ' . $e->getMessage();
-
-			Logger::save_log_information(
-				[
-					'object_id'       => 0,
-					'entity'          => 'comment',
-					'request_action'  => $request_action,
-					'request_type'    => 'outgoing',
-					'request_data'    => serialize( $request_data ),
-					'server_response' => serialize( $server_response ),
-					'error'           => 1,
-				]
-			);
-
-			Core::send_error_email( $server_response );
+		if ( $this->has_entity_disable_update( 'comment', $request_action ) ) {
+			return;
 		}
 
-		Logger::save_log_information(
-			[
-				'object_id'       => $comment_id,
-				'entity'          => 'comment',
-				'request_action'  => $request_action,
-				'request_type'    => 'outgoing',
-				'request_data'    => serialize( $request_data ),
-				'server_response' => serialize( $server_response ),
-			]
-		);
+		$fields = apply_filters( 'ainsys_update_comment_fields', $this->prepare_comment_data( $comment_id, $data ), $data );
 
-		return [
-			'request'  => $request_data,
-			'response' => $server_response,
-		];
+		$this->send_data( $comment_id, 'comment', $request_action, $fields );
 	}
 
 }

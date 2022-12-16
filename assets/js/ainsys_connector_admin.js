@@ -403,9 +403,6 @@ jQuery( function ( $ ) {
 		jQuery.post( ainsys_connector_params.ajax_url, data, function ( response ) {
 			$( '.ainsys-log-status' ).removeClass( 'ainsys-loading' );
 
-			console.log(response);
-			//const result = JSON.parse( response );
-
 			if ( response.logging_since ) {
 				$( '#stop_loging' ).removeClass( 'disabled' );
 				$( '#start_loging_timeinterval' ).addClass( 'disabled' ).prop( 'disabled', true );

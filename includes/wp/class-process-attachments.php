@@ -9,24 +9,6 @@ use Ainsys\Connector\Master\Logger;
 class Process_Attachments implements Hooked {
 
 	/**
-	 * @var Core
-	 */
-	private Core $core;
-
-	/**
-	 * @var Logger
-	 */
-	private Logger $logger;
-
-
-	public function __construct( Core $core, Logger $logger ) {
-
-		$this->core   = $core;
-		$this->logger = $logger;
-	}
-
-
-	/**
 	 * Initializes WordPress hooks for plugin/components.
 	 *
 	 * @return void
@@ -177,11 +159,11 @@ class Process_Attachments implements Hooked {
 		];
 
 		try {
-			$server_response = $this->core->curl_exec_func( $request_data );
+			$server_response = Core::curl_exec_func( $request_data );
 		} catch ( \Exception $e ) {
 			$server_response = 'Error: ' . $e->getMessage();
 
-			$this->logger::save(
+			Logger::save(
 				[
 					'object_id'       => 0,
 					'entity'          => 'attachment',
@@ -193,10 +175,10 @@ class Process_Attachments implements Hooked {
 				]
 			);
 
-			$this->core->send_error_email( $server_response );
+			Core::send_error_email( $server_response );
 		}
 
-		$this->logger::save(
+		Logger::save(
 			[
 				'object_id'       => $attachment_id,
 				'entity'          => 'attachment',
@@ -204,6 +186,7 @@ class Process_Attachments implements Hooked {
 				'request_type'    => 'outgoing',
 				'request_data'    => serialize( $request_data ),
 				'server_response' => serialize( $server_response ),
+				'error'           => false !== strpos( $server_response, 'Error:' ),
 			]
 		);
 

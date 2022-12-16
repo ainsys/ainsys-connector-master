@@ -1,6 +1,6 @@
 <?php
 /**
- * Settings General Tab
+ * Settings Entities Controlling Tab
  *
  * @package ainsys
  *
@@ -13,7 +13,7 @@ use Ainsys\Connector\Master\Settings\Settings;
 
 $admin_ui    = $args['admin_ui'];
 $active      = $args['active'];
-$settings    = new Admin_UI_Entities_Controlling( );
+$columns     = Admin_UI_Entities_Controlling::columns_entities_controlling();
 $option_name = Settings::get_option_name( 'check_controlling_entity' );
 $option      = Settings::get_option( 'check_controlling_entity' );
 
@@ -22,7 +22,7 @@ $option      = Settings::get_option( 'check_controlling_entity' );
 <div id="setting-section-entities" class="tab-target">
 	<table class="ainsys-table ainsys-table--controlling-entities">
 		<thead>
-			<?php foreach ( $settings->columns_entities_controlling() as $column_id => $column_name ) : ?>
+			<?php foreach ( $columns as $column_id => $column_name ) : ?>
 
 				<th class="ainsys-table--header ainsys-table--header--<?php echo esc_attr( $column_id ); ?>">
 					<span class="ainsys-table--header--title"><?php echo esc_html( $column_name ); ?></span>
@@ -33,7 +33,7 @@ $option      = Settings::get_option( 'check_controlling_entity' );
 		<?php foreach ( Settings::get_entities() as $entity_id => $entity_label ) : ?>
 
 			<tr class="ainsys-table-table__row ainsys-table__row--id-<?php echo esc_attr( $entity_id ); ?> ">
-				<?php foreach ( $settings->columns_entities_controlling() as $column_id => $column_name ) : ?>
+				<?php foreach ( $columns as $column_id => $column_name ) : ?>
 					<td class="ainsys-table-table__cell ainsys-table-table__cell-<?php echo esc_attr( $column_id ); ?>"
 					    data-title="<?php echo esc_attr( $column_name ); ?>">
 
@@ -42,7 +42,7 @@ $option      = Settings::get_option( 'check_controlling_entity' );
 						$option_item        = ! empty( $option[ $entity_id ]['general'][ $column_id ] ) ? $option[ $entity_id ]['general'][ $column_id ] : 0;
 						$option_name_column = sprintf( '-%s', $column_id );
 						$option_name_item   = sprintf( '-%s%s', $entity_id, $option_name_column );
-						$option_on_off = !empty( $option[ $entity_id ]['general']['on_off'] ) ? $option[ $entity_id ]['general']['on_off'] : 0;
+						$option_on_off      = ! empty( $option[ $entity_id ]['general']['on_off'] ) ? $option[ $entity_id ]['general']['on_off'] : 0;
 
 						switch ( $column_id ):
 							case 'arrow' :
@@ -129,7 +129,7 @@ $option      = Settings::get_option( 'check_controlling_entity' );
 											       data-toggle-checkbox-entity-id="<?php echo esc_attr( $entity_id ); ?>"
 											       data-toggle-checkbox-column-id="<?php echo esc_attr( $column_id ); ?>"
 												<?php checked( 1, esc_html( $option_item ) ); ?>
-												<?php disabled( 0, $option_on_off); ?>
+												<?php disabled( 0, $option_on_off ); ?>
 											>
 											<span class="toggle-switch"></span>
 											<span class="toggle-label"><?php echo esc_attr( $column_name ); ?></span>

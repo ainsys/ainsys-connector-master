@@ -19,12 +19,12 @@ class Admin_UI_Entities_Controlling implements Hooked {
 	}
 
 
-	public function columns_entities_controlling(): array {
+	public static function columns_entities_controlling(): array {
 
 		return apply_filters(
-			'columns_entities_controlling',
+			'ainsys_columns_entities_controlling',
 			[
-				'arrow'         => '',
+				//'arrow'         => '',
 				'entity'        => __( 'Entity', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'on_off'        => __( 'On/Off', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'create'        => __( 'Create', AINSYS_CONNECTOR_TEXTDOMAIN ),
@@ -32,7 +32,7 @@ class Admin_UI_Entities_Controlling implements Hooked {
 				'update'        => __( 'Update', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'delete'        => __( 'Delete', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'last_exchange' => __( 'Last exchange', AINSYS_CONNECTOR_TEXTDOMAIN ),
-				'log'           => '',
+				//'log'           => '',
 			]
 		);
 	}

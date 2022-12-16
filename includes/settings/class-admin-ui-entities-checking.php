@@ -159,17 +159,20 @@ class Admin_UI_Entities_Checking implements Hooked {
 	 */
 	protected function get_result_entity( array $result_test, $result_entity, $entity ) {
 
-		$full_response = Logger::convert_response( $result_test['response'] );
+		$result_request  = !empty($result_test['request']) ? $result_test['request'] : __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN );
+		$result_response  = !empty($result_test['response']) ? $result_test['response'] : '';
+
+		$full_response = Logger::convert_response( $result_response);
 
 		$result_entity[ $entity ] = [
-			'request'        => $result_test['request'],
-			'response'       => $result_test['response'],
-			'short_request'  => mb_substr( serialize( $result_test['request'] ), 0, 40 ) . ' ... ',
-			'full_request'   => Logger::render_json( $result_test['request'] ),
-			'short_response' => mb_substr( serialize( $result_test['response'] ), 0, 40 ) . ' ... ',
+			'request'        => $result_request,
+			'response'       => $result_response,
+			'short_request'  => mb_substr( serialize( $result_request ), 0, 40 ) . ' ... ',
+			'full_request'   => Logger::render_json( $result_request ),
+			'short_response' => mb_substr( serialize( $result_response ), 0, 40 ) . ' ... ',
 			'full_response'  => $full_response,
 			'time'           => current_time( 'mysql' ),
-			'status'         => false === strpos( $result_test['response'], 'Error:' ),
+			'status'         => false === strpos( $result_response, 'Error:' ),
 		];
 
 		Settings::set_option( 'check_connection_entity', $result_entity );

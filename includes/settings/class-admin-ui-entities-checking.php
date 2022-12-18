@@ -4,6 +4,7 @@ namespace Ainsys\Connector\Master\Settings;
 
 use Ainsys\Connector\Master\Hooked;
 use Ainsys\Connector\Master\Logger;
+use Ainsys\Connector\Master\WP\Process_Attachments;
 use Ainsys\Connector\Master\WP\Process_Comments;
 use Ainsys\Connector\Master\WP\Process_Users;
 
@@ -46,22 +47,25 @@ class Admin_UI_Entities_Checking implements Hooked {
 			Settings::set_option( 'check_connection_entity', $result_entity );
 		}
 
-		if ( 'user' === $entity ) {
-			$make_request  = true;
-			$result_test   = $this->get_user_for_test();
-			$result_entity = Settings::get_option( 'check_connection_entity' );
-			$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
-
-		}
-
-		if ( 'comment' === $entity ) {
-
-			$make_request = true;
-
-			$result_test   = $this->get_comment_for_test();
-			$result_entity = Settings::get_option( 'check_connection_entity' );
-			$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
-
+		switch ( $entity ) {
+			case 'user':
+				$make_request  = true;
+				$result_test   = $this->get_user_for_test();
+				$result_entity = Settings::get_option( 'check_connection_entity' );
+				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
+				break;
+			case 'comment':
+				$make_request  = true;
+				$result_test   = $this->get_comment_for_test();
+				$result_entity = Settings::get_option( 'check_connection_entity' );
+				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
+				break;
+			case 'attachment':
+				$make_request  = true;
+				$result_test   = $this->get_attachment_for_test();
+				$result_entity = Settings::get_option( 'check_connection_entity' );
+				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
+				break;
 		}
 
 		$result_entity = apply_filters( 'ainsys_check_connection_request', $result_entity, $entity, $make_request );
@@ -139,7 +143,10 @@ class Admin_UI_Entities_Checking implements Hooked {
 		] );
 
 		if ( empty( $comments ) ) {
-			return [];
+			return [
+				'request'  => '',
+				'response' => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			];
 		}
 
 		$comment    = (array) reset( $comments );
@@ -147,6 +154,32 @@ class Admin_UI_Entities_Checking implements Hooked {
 		unset( $comment['comment_ID'] );
 
 		return ( new Process_Comments )->send_update_comment_to_ainsys( (int) $comment_id, $comment, true );
+	}
+
+
+	/**
+	 * @return array
+	 */
+	protected function get_attachment_for_test(): array {
+
+		$attachments = get_posts( [
+			'post_type'      => 'attachment',
+			'posts_per_page' => 50,
+			'post_status'    => 'any',
+			'post_parent'    => null,
+		] );
+
+		if ( empty( $attachments ) ) {
+			return [
+				'request'  => '',
+				'response' => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			];
+		}
+
+		$attachment    = (array) end( $attachments );
+		$attachment_id = $attachment['ID'];
+
+		return ( new Process_Attachments )->process_edit_attachment( (int) $attachment_id, $attachment, true );
 	}
 
 
@@ -172,7 +205,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 		}
 
 		$full_response = Logger::convert_response( $result_response );
-		$full_request  = Logger::convert_response( $result_response );
+		$full_request  = Logger::convert_response( $result_request );
 
 		$result_entity[ $entity ] = [
 			'request'        => $result_request,

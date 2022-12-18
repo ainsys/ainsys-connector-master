@@ -2,7 +2,6 @@
 
 namespace Ainsys\Connector\Master;
 
-use Ainsys\Connector\Master\Conditions\Conditions;
 use Ainsys\Connector\Master\Settings\Admin_UI;
 use Ainsys\Connector\Master\Settings\Admin_UI_Entities_Checking;
 use Ainsys\Connector\Master\Settings\Admin_UI_Entities_Controlling;

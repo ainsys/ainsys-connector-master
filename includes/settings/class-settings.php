@@ -166,8 +166,9 @@ class Settings implements Hooked {
 
 		/// Get WordPress pre installed entities.
 		$entities = [
-			'user'    => __( 'User / fields', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
-			'comment' => __( 'Comments / fields', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
+			'user'    => __( 'User / fields', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			'comment' => __( 'Comments / fields', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			'attachment' => __( 'Attachments / fields', AINSYS_CONNECTOR_TEXTDOMAIN ),
 		];
 
 		return apply_filters( 'ainsys_get_entities_list', $entities );

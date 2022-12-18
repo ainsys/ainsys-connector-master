@@ -5,7 +5,6 @@ namespace Ainsys\Connector\Master\WP;
 use Ainsys\Connector\Master\Conditions;
 use Ainsys\Connector\Master\Hooked;
 
-//TODO управления вложениями нет, так что могут быть траблы с логирование и отправкой данных
 class Process_Attachments extends Process implements Hooked {
 
 	/**
@@ -80,13 +79,13 @@ class Process_Attachments extends Process implements Hooked {
 	 * @param       $attachment_id
 	 * @param       $attachment_after
 	 * @param       $attachment_before
-	 * @param  bool $test
+	 * @param  bool $checking_connected
 	 *
 	 * @return array
 	 */
-	public function process_edit_attachment( $attachment_id, $attachment_after, $attachment_before, bool $test = false ): array {
+	public function process_edit_attachment( $attachment_id, $attachment_after, $attachment_before, bool $checking_connected = false ): array {
 
-		$request_action = 'UPDATE';
+		$request_action = $checking_connected ? 'Checking Connected' : 'UPDATE';
 
 		if ( Conditions::has_entity_disable_update( 'attachment', $request_action ) ) {
 			return [];

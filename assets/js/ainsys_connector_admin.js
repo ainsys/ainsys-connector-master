@@ -413,7 +413,7 @@ jQuery( function ( $ ) {
 				checkToDisableLogging();
 			} else {
 				$( '#start_loging' ).removeClass( 'disabled' );
-				$( '#start_loging_timeinterval' ).removeClass( 'disabled' ).prop( 'disabled', false ).val( -1 );
+				$( '#start_loging_timeinterval' ).removeClass( 'disabled' ).prop( 'disabled', false ).val( time);
 				$( '.ainsys-log-time' ).text( '-1' );
 				$( '.ainsys-log-status-ok' ).hide();
 				$( '.ainsys-log-status-no' ).show();

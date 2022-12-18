@@ -2,29 +2,14 @@
 
 namespace Ainsys\Connector\Master\Webhooks;
 
-use Ainsys\Connector\Master\Core;
+use Ainsys\Connector\Master\Conditions;
 use Ainsys\Connector\Master\Hooked;
 use Ainsys\Connector\Master\Logger;
 use Ainsys\Connector\Master\Webhook_Handler;
 
-class Handle_Comment implements Hooked, Webhook_Handler {
+class Handle_Comment extends Handle implements Hooked, Webhook_Handler {
 
-	/**
-	 * @var \Ainsys\Connector\Master\Logger
-	 */
-	protected Logger $logger;
-
-	/**
-	 * @var Core
-	 */
-	private Core $core;
-
-
-	public function __construct( Core $core, Logger $logger ) {
-
-		$this->core   = $core;
-		$this->logger = $logger;
-	}
+	protected static string $entity = 'comment';
 
 
 	/**
@@ -40,7 +25,7 @@ class Handle_Comment implements Hooked, Webhook_Handler {
 
 	public function register_webhook_handler( $handlers = [] ) {
 
-		$handlers['comment'] = [ $this, 'handler' ];
+		$handlers[ self::$entity ] = [ $this, 'handler' ];
 
 		return $handlers;
 	}
@@ -54,13 +39,13 @@ class Handle_Comment implements Hooked, Webhook_Handler {
 
 		switch ( $action ) {
 			case 'CREATE':
-				$response = $this->create( $data );
+				$response = $this->create( $data, $action );
 				break;
 			case 'UPDATE':
-				$response = $this->update( $data, $object_id );
+				$response = $this->update( $data, $action, $object_id );
 				break;
 			case 'DELETE':
-				$response = wp_delete_user( $object_id );
+				$response = $this->delete( $object_id, $data, $action );
 				break;
 		}
 
@@ -70,46 +55,34 @@ class Handle_Comment implements Hooked, Webhook_Handler {
 
 	/**
 	 * @param  array $data
+	 * @param        $action
 	 *
 	 * @return string
 	 */
-	protected function create( array $data ): string {
+	protected function create( array $data, $action ): string {
 
-		$success = __( 'The comment has been successfully created: comment ID = ', AINSYS_CONNECTOR_TEXTDOMAIN );
-		$error   = __( 'Failed to create a comment', AINSYS_CONNECTOR_TEXTDOMAIN );
+		if ( Conditions::has_entity_disable_create( self::$entity, $action, 'incoming' ) ) {
+			return sprintf( __( 'Error: %s creation is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
+		}
+
+		$error = __( 'Error: Failed to create a comment', AINSYS_CONNECTOR_TEXTDOMAIN );
 
 		$comment_id = wp_insert_comment( wp_slash( $data ) );
 
-		if ( ! $comment_id ) {
-			$message = $error;
-
-			$this->logger::save(
-				[
-					'object_id'       => 0,
-					'entity'          => 'comment',
-					'request_action'  => 'CREATE',
-					'request_type'    => 'incoming',
-					'request_data'    => serialize( $data ),
-					'server_response' => serialize($message),
-					'error'           => 1,
-				]
-			);
-
-			$this->core->send_error_email( $message );
-
-			return $message;
+		if ( is_wp_error( $comment_id ) ) {
+			return $this->handle_error( $data, $comment_id, $error, self::$entity, $action );
 		}
 
-		$message = $success . $comment_id;
+		$message = $this->message_success( $action, $comment_id );
 
-		$this->logger::save(
+		Logger::save(
 			[
 				'object_id'       => $comment_id,
-				'entity'          => 'comment',
-				'request_action'  => 'CREATE',
+				'entity'          => self::$entity,
+				'request_action'  => $action,
 				'request_type'    => 'incoming',
 				'request_data'    => serialize( $data ),
-				'server_response' => serialize($message),
+				'server_response' => serialize( $message ),
 			]
 		);
 
@@ -117,43 +90,61 @@ class Handle_Comment implements Hooked, Webhook_Handler {
 	}
 
 
-	protected function update( $data ): string {
+	protected function update( $data, $action ): string {
+
+		if ( Conditions::has_entity_disable_update( self::$entity, $action, 'incoming' ) ) {
+			return sprintf( __( 'Error: %s update is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
+		}
+
+		$error = __( 'Error: Perhaps such a comment does not exist', AINSYS_CONNECTOR_TEXTDOMAIN );
 
 		$result = wp_update_comment( wp_slash( $data ), true );
 
-		$success = __( 'The comment has been successfully updated: comment_ID = ', AINSYS_CONNECTOR_TEXTDOMAIN );
-		$error   = __( 'An error has occurred, perhaps such a comment does not exist', AINSYS_CONNECTOR_TEXTDOMAIN );
-
 		if ( is_wp_error( $result ) ) {
-			$message = $error . $result->get_error_message();
-
-			$this->logger::save(
-				[
-					'object_id'       => 0,
-					'entity'          => 'comment',
-					'request_action'  => 'CREATE',
-					'request_type'    => 'incoming',
-					'request_data'    => serialize( $data ),
-					'server_response' => serialize($message),
-					'error'           => 1,
-				]
-			);
-
-			$this->core->send_error_email( $message );
-
-			return $message;
+			return $this->handle_error( $data, $result, $error, self::$entity, $action );
 		}
 
-		$message = $success . $result;
+		$message = $this->message_success( $action, $result );
 
-		$this->logger::save(
+		Logger::save(
 			[
 				'object_id'       => $result,
-				'entity'          => 'comment',
-				'request_action'  => 'UPDATE',
+				'entity'          => self::$entity,
+				'request_action'  => $action,
 				'request_type'    => 'incoming',
 				'request_data'    => serialize( $data ),
-				'server_response' => serialize($message),
+				'server_response' => serialize( $message ),
+			]
+		);
+
+		return $message;
+	}
+
+
+	protected function delete( $object_id, $data, $action ): string {
+
+		if ( Conditions::has_entity_disable_delete( self::$entity, $action, 'incoming' ) ) {
+			return sprintf( __( 'Error: %s delete is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
+		}
+
+		$error = __( 'Error: user is not deleted', AINSYS_CONNECTOR_TEXTDOMAIN );
+
+		$result = wp_delete_comment( $object_id, true );
+
+		if ( is_wp_error( $result ) ) {
+			return $this->handle_error( $data, $result, $error, self::$entity, $action );
+		}
+
+		$message = $this->message_success( $action, $object_id );
+
+		Logger::save(
+			[
+				'object_id'       => $result,
+				'entity'          => self::$entity,
+				'request_action'  => $action,
+				'request_type'    => 'incoming',
+				'request_data'    => serialize( $data ),
+				'server_response' => serialize( $message ),
 			]
 		);
 

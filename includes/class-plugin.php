@@ -2,6 +2,7 @@
 
 namespace Ainsys\Connector\Master;
 
+use Ainsys\Connector\Master\Conditions\Conditions;
 use Ainsys\Connector\Master\Settings\Admin_UI;
 use Ainsys\Connector\Master\Settings\Admin_UI_Entities_Checking;
 use Ainsys\Connector\Master\Settings\Admin_UI_Entities_Controlling;
@@ -59,6 +60,7 @@ class Plugin implements Hooked {
 		$this->components['settings']            = $this->di_container->resolve( Settings::class );
 		$this->components['logger']              = $this->di_container->resolve( Logger::class );
 		$this->components['core']                = $this->di_container->resolve( Core::class );
+		$this->components['conditions']          = $this->di_container->resolve( Conditions::class );
 		$this->components['utm_handler']         = $this->di_container->resolve( UTM_Handler::class );
 		$this->components['process_users']       = $this->di_container->resolve( Process_Users::class );
 		$this->components['process_comments']    = $this->di_container->resolve( Process_Comments::class );
@@ -69,7 +71,7 @@ class Plugin implements Hooked {
 
 		$this->components['settings_admin_ui']                      = $this->di_container->resolve( Admin_UI::class );
 		$this->components['settings_admin_ui_general']              = $this->di_container->resolve( Admin_UI_General::class );
-		$this->components['settings_admin_ui_logs']              = $this->di_container->resolve( Admin_UI_Logs::class );
+		$this->components['settings_admin_ui_logs']                 = $this->di_container->resolve( Admin_UI_Logs::class );
 		$this->components['settings_admin_ui_entities_checking']    = $this->di_container->resolve( Admin_UI_Entities_Checking::class );
 		$this->components['settings_admin_ui_entities_controlling'] = $this->di_container->resolve( Admin_UI_Entities_Controlling::class );
 	}

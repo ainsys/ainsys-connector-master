@@ -159,16 +159,26 @@ class Admin_UI_Entities_Checking implements Hooked {
 	 */
 	protected function get_result_entity( array $result_test, $result_entity, $entity ) {
 
-		$result_request  = !empty($result_test['request']) ? $result_test['request'] : __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN );
-		$result_response  = !empty($result_test['response']) ? $result_test['response'] : '';
+		if ( ! empty( $result_test['request'] ) ) {
+			$result_request = $result_test['request'];
+		} else {
+			$result_request = '';
+		}
 
-		$full_response = Logger::convert_response( $result_response);
+		if ( ! empty( $result_test['response'] ) ) {
+			$result_response = $result_test['response'];
+		} else {
+			$result_response = __( 'Error: Data transfer is disabled. Check the Entities export settings tab', AINSYS_CONNECTOR_TEXTDOMAIN );
+		}
+
+		$full_response = Logger::convert_response( $result_response );
+		$full_request  = Logger::convert_response( $result_response );
 
 		$result_entity[ $entity ] = [
 			'request'        => $result_request,
 			'response'       => $result_response,
 			'short_request'  => mb_substr( serialize( $result_request ), 0, 40 ) . ' ... ',
-			'full_request'   => Logger::render_json( $result_request ),
+			'full_request'   => $full_request,//Logger::render_json( $result_request ),
 			'short_response' => mb_substr( serialize( $result_response ), 0, 40 ) . ' ... ',
 			'full_response'  => $full_response,
 			'time'           => current_time( 'mysql' ),

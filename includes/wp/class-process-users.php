@@ -2,6 +2,7 @@
 
 namespace Ainsys\Connector\Master\WP;
 
+use Ainsys\Connector\Master\Conditions\Conditions;
 use Ainsys\Connector\Master\Hooked;
 
 class Process_Users extends Process implements Hooked {
@@ -30,7 +31,7 @@ class Process_Users extends Process implements Hooked {
 
 		$request_action = 'CREATE';
 
-		if ( $this->has_entity_disable_create( 'user', $request_action ) ) {
+		if ( Conditions::has_entity_disable_create( 'user', $request_action ) ) {
 			return;
 		}
 
@@ -76,7 +77,8 @@ class Process_Users extends Process implements Hooked {
 
 		$request_action = $checking_connected ? 'Checking Connected' : 'UPDATE';
 
-		if ( $this->has_entity_disable_update( 'user', $request_action ) ) {
+		if ( Conditions::has_entity_disable_update( 'user', $request_action ) ) {
+
 			return [];
 		}
 

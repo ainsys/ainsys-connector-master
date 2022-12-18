@@ -2,6 +2,7 @@
 
 namespace Ainsys\Connector\Master\WP;
 
+use Ainsys\Connector\Master\Conditions\Conditions;
 use Ainsys\Connector\Master\Hooked;
 
 //TODO управления вложениями нет, так что могут быть траблы с логирование и отправкой данных
@@ -34,7 +35,7 @@ class Process_Attachments extends Process implements Hooked {
 
 		$request_action = 'CREATE';
 
-		if ( $this->has_entity_disable_create( 'attachment', $request_action ) ) {
+		if ( Conditions::has_entity_disable_create( 'attachment', $request_action ) ) {
 			return;
 		}
 
@@ -87,7 +88,7 @@ class Process_Attachments extends Process implements Hooked {
 
 		$request_action = 'UPDATE';
 
-		if ( $this->has_entity_disable_update( 'attachment', $request_action ) ) {
+		if ( Conditions::has_entity_disable_update( 'attachment', $request_action ) ) {
 			return [];
 		}
 

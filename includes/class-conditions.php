@@ -1,11 +1,16 @@
 <?php
 
-namespace Ainsys\Connector\Master\Conditions;
+namespace Ainsys\Connector\Master;
 
-use Ainsys\Connector\Master\Logger;
 use Ainsys\Connector\Master\Settings\Settings;
 
-class Conditions {
+class Conditions implements Hooked {
+
+	/**
+	 * Init hooks.
+	 */
+	public function init_hooks() { }
+
 
 	public static function get_option_control( $entity ) {
 

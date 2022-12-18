@@ -2,7 +2,7 @@
 
 namespace Ainsys\Connector\Master\WP;
 
-use Ainsys\Connector\Master\Conditions\Conditions;
+use Ainsys\Connector\Master\Conditions;
 use Ainsys\Connector\Master\Hooked;
 
 class Process_Comments extends Process implements Hooked {

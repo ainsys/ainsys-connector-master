@@ -22,7 +22,7 @@ $status_addons = $settings->get_statuses_addons();
 
 <div id="setting-section-general" class="tab-target">
 	<div class="ainsys-settings-blocks">
-		<form method="post" action="options.php">
+		<div class="ainsys-settings-block--primary">
 			<div class="ainsys-settings-block ainsys-settings-block--connection">
 				<h2><?php _e( 'Connection Settings', AINSYS_CONNECTOR_TEXTDOMAIN ); // phpcs:ignore ?></h2>
 
@@ -124,9 +124,8 @@ $status_addons = $settings->get_statuses_addons();
 						<input id="full-uninstall-checkbox"
 						       type="checkbox"
 						       name="<?php echo esc_attr( Settings::get_option_name( 'full_uninstall' ) ); ?>"
-						       value="<?php echo esc_attr( Settings::get_option( 'full_uninstall' ) ); ?>" <?php checked(
-							1, esc_html( Settings::get_option( 'full_uninstall' ) ), true
-						); ?> />
+						       value="<?php echo esc_attr( Settings::get_option( 'full_uninstall' ) ); ?>"
+							<?php checked( 1, esc_html( Settings::get_option( 'full_uninstall' ) ) ); ?> />
 					</div>
 					<label for="full-uninstall-checkbox" class="ainsys-form-label">
 						<?php _e( 'Purge all plugin data during deactivation to reset connector settings ', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
@@ -136,7 +135,7 @@ $status_addons = $settings->get_statuses_addons();
 					</label>
 				</div>
 			</div>
-		</form>
+		</div>
 		<div class="ainsys-settings-block--sidebar">
 
 			<div class="ainsys-settings-block ainsys-settings-block--status ">

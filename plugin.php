@@ -8,7 +8,7 @@ namespace Ainsys\Connector\Master;
  * Description: AINSYS connector master.
  * Version:           4.2.4
  * Author:            AINSYS
- * Author URI:        https://app.ainsys.com/
+ * Author URI:        https://ainsys.com/
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:     ainsys_connector

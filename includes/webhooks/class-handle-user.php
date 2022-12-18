@@ -11,7 +11,6 @@ class Handle_User extends Handle implements Hooked, Webhook_Handler {
 
 	protected static string $entity = 'user';
 
-
 	/**
 	 * Initializes WordPress hooks for component.
 	 *
@@ -61,7 +60,7 @@ class Handle_User extends Handle implements Hooked, Webhook_Handler {
 	 */
 	protected function create( array $data, $action ): string {
 
-		if ( Conditions::has_entity_disable_create( 'user', $action, 'incoming' ) ) {
+		if ( Conditions::has_entity_disable_create( self::$entity, $action, 'incoming' ) ) {
 			return sprintf( __( 'Error: %s creation is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
 		}
 
@@ -94,7 +93,7 @@ class Handle_User extends Handle implements Hooked, Webhook_Handler {
 
 	protected function update( $data, $action ): string {
 
-		if ( Conditions::has_entity_disable_update( 'user', $action, 'incoming' ) ) {
+		if ( Conditions::has_entity_disable_update( self::$entity, $action, 'incoming' ) ) {
 			return sprintf( __( 'Error: %s update is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
 		}
 
@@ -125,7 +124,7 @@ class Handle_User extends Handle implements Hooked, Webhook_Handler {
 
 	protected function delete( $object_id, $data, $action ): string {
 
-		if ( Conditions::has_entity_disable_delete( 'user', $action, 'incoming' ) ) {
+		if ( Conditions::has_entity_disable_delete( self::$entity, $action, 'incoming' ) ) {
 			return sprintf( __( 'Error: %s delete is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
 		}
 

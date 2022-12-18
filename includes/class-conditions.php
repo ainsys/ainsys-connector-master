@@ -50,15 +50,15 @@ class Conditions implements Hooked {
 	}
 
 
-	public static function has_entity_disable_create( $entity, $request_action = '' ): bool {
+	public static function has_entity_disable_create( $entity, $action = '', $type = 'outgoing' ): bool {
 
 		if ( empty( self::get_option_control( $entity ) ) ) {
 			Logger::save(
 				[
 					'object_id'       => 0,
 					'entity'          => $entity,
-					'request_action'  => $request_action,
-					'request_type'    => 'outgoing',
+					'request_action'  => $action,
+					'request_type'    => $type,
 					'request_data'    => '',
 					'server_response' => serialize( 'Error: No url provided' ),
 					'error'           => 1,
@@ -73,8 +73,8 @@ class Conditions implements Hooked {
 				[
 					'object_id'       => 0,
 					'entity'          => $entity,
-					'request_action'  => $request_action,
-					'request_type'    => 'outgoing',
+					'request_action'  => $action,
+					'request_type'    => $type,
 					'request_data'    => serialize( __( 'Error: Data transfer is completely disabled. Check the Entities export settings tab', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
 					'server_response' => serialize( __( 'Error: Data transfer is completely disabled. Check the Entities export settings tab', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
 					'error'           => 1,
@@ -89,8 +89,8 @@ class Conditions implements Hooked {
 				[
 					'object_id'       => 0,
 					'entity'          => $entity,
-					'request_action'  => $request_action,
-					'request_type'    => 'outgoing',
+					'request_action'  => $action,
+					'request_type'    => $type,
 					'request_data'    => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
 					'server_response' => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
 					'error'           => 1,
@@ -106,15 +106,15 @@ class Conditions implements Hooked {
 	}
 
 
-	public static function has_entity_disable_update( $entity, $request_action = '' ): bool {
+	public static function has_entity_disable_update( $entity, $action = '', $type = 'outgoing' ): bool {
 
 		if ( empty( self::get_option_control( $entity ) ) ) {
 			Logger::save(
 				[
 					'object_id'       => 0,
 					'entity'          => $entity,
-					'request_action'  => $request_action,
-					'request_type'    => 'outgoing',
+					'request_action'  => $action,
+					'request_type'    => $type,
 					'request_data'    => '',
 					'server_response' => serialize( 'Error: No url provided' ),
 					'error'           => 1,
@@ -129,7 +129,7 @@ class Conditions implements Hooked {
 				[
 					'object_id'       => 0,
 					'entity'          => $entity,
-					'request_action'  => $request_action,
+					'request_action'  => $type,
 					'request_type'    => 'outgoing',
 					'request_data'    => serialize( __( 'Error: Data transfer is completely disabled. Check the Entities export settings tab', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
 					'server_response' => serialize( __( 'Error: Data transfer is completely disabled. Check the Entities export settings tab', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
@@ -145,7 +145,7 @@ class Conditions implements Hooked {
 				[
 					'object_id'       => 0,
 					'entity'          => $entity,
-					'request_action'  => $request_action,
+					'request_action'  => $type,
 					'request_type'    => 'outgoing',
 					'request_data'    => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
 					'server_response' => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
@@ -161,15 +161,15 @@ class Conditions implements Hooked {
 	}
 
 
-	public static function has_entity_disable_read( $entity, $request_action = '' ): bool {
+	public static function has_entity_disable_read( $entity, $action = '', $type = 'outgoing' ): bool {
 
 		if ( empty( self::get_option_control( $entity ) ) ) {
 			Logger::save(
 				[
 					'object_id'       => 0,
 					'entity'          => $entity,
-					'request_action'  => $request_action,
-					'request_type'    => 'outgoing',
+					'request_action'  => $action,
+					'request_type'    => $type,
 					'request_data'    => '',
 					'server_response' => serialize( 'Error: No url provided' ),
 					'error'           => 1,
@@ -184,8 +184,8 @@ class Conditions implements Hooked {
 				[
 					'object_id'       => 0,
 					'entity'          => $entity,
-					'request_action'  => $request_action,
-					'request_type'    => 'outgoing',
+					'request_action'  => $action,
+					'request_type'    => $type,
 					'request_data'    => serialize( __( 'Error: Data transfer is completely disabled. Check the Entities export settings tab', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
 					'server_response' => serialize( __( 'Error: Data transfer is completely disabled. Check the Entities export settings tab', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
 					'error'           => 1,
@@ -200,8 +200,8 @@ class Conditions implements Hooked {
 				[
 					'object_id'       => 0,
 					'entity'          => $entity,
-					'request_action'  => $request_action,
-					'request_type'    => 'outgoing',
+					'request_action'  => $action,
+					'request_type'    => $type,
 					'request_data'    => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
 					'server_response' => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
 					'error'           => 1,
@@ -216,15 +216,15 @@ class Conditions implements Hooked {
 	}
 
 
-	public static function has_entity_disable_delete( $entity, $request_action = '' ): bool {
+	public static function has_entity_disable_delete( $entity, $action = '', $type = 'outgoing' ): bool {
 
 		if ( empty( self::get_option_control( $entity ) ) ) {
 			Logger::save(
 				[
 					'object_id'       => 0,
 					'entity'          => $entity,
-					'request_action'  => $request_action,
-					'request_type'    => 'outgoing',
+					'request_action'  => $action,
+					'request_type'    => $type,
 					'request_data'    => '',
 					'server_response' => serialize( 'Error: No url provided' ),
 					'error'           => 1,
@@ -239,8 +239,8 @@ class Conditions implements Hooked {
 				[
 					'object_id'       => 0,
 					'entity'          => $entity,
-					'request_action'  => $request_action,
-					'request_type'    => 'outgoing',
+					'request_action'  => $action,
+					'request_type'    => $type,
 					'request_data'    => serialize( __( 'Error: Data transfer is completely disabled. Check the Entities export settings tab', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
 					'server_response' => serialize( __( 'Error: Data transfer is completely disabled. Check the Entities export settings tab', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
 					'error'           => 1,
@@ -255,8 +255,8 @@ class Conditions implements Hooked {
 				[
 					'object_id'       => 0,
 					'entity'          => $entity,
-					'request_action'  => $request_action,
-					'request_type'    => 'outgoing',
+					'request_action'  => $action,
+					'request_type'    => $type,
 					'request_data'    => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
 					'server_response' => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
 					'error'           => 1,

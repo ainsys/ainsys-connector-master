@@ -4,7 +4,7 @@
  *
  * @package ainsys
  *
- * @global $args
+ * @global                                            $args
  * @global  Ainsys\Connector\Master\Settings\Admin_UI $this
  */
 
@@ -30,27 +30,28 @@ $settings_content_tabs = $this->get_nav_content_fields();
 	</div>
 
 	<div class="ainsys-tabs-content-wrapper">
-		<?php
+		<form method="post" action="options.php">
+			<?php
 
-		do_action( 'ainsys_connector_after_content_tabs' );
+			do_action( 'ainsys_connector_after_content_tabs' );
 
-		foreach ( $settings_content_tabs as $content ):
+			foreach ( $settings_content_tabs as $content ):
 
-			load_template(
-				AINSYS_CONNECTOR_PLUGIN_DIR . $content['template'],
-				false,
-				[
-					'admin_ui' => $this,
-					'active'   => $content['active'],
-				]
-			);
+				load_template(
+					AINSYS_CONNECTOR_PLUGIN_DIR . $content['template'],
+					false,
+					[
+						'admin_ui' => $this,
+						'active'   => $content['active'],
+					]
+				);
 
-		endforeach;
+			endforeach;
 
-		do_action( 'ainsys_connector_after_content_tabs' )
+			do_action( 'ainsys_connector_after_content_tabs' )
 
-		?>
-
+			?>
+		</form>
 
 	</div>
 

@@ -71,7 +71,7 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 												<?php echo mb_substr( serialize( $check_entity[ $entity_id ]['request'] ), 0, 40 ) . ' ... ' ?>
 											</div>
 											<div class="ainsys-response-full">
-												<?php echo Logger::render_json( $check_entity[ $entity_id ]['request'] ) ?>
+												<?php echo Logger::convert_response( $check_entity[ $entity_id ]['request'] ); ?>
 											</div>
 										<?php endif; ?>
 

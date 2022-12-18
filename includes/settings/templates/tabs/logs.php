@@ -28,7 +28,7 @@ $start    = Settings::get_option( 'do_log_transactions' ) ? ' disabled' : '';
 $stop     = Settings::get_option( 'do_log_transactions' ) ? '' : ' disabled';
 $since    = Settings::get_option( 'log_transactions_since' ) ?? '';
 $time     = Settings::get_option( 'log_until_certain_time' ) ?? 0;
-$selected = Settings::get_option( 'log_select_value' ) ?? - 1;
+$selected = empty( Settings::get_option( 'log_select_value' ) ) ? 1 : Settings::get_option( 'log_select_value' );
 
 ?>
 <div id="setting-section-log" class="tab-target">
@@ -51,11 +51,22 @@ $selected = Settings::get_option( 'log_select_value' ) ?? - 1;
 			        id="start_loging"
 			        class="btn btn-primary ainsys-log-control<?php echo esc_attr( $start ); ?>"><?php _e( 'Start log', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></button>
 
-			<select id="start_loging_timeinterval" class="<?php echo esc_attr( $start ); ?>" <?php echo esc_attr( $start ); ?> name="loging_timeinterval">
+			<select id="start_loging_timeinterval"
+			        class="<?php echo esc_attr( $start ); ?>" <?php echo esc_attr( $start ); ?>
+			        name="<?php echo esc_attr( Settings::get_option_name( 'log_select_value' ) ); ?>loging_timeinterval">
 				<?php foreach ( $time_select as $key => $val ): ?>
 					<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $selected, $key ); ?>><?php echo esc_html( $val ); ?></option>
 				<?php endforeach; ?>
 			</select>
+
+			<div class="ainsys-form-input">
+				<label for="<?php echo esc_attr( Settings::get_option_name( 'do_log_transactions' ) ); ?>" class="ainsys-form-label">
+					<input id="<?php echo esc_attr( Settings::get_option_name( 'do_log_transactions' ) ); ?>"
+					       type="hidden"
+					       name="<?php echo esc_attr( Settings::get_option_name( 'do_log_transactions' ) ); ?>"
+					       value="<?php echo esc_attr( ! empty( Settings::get_option( 'do_log_transactions' ) ? : 1 ) ); ?>"/>
+				</label>
+			</div>
 
 			<button type="button"
 			        id="stop_loging"

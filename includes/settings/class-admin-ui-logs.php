@@ -28,10 +28,14 @@ class Admin_UI_Logs implements Hooked {
 		return apply_filters(
 			'ainsys_select_time_logs',
 			[
-				'1'  => __( '1 hour', AINSYS_CONNECTOR_TEXTDOMAIN ),
-				'5'  => __( '5 hours', AINSYS_CONNECTOR_TEXTDOMAIN ),
-				'12' => __( '12 hours', AINSYS_CONNECTOR_TEXTDOMAIN ),
-				'24' => __( '24 hours', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'60'  => __( '1 min', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'900'  => __( '15 min', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'1800'  => __( '30 min', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'3600'  => __( '1 hour', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'10800'  => __( '3 hours', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'21600'  => __( '6 hours', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'43200' => __( '12 hours', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'86400' => __( '24 hours', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'-1' => __( 'Unlimited', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			]
 		);
@@ -94,7 +98,7 @@ class Admin_UI_Logs implements Hooked {
 			$end_time     = $time;
 
 			if ( $time > 0 ) {
-				$end_time = $current_time + $time * 60 * 60;
+				$end_time = $current_time + $time;
 			}
 
 			Settings::set_option( 'log_until_certain_time', $end_time );
@@ -112,7 +116,7 @@ class Admin_UI_Logs implements Hooked {
 		} else {
 			Settings::set_option( 'do_log_transactions', 0 );
 			Settings::set_option( 'log_transactions_since', '' );
-			Settings::set_option( 'log_select_value', - 1 );
+			Settings::set_option( 'log_select_value', $time );
 		}
 
 		wp_send_json( [

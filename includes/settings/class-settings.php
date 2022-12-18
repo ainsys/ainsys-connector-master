@@ -61,7 +61,7 @@ class Settings implements Hooked {
 			'do_log_transactions'      => 0,
 			'log_transactions_since'   => '',
 			'log_until_certain_time'   => 0,
-			'log_select_value'         => - 1,
+			'log_select_value'         => 1,
 			'full_uninstall'           => 0,
 			'connector_id'             => '',
 			'client_full_name'         => '',
@@ -178,6 +178,7 @@ class Settings implements Hooked {
 	 * Autodisables logging.
 	 *
 	 * @return void
+	 * @todo плохо релизовано отключение логировния по времени, отчсет идет в js что не есть правильно
 	 */
 	public static function check_to_auto_disable_logging(): void {
 

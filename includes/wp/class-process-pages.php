@@ -16,10 +16,10 @@ class Process_Pages extends Process implements Hooked {
 	 * @return void
 	 */
 	public function init_hooks() {
-		//TODO проверить на ошибки, что-то странное возвращает
-		add_action( 'wp_insert_post', [ $this, 'process_create' ], 10, 3 );
-		add_action( 'edit_post', [ $this, 'process_update' ], 10,3 );
-		add_action( 'delete_post', [ $this, 'process_delete' ], 10, 2 );
+
+		add_action( 'wp_after_insert_post', [ $this, 'process_create' ], 10, 4 );
+		add_action( 'save_post_page', [ $this, 'process_update' ], 10, 4 );
+		add_action( 'deleted_post', [ $this, 'process_delete' ], 10, 2 );
 
 	}
 
@@ -30,18 +30,19 @@ class Process_Pages extends Process implements Hooked {
 	 * @param  int $post_id
 	 * @param      $post
 	 * @param      $update
+	 * @param      $post_before
 	 *
 	 * @return void
 	 */
-	public function process_create( int $post_id, $post, $update ): void {
+	public function process_create( int $post_id, $post, $update, $post_before ): void {
 
-		if ( $update ) {
+		self::$action = 'CREATE';
+
+		if ( Conditions::has_entity_disable_create( self::$entity, self::$action ) ) {
 			return;
 		}
 
-		$request_action = 'CREATE';
-
-		if ( Conditions::has_entity_disable_create( self::$entity, $request_action ) ) {
+		if ( ! is_null( $post_before ) || true === $update ) {
 			return;
 		}
 
@@ -55,25 +56,30 @@ class Process_Pages extends Process implements Hooked {
 			$post_id
 		);
 
-		$this->send_data( $post_id, self::$entity, $request_action, $fields );
+		$this->send_data( $post_id, self::$entity, self::$action, $fields );
 
 	}
 
 
 	/**
-	 * Sends updated attachment details to AINSYS.
+	 * Sends updated post details to AINSYS.
 	 *
 	 * @param       $post_id
 	 * @param       $post
+	 * @param       $update
 	 * @param  bool $checking_connected
 	 *
 	 * @return array
 	 */
-	public function process_update( $post_id, $post, bool $checking_connected = false ): array {
+	public function process_update( $post_id, $post, $update, bool $checking_connected = false ): array {
 
-		$request_action = $checking_connected ? 'Checking Connected' : 'UPDATE';
+		self::$action = $checking_connected ? 'Checking Connected' : 'UPDATE';
 
-		if ( Conditions::has_entity_disable_update( self::$entity, $request_action ) ) {
+		if ( Conditions::has_entity_disable_update( self::$entity, self::$action ) ) {
+			return [];
+		}
+
+		if ( ! $this->is_updated( $post_id, $update ) ) {
 			return [];
 		}
 
@@ -86,13 +92,13 @@ class Process_Pages extends Process implements Hooked {
 			$this->prepare_post_data( $post_id, $post ),
 			$post_id
 		);
-		error_log( print_r( $post, 1 ) );
-		return $this->send_data( $post_id, self::$entity, $request_action, $fields );
+
+		return $this->send_data( $post_id, self::$entity, self::$action, $fields );
 	}
 
 
 	/**
-	 * Sends delete attachment details to AINSYS
+	 * Sends delete post details to AINSYS
 	 *
 	 * @param  int $post_id
 	 * @param      $post
@@ -101,7 +107,7 @@ class Process_Pages extends Process implements Hooked {
 	 */
 	public function process_delete( int $post_id, $post ): void {
 
-		$request_action = 'DELETE';
+		self::$action = 'DELETE';
 
 		$fields = apply_filters(
 			'ainsys_process_delete_fields_' . self::$entity,
@@ -109,7 +115,7 @@ class Process_Pages extends Process implements Hooked {
 			$post_id
 		);
 
-		$this->send_data( $post_id, self::$entity, $request_action, $fields );
+		$this->send_data( $post_id, self::$entity, self::$action, $fields );
 
 	}
 
@@ -122,7 +128,7 @@ class Process_Pages extends Process implements Hooked {
 	 *
 	 * @return array
 	 */
-	protected function prepare_post_data( int $post_ID, $post ){
+	protected function prepare_post_data( int $post_ID, $post ) {
 
 		if ( ! $post ) {
 			$post = get_post( $post_ID );
@@ -132,7 +138,24 @@ class Process_Pages extends Process implements Hooked {
 			return [];
 		}
 
-		return $post;
+		return [
+			'ID'             => $post->ID,
+			'post_author'    => $post->post_author,
+			'post_content'   => $post->post_content,
+			'post_title'     => $post->post_title,
+			'post_excerpt'   => $post->post_excerpt,
+			'post_status'    => $post->post_status,
+			'post_type'      => $post->post_type,
+			'post_date'      => $post->post_date,
+			'post_modified'  => $post->post_modified,
+			'post_password'  => $post->post_password,
+			'post_parent'    => $post->post_parent,
+			'menu_order'     => $post->menu_order,
+			'guid'           => $post->guid,
+			'comment_status' => $post->comment_status,
+			'comment_count'  => $post->comment_count,
+			'meta_input'     => get_post_meta( $post->ID ),
+		];
 	}
 
 }

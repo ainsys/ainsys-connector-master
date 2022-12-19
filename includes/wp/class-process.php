@@ -65,4 +65,48 @@ class Process {
 		];
 	}
 
+	/**
+	 * @param $post
+	 *
+	 * @return array
+	 */
+	public function get_taxonomies( $post ): array {
+
+		$taxonomies     = [];
+		$taxonomy_names = get_object_taxonomies( $post );
+
+		foreach ( $taxonomy_names as  $taxonomy_name ) {
+
+			$terms = get_the_terms( $post, (string) $taxonomy_name );
+
+			$taxonomies[ $taxonomy_name ] = $terms;
+
+		}
+
+		return $taxonomies;
+	}
+
+	public function is_updated( $post_id, $update ): bool {
+
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return false;
+		}
+
+		// Check if it is a REST Request
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			return false;
+		}
+
+		// Check if it is an autosave or a revision.
+		if ( wp_is_post_autosave( $post_id ) || wp_is_post_revision( $post_id ) ) {
+			return false;
+		}
+
+		if ( ! $update ) {
+			return false;
+		}
+
+		return true;
+	}
+
 }

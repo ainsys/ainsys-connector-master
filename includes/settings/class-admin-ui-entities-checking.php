@@ -6,6 +6,7 @@ use Ainsys\Connector\Master\Hooked;
 use Ainsys\Connector\Master\Logger;
 use Ainsys\Connector\Master\WP\Process_Attachments;
 use Ainsys\Connector\Master\WP\Process_Comments;
+use Ainsys\Connector\Master\WP\Process_Pages;
 use Ainsys\Connector\Master\WP\Process_Posts;
 use Ainsys\Connector\Master\WP\Process_Users;
 
@@ -70,6 +71,12 @@ class Admin_UI_Entities_Checking implements Hooked {
 			case 'post':
 				$make_request  = true;
 				$result_test   = $this->get_post_for_test();
+				$result_entity = Settings::get_option( 'check_connection_entity' );
+				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
+				break;
+			case 'page':
+				$make_request  = true;
+				$result_test   = $this->get_page_for_test();
 				$result_entity = Settings::get_option( 'check_connection_entity' );
 				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
 				break;
@@ -213,6 +220,31 @@ class Admin_UI_Entities_Checking implements Hooked {
 		$post_id = $post->ID;
 
 		return ( new Process_Posts )->process_update( (int) $post_id, $post, true );
+	}
+
+	/**
+	 * @return array
+	 */
+	protected function get_page_for_test(): array {
+
+		$posts = get_posts( [
+			'post_type'      => 'page',
+			'posts_per_page' => 50,
+			'post_status'    => 'public',
+			'post_parent'    => null,
+		] );
+
+		if ( empty( $posts ) ) {
+			return [
+				'request'  => '',
+				'response' => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			];
+		}
+
+		$post    = end( $posts );
+		$post_id = $post->ID;
+
+		return ( new Process_Pages )->process_update( (int) $post_id, $post, true );
 	}
 
 

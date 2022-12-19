@@ -7,7 +7,7 @@ use Ainsys\Connector\Master\Logger;
 
 class Handle {
 
-	protected static string $entity;
+	protected static ?string $entity = '';
 
 
 	public function handle_error( $data, $result, $message_error, $entity, $action ): string {
@@ -33,20 +33,35 @@ class Handle {
 
 
 	/**
+	 * @param $entity
 	 * @param $action
 	 * @param $user_id
 	 *
 	 * @return string
 	 */
-	public function message_success( $action, $user_id ): string {
+	public function message_success( $entity, $action, $user_id ): string {
 
 		return sprintf(
 			__( '%s has been successfully %s - %s ID:  %s', AINSYS_CONNECTOR_TEXTDOMAIN ),
-			ucwords( strtolower( self::$entity ) ),
+			ucwords( strtolower( $entity ) ),
 			strtolower( $action ),
-			$user_id,
-			self::$entity
+			$entity,
+			$user_id
 		);
 	}
+
+
+	public function statuses(): array {
+
+		return [
+			'draft',
+			'future',
+			'pending',
+			'private',
+			'publish',
+			'trash',
+		];
+	}
+
 
 }

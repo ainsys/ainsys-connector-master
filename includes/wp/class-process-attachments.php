@@ -7,7 +7,7 @@ use Ainsys\Connector\Master\Hooked;
 
 class Process_Attachments extends Process implements Hooked {
 
-	protected static string $entity = 'attachment';
+	protected static ?string $entity = 'attachment';
 
 
 	/**

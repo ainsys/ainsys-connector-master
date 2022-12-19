@@ -36,9 +36,9 @@ class Process_Posts extends Process implements Hooked {
 	 */
 	public function process_create( int $post_id, $post, $update, $post_before ): void {
 
-		$request_action = 'CREATE';
+		self::$action = 'CREATE';
 
-		if ( Conditions::has_entity_disable_create( self::$entity, $request_action ) ) {
+		if ( Conditions::has_entity_disable_create( self::$entity, self::$action ) ) {
 			return;
 		}
 
@@ -56,7 +56,7 @@ class Process_Posts extends Process implements Hooked {
 			$post_id
 		);
 
-		$this->send_data( $post_id, self::$entity, $request_action, $fields );
+		$this->send_data( $post_id, self::$entity, self::$action, $fields );
 
 	}
 
@@ -73,9 +73,9 @@ class Process_Posts extends Process implements Hooked {
 	 */
 	public function process_update( $post_id, $post, $update, bool $checking_connected = false ): array {
 
-		$request_action = $checking_connected ? 'Checking Connected' : 'UPDATE';
+		self::$action = $checking_connected ? 'Checking Connected' : 'UPDATE';
 
-		if ( Conditions::has_entity_disable_update( self::$entity, $request_action ) ) {
+		if ( Conditions::has_entity_disable_update( self::$entity, self::$action ) ) {
 			return [];
 		}
 
@@ -93,7 +93,7 @@ class Process_Posts extends Process implements Hooked {
 			$post_id
 		);
 
-		return $this->send_data( $post_id, self::$entity, $request_action, $fields );
+		return $this->send_data( $post_id, self::$entity, self::$action, $fields );
 	}
 
 
@@ -107,7 +107,7 @@ class Process_Posts extends Process implements Hooked {
 	 */
 	public function process_delete( int $post_id, $post ): void {
 
-		$request_action = 'DELETE';
+		self::$action = 'DELETE';
 
 		$fields = apply_filters(
 			'ainsys_process_delete_fields_' . self::$entity,
@@ -115,7 +115,7 @@ class Process_Posts extends Process implements Hooked {
 			$post_id
 		);
 
-		$this->send_data( $post_id, self::$entity, $request_action, $fields );
+		$this->send_data( $post_id, self::$entity, self::$action, $fields );
 
 	}
 

@@ -244,7 +244,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 		$post    = end( $posts );
 		$post_id = $post->ID;
 
-		return ( new Process_Pages )->process_update( (int) $post_id, $post, true );
+		return ( new Process_Pages )->process_update( (int) $post_id, $post, true, true );
 	}
 
 

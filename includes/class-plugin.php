@@ -12,6 +12,7 @@ use Ainsys\Connector\Master\Webhooks\Handle_Comment;
 use Ainsys\Connector\Master\Webhooks\Handle_User;
 use Ainsys\Connector\Master\WP\Process_Attachments;
 use Ainsys\Connector\Master\WP\Process_Comments;
+use Ainsys\Connector\Master\WP\Process_Posts;
 use Ainsys\Connector\Master\WP\Process_Users;
 
 defined( 'ABSPATH' ) || die();
@@ -56,17 +57,20 @@ class Plugin implements Hooked {
 		 * among the plugin.
 		 */
 
-		$this->components['settings']            = $this->di_container->resolve( Settings::class );
-		$this->components['logger']              = $this->di_container->resolve( Logger::class );
-		$this->components['core']                = $this->di_container->resolve( Core::class );
-		$this->components['conditions']          = $this->di_container->resolve( Conditions::class );
-		$this->components['utm_handler']         = $this->di_container->resolve( UTM_Handler::class );
+		$this->components['settings']    = $this->di_container->resolve( Settings::class );
+		$this->components['logger']      = $this->di_container->resolve( Logger::class );
+		$this->components['core']        = $this->di_container->resolve( Core::class );
+		$this->components['conditions']  = $this->di_container->resolve( Conditions::class );
+		$this->components['utm_handler'] = $this->di_container->resolve( UTM_Handler::class );
+
 		$this->components['process_users']       = $this->di_container->resolve( Process_Users::class );
 		$this->components['process_comments']    = $this->di_container->resolve( Process_Comments::class );
 		$this->components['process_attachments'] = $this->di_container->resolve( Process_Attachments::class );
-		$this->components['webhooks']            = $this->di_container->resolve( Webhook_Listener::class );
-		$this->components['webhook_user']        = $this->di_container->resolve( Handle_User::class );
-		$this->components['webhook_comment']     = $this->di_container->resolve( Handle_Comment::class );
+		$this->components['process_posts']       = $this->di_container->resolve( Process_Posts::class );
+
+		$this->components['webhooks']        = $this->di_container->resolve( Webhook_Listener::class );
+		$this->components['webhook_user']    = $this->di_container->resolve( Handle_User::class );
+		$this->components['webhook_comment'] = $this->di_container->resolve( Handle_Comment::class );
 
 		$this->components['settings_admin_ui']                      = $this->di_container->resolve( Admin_UI::class );
 		$this->components['settings_admin_ui_general']              = $this->di_container->resolve( Admin_UI_General::class );

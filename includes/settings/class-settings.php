@@ -169,6 +169,7 @@ class Settings implements Hooked {
 			'user'    => __( 'User / fields', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			'comment' => __( 'Comments / fields', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			'attachment' => __( 'Attachments / fields', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			'post' => __( 'Posts / fields', AINSYS_CONNECTOR_TEXTDOMAIN ),
 		];
 
 		return apply_filters( 'ainsys_get_entities_list', $entities );

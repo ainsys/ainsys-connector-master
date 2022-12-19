@@ -9,6 +9,7 @@ use Ainsys\Connector\Master\Settings\Admin_UI_Logs;
 use Ainsys\Connector\Master\Settings\Settings;
 use Ainsys\Connector\Master\Settings\Admin_UI_General;
 use Ainsys\Connector\Master\Webhooks\Handle_Comment;
+use Ainsys\Connector\Master\Webhooks\Handle_Page;
 use Ainsys\Connector\Master\Webhooks\Handle_Post;
 use Ainsys\Connector\Master\Webhooks\Handle_User;
 use Ainsys\Connector\Master\WP\Process_Attachments;
@@ -75,6 +76,7 @@ class Plugin implements Hooked {
 		$this->components['webhook_user']    = $this->di_container->resolve( Handle_User::class );
 		$this->components['webhook_comment'] = $this->di_container->resolve( Handle_Comment::class );
 		$this->components['webhook_post']    = $this->di_container->resolve( Handle_Post::class );
+		$this->components['webhook_page']    = $this->di_container->resolve( Handle_Page::class );
 
 		$this->components['settings_admin_ui']                      = $this->di_container->resolve( Admin_UI::class );
 		$this->components['settings_admin_ui_general']              = $this->di_container->resolve( Admin_UI_General::class );

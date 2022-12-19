@@ -68,6 +68,10 @@ class Handle_Post extends Handle implements Hooked, Webhook_Handler {
 			return sprintf( __( 'Error: %s creation is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
 		}
 
+		if ( empty( $data['post_status'] ) && $data['post_status'] !== self::$entity ) {
+			$data['post_status'] = self::$entity;
+		}
+
 		$result = wp_insert_post( $data );
 
 		if ( is_wp_error( $result ) ) {
@@ -98,6 +102,10 @@ class Handle_Post extends Handle implements Hooked, Webhook_Handler {
 
 		if ( Conditions::has_entity_disable_update( self::$entity, $action, 'incoming' ) ) {
 			return sprintf( __( 'Error: %s update is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
+		}
+
+		if ( empty( $data['post_status'] ) && $data['post_status'] !== self::$entity ) {
+			$data['post_status'] = self::$entity;
 		}
 
 		$result = wp_update_post( $data );

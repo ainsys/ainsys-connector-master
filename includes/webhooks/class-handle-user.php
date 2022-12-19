@@ -9,7 +9,7 @@ use Ainsys\Connector\Master\Webhook_Handler;
 
 class Handle_User extends Handle implements Hooked, Webhook_Handler {
 
-	protected static string $entity = 'user';
+	protected static ?string $entity = 'user';
 
 	/**
 	 * Initializes WordPress hooks for component.

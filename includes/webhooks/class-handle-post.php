@@ -9,7 +9,7 @@ use Ainsys\Connector\Master\Webhook_Handler;
 
 class Handle_Post extends Handle implements Hooked, Webhook_Handler {
 
-	protected static ?string $entity = 'post';
+	protected static string $entity = 'post';
 
 
 	/**
@@ -68,12 +68,8 @@ class Handle_Post extends Handle implements Hooked, Webhook_Handler {
 			return sprintf( __( 'Error: %s creation is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
 		}
 
-		if ( empty( $data['post_type'] ) && $data['post_type'] !== self::$entity ) {
-			$data['post_type'] = self::$entity;
-		}
-
-		if ( empty( $data['post_status'] ) &&  !in_array( $data['post_status'], $this->statuses(), true)) {
-			$data['post_type'] = 'publish';
+		if ( empty( $data['post_status'] ) && $data['post_status'] !== self::$entity ) {
+			$data['post_status'] = self::$entity;
 		}
 
 		$result = wp_insert_post( $data );
@@ -85,7 +81,7 @@ class Handle_Post extends Handle implements Hooked, Webhook_Handler {
 			return $this->handle_error( $data, $result, $error, self::$entity, $action );
 		}
 
-		$message = $this->message_success(self::$entity, $action, $result );
+		$message = $this->message_success( $action, $result );
 
 		Logger::save(
 			[
@@ -108,12 +104,8 @@ class Handle_Post extends Handle implements Hooked, Webhook_Handler {
 			return sprintf( __( 'Error: %s update is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
 		}
 
-		if ( empty( $data['post_type'] ) && $data['post_type'] !== self::$entity ) {
-			$data['post_type'] = self::$entity;
-		}
-
-		if ( empty( $data['post_status'] ) &&  !in_array( $data['post_status'], $this->statuses(), true)) {
-			$data['post_type'] = 'publish';
+		if ( empty( $data['post_status'] ) && $data['post_status'] !== self::$entity ) {
+			$data['post_status'] = self::$entity;
 		}
 
 		$result = wp_update_post( $data );
@@ -124,7 +116,7 @@ class Handle_Post extends Handle implements Hooked, Webhook_Handler {
 			return $this->handle_error( $data, $result, $error, self::$entity, $action );
 		}
 
-		$message = $this->message_success(self::$entity, $action, $result );
+		$message = $this->message_success( $action, $result );
 
 		Logger::save(
 			[
@@ -155,7 +147,7 @@ class Handle_Post extends Handle implements Hooked, Webhook_Handler {
 			return $this->handle_error( $data, $result, $error, self::$entity, $action );
 		}
 
-		$message = $this->message_success(self::$entity, $action, $result );
+		$message = $this->message_success( $action, $object_id );
 
 		Logger::save(
 			[

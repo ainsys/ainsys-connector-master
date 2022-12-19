@@ -45,6 +45,10 @@ class Process_Posts extends Process implements Hooked {
 			return;
 		}
 
+		if ( $post->post_type !== self::$entity ) {
+			return;
+		}
+
 		$fields = apply_filters(
 			'ainsys_process_create_fields_' . self::$entity,
 			$this->prepare_post_data( $post_id, $post ),
@@ -73,12 +77,16 @@ class Process_Posts extends Process implements Hooked {
 			return [];
 		}
 
+		if ( $post->post_type !== self::$entity ) {
+			return [];
+		}
+
 		$fields = apply_filters(
 			'ainsys_process_update_fields_' . self::$entity,
 			$this->prepare_post_data( $post_id, $post ),
 			$post_id
 		);
-
+		error_log( print_r( $post, 1 ) );
 		return $this->send_data( $post_id, self::$entity, $request_action, $fields );
 	}
 
@@ -123,7 +131,7 @@ class Process_Posts extends Process implements Hooked {
 		if ( $post->post_type !== self::$entity ) {
 			return [];
 		}
-		error_log( print_r( $post, 1 ) );
+
 		return $post;
 	}
 

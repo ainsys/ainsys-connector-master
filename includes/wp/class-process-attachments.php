@@ -14,9 +14,9 @@ class Process_Attachments extends Process implements Hooked {
 	 */
 	public function init_hooks() {
 
-		add_action( 'add_attachment', [ $this, 'process_new_attachment' ], 10, 1 );
-		add_action( 'attachment_updated', [ $this, 'process_edit_attachment' ], 10, 3 );
-		add_action( 'delete_attachment', [ $this, 'process_delete_attachment' ], 10, 3 );
+		add_action( 'add_attachment', [ $this, 'process_create' ], 10, 1 );
+		add_action( 'attachment_updated', [ $this, 'process_update' ], 10, 3 );
+		add_action( 'delete_attachment', [ $this, 'process_delete' ], 10, 3 );
 
 		add_filter( 'bulk_actions-upload', [ $this, 'bulk_updates_attachment' ] );
 		add_filter( 'handle_bulk_actions-upload', [ $this, 'bulk_updates_attachment_action_handler' ], 10, 3 );
@@ -30,7 +30,7 @@ class Process_Attachments extends Process implements Hooked {
 	 *
 	 * @return void
 	 */
-	public function process_new_attachment( int $attachment_id ): void {
+	public function process_create( int $attachment_id ): void {
 
 		$request_action = 'CREATE';
 
@@ -57,7 +57,7 @@ class Process_Attachments extends Process implements Hooked {
 	 *
 	 * @return void
 	 */
-	public function process_delete_attachment( int $attachment_id, $attachment ): void {
+	public function process_delete( int $attachment_id, $attachment ): void {
 
 		$request_action = 'DELETE';
 
@@ -83,7 +83,7 @@ class Process_Attachments extends Process implements Hooked {
 	 *
 	 * @return array
 	 */
-	public function process_edit_attachment( $attachment_id, $attachment_after, $attachment_before, bool $checking_connected = false ): array {
+	public function process_update( $attachment_id, $attachment_after, $attachment_before, bool $checking_connected = false ): array {
 
 		$request_action = $checking_connected ? 'Checking Connected' : 'UPDATE';
 

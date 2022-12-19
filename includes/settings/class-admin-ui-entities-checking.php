@@ -123,7 +123,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 		$users     = get_users( $users_args );
 		$user_test = end( $users );
 
-		return ( new Process_Users )->send_user_details_update_to_ainsys(
+		return ( new Process_Users )->process_update(
 			(int) $user_test->ID,
 			(array) $user_test->data,
 			(array) $user_test->data,
@@ -153,7 +153,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 		$comment_id = $comment['comment_ID'];
 		unset( $comment['comment_ID'] );
 
-		return ( new Process_Comments )->send_update_comment_to_ainsys( (int) $comment_id, $comment, true );
+		return ( new Process_Comments )->process_update( (int) $comment_id, $comment, true );
 	}
 
 
@@ -179,7 +179,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 		$attachment    = (array) end( $attachments );
 		$attachment_id = $attachment['ID'];
 
-		return ( new Process_Attachments )->process_edit_attachment( (int) $attachment_id, $attachment, true );
+		return ( new Process_Attachments )->process_update( (int) $attachment_id, $attachment, true );
 	}
 
 

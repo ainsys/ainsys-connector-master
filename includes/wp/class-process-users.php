@@ -14,8 +14,8 @@ class Process_Users extends Process implements Hooked {
 	 */
 	public function init_hooks() {
 
-		add_action( 'user_register', [ $this, 'process_new_user' ], 10, 2 );
-		add_action( 'profile_update', [ $this, 'send_user_details_update_to_ainsys' ], 10, 4 );
+		add_action( 'user_register', [ $this, 'process_create' ], 10, 2 );
+		add_action( 'profile_update', [ $this, 'process_update' ], 10, 4 );
 	}
 
 
@@ -27,7 +27,7 @@ class Process_Users extends Process implements Hooked {
 	 *
 	 * @return void
 	 */
-	public function process_new_user( int $user_id, array $userdata ): void {
+	public function process_create( int $user_id, array $userdata ): void {
 
 		$request_action = 'CREATE';
 
@@ -73,7 +73,7 @@ class Process_Users extends Process implements Hooked {
 	 * @reference in multisite mode, users are created without a password,
 	 * a password is created automatically or when clicking on a link, because this hook triggers the user creation field
 	 */
-	public function send_user_details_update_to_ainsys( $user_id, $userdata, $old_user_data, $checking_connected = false ): array {
+	public function process_update( $user_id, $userdata, $old_user_data, $checking_connected = false ): array {
 
 		$request_action = $checking_connected ? 'Checking Connected' : 'UPDATE';
 

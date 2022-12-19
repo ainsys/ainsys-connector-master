@@ -14,8 +14,8 @@ class Process_Comments extends Process implements Hooked {
 	 */
 	public function init_hooks() {
 
-		add_action( 'comment_post', [ $this, 'send_new_comment_to_ainsys' ], 10, 3 );
-		add_action( 'edit_comment', [ $this, 'send_update_comment_to_ainsys' ], 10, 3 );
+		add_action( 'comment_post', [ $this, 'process_create' ], 10, 3 );
+		add_action( 'edit_comment', [ $this, 'process_update' ], 10, 3 );
 	}
 
 
@@ -27,7 +27,7 @@ class Process_Comments extends Process implements Hooked {
 	 * @param  object $data
 	 *
 	 */
-	public function send_new_comment_to_ainsys( $comment_id, $comment_approved, $data ): void {
+	public function process_create( $comment_id, $comment_approved, $data ): void {
 
 		$request_action = 'CREATE';
 
@@ -69,7 +69,7 @@ class Process_Comments extends Process implements Hooked {
 	 *
 	 * @return array
 	 */
-	public function send_update_comment_to_ainsys( $comment_id, $data, $checking_connected = false ): array {
+	public function process_update( $comment_id, $data, $checking_connected = false ): array {
 
 		$request_action = $checking_connected ? 'Checking Connected' : 'UPDATE';
 

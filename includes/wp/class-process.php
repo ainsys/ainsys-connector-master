@@ -8,6 +8,10 @@ use Ainsys\Connector\Master\Settings\Settings;
 
 class Process {
 
+	protected static string $entity;
+	protected static string $action;
+
+
 	/**
 	 * @param  int    $object_id
 	 * @param  string $object_name
@@ -65,6 +69,7 @@ class Process {
 		];
 	}
 
+
 	/**
 	 * @param $post
 	 *
@@ -75,7 +80,7 @@ class Process {
 		$taxonomies     = [];
 		$taxonomy_names = get_object_taxonomies( $post );
 
-		foreach ( $taxonomy_names as  $taxonomy_name ) {
+		foreach ( $taxonomy_names as $taxonomy_name ) {
 
 			$terms = get_the_terms( $post, (string) $taxonomy_name );
 
@@ -85,6 +90,7 @@ class Process {
 
 		return $taxonomies;
 	}
+
 
 	public function is_updated( $post_id, $update ): bool {
 

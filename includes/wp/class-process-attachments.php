@@ -7,6 +7,9 @@ use Ainsys\Connector\Master\Hooked;
 
 class Process_Attachments extends Process implements Hooked {
 
+	protected static string $entity = 'attachment';
+
+
 	/**
 	 * Initializes WordPress hooks for plugin/components.
 	 *
@@ -32,43 +35,19 @@ class Process_Attachments extends Process implements Hooked {
 	 */
 	public function process_create( int $attachment_id ): void {
 
-		$request_action = 'CREATE';
+		self::$action = 'CREATE';
 
-		if ( Conditions::has_entity_disable_create( 'attachment', $request_action ) ) {
+		if ( Conditions::has_entity_disable_create( self::$entity, self::$action ) ) {
 			return;
 		}
 
 		$fields = apply_filters(
-			'ainsys_new_attachment_fields',
+			'ainsys_process_create_fields_' . self::$entity,
 			$this->prepare_attachment_data( $attachment_id ),
 			$attachment_id
 		);
 
-		$this->send_data( $attachment_id, 'attachment', $request_action, $fields );
-
-	}
-
-
-	/**
-	 * Sends delete attachment details to AINSYS
-	 *
-	 * @param  int $attachment_id
-	 * @param      $attachment
-	 *
-	 * @return void
-	 */
-	public function process_delete( int $attachment_id, $attachment ): void {
-
-		$request_action = 'DELETE';
-
-		$fields = apply_filters(
-			'ainsys_delete_attachment_fields',
-			$this->prepare_attachment_data( $attachment_id ),
-			$attachment_id,
-			$attachment
-		);
-
-		$this->send_data( $attachment_id, 'attachment', $request_action, $fields );
+		$this->send_data( $attachment_id, self::$entity, self::$action, $fields );
 
 	}
 
@@ -85,20 +64,44 @@ class Process_Attachments extends Process implements Hooked {
 	 */
 	public function process_update( $attachment_id, $attachment_after, $attachment_before, bool $checking_connected = false ): array {
 
-		$request_action = $checking_connected ? 'Checking Connected' : 'UPDATE';
+		self::$action = $checking_connected ? 'Checking Connected' : 'UPDATE';
 
-		if ( Conditions::has_entity_disable_update( 'attachment', $request_action ) ) {
+		if ( Conditions::has_entity_disable_update( self::$entity, self::$action ) ) {
 			return [];
 		}
 
 		$fields = apply_filters(
-			'ainsys_update_attachment_fields',
+			'ainsys_process_update_fields_' . self::$entity,
 			$this->prepare_attachment_data( $attachment_id ),
 			$attachment_after,
 			$attachment_before
 		);
 
-		return $this->send_data( $attachment_id, 'attachment', $request_action, $fields );
+		return $this->send_data( $attachment_id, self::$entity, self::$action, $fields );
+	}
+
+
+	/**
+	 * Sends delete attachment details to AINSYS
+	 *
+	 * @param  int $attachment_id
+	 * @param      $attachment
+	 *
+	 * @return void
+	 */
+	public function process_delete( int $attachment_id, $attachment ): void {
+
+		self::$action = 'DELETE';
+
+		$fields = apply_filters(
+			'ainsys_process_delete_fields_' . self::$entity,
+			$this->prepare_attachment_data( $attachment_id ),
+			$attachment_id,
+			$attachment
+		);
+
+		$this->send_data( $attachment_id, self::$entity, self::$action, $fields );
+
 	}
 
 
@@ -158,7 +161,7 @@ class Process_Attachments extends Process implements Hooked {
 			return [];
 		}
 
-		if ( $attachment->post_type !== 'attachment' ) {
+		if ( $attachment->post_type !== self::$entity ) {
 			return [];
 		}
 

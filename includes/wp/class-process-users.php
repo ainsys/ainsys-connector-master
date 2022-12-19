@@ -7,6 +7,9 @@ use Ainsys\Connector\Master\Hooked;
 
 class Process_Users extends Process implements Hooked {
 
+	protected static string $entity = 'user';
+
+
 	/**
 	 * Initializes WordPress hooks for plugin/components.
 	 *
@@ -29,15 +32,19 @@ class Process_Users extends Process implements Hooked {
 	 */
 	public function process_create( int $user_id, array $userdata ): void {
 
-		$request_action = 'CREATE';
+		self::$action = 'CREATE';
 
-		if ( Conditions::has_entity_disable_create( 'user', $request_action ) ) {
+		if ( Conditions::has_entity_disable_create( self::$entity, self::$action ) ) {
 			return;
 		}
 
-		$fields = apply_filters( 'ainsys_new_user_fields', $this->prepare_user_data( $user_id, $userdata ), $userdata );
+		$fields = apply_filters(
+			'ainsys_process_create_fields_' . self::$entity,
+			$this->prepare_user_data( $user_id, $userdata ),
+			$userdata
+		);
 
-		$this->send_data( $user_id, 'user', $request_action, $fields );
+		$this->send_data( $user_id, self::$entity, self::$action, $fields );
 
 	}
 
@@ -75,16 +82,20 @@ class Process_Users extends Process implements Hooked {
 	 */
 	public function process_update( $user_id, $userdata, $old_user_data, $checking_connected = false ): array {
 
-		$request_action = $checking_connected ? 'Checking Connected' : 'UPDATE';
+		self::$action = $checking_connected ? 'Checking Connected' : 'UPDATE';
 
-		if ( Conditions::has_entity_disable_update( 'user', $request_action ) ) {
+		if ( Conditions::has_entity_disable_update( self::$entity, self::$action ) ) {
 
 			return [];
 		}
 
-		$fields = apply_filters( 'ainsys_user_details_update_fields', $this->prepare_user_data( $user_id, $userdata ), $userdata );
+		$fields = apply_filters(
+			'ainsys_process_update_fields_' . self::$entity,
+			$this->prepare_user_data( $user_id, $userdata ),
+			$userdata
+		);
 
-		return $this->send_data( $user_id, 'user', $request_action, $fields );
+		return $this->send_data( $user_id, self::$entity, self::$action, $fields );
 
 	}
 

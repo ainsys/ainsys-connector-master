@@ -7,6 +7,9 @@ use Ainsys\Connector\Master\Hooked;
 
 class Process_Comments extends Process implements Hooked {
 
+	protected static string $entity = 'comment';
+
+
 	/**
 	 * Initializes WordPress hooks for plugin/components.
 	 *
@@ -29,15 +32,19 @@ class Process_Comments extends Process implements Hooked {
 	 */
 	public function process_create( $comment_id, $comment_approved, $data ): void {
 
-		$request_action = 'CREATE';
+		self::$action = 'CREATE';
 
-		if ( Conditions::has_entity_disable_create( 'comment', $request_action ) ) {
+		if ( Conditions::has_entity_disable_create( self::$entity, self::$action ) ) {
 			return;
 		}
 
-		$fields = apply_filters( 'ainsys_new_comment_fields', $this->prepare_comment_data( $comment_id, $data ), $data );
+		$fields = apply_filters(
+			'ainsys_process_create_fields_' . self::$entity,
+			$this->prepare_comment_data( $comment_id, $data ),
+			$data
+		);
 
-		$this->send_data( $comment_id, 'comment', $request_action, $fields );
+		$this->send_data( $comment_id, 'comment', self::$action, $fields );
 
 	}
 
@@ -71,15 +78,19 @@ class Process_Comments extends Process implements Hooked {
 	 */
 	public function process_update( $comment_id, $data, $checking_connected = false ): array {
 
-		$request_action = $checking_connected ? 'Checking Connected' : 'UPDATE';
+		self::$action = $checking_connected ? 'Checking Connected' : 'UPDATE';
 
-		if ( Conditions::has_entity_disable_update( 'comment', $request_action ) ) {
+		if ( Conditions::has_entity_disable_update( 'comment', self::$action ) ) {
 			return [];
 		}
 
-		$fields = apply_filters( 'ainsys_update_comment_fields', $this->prepare_comment_data( $comment_id, $data ), $data );
+		$fields = apply_filters(
+			'ainsys_process_update_fields_' . self::$entity,
+			$this->prepare_comment_data( $comment_id, $data ),
+			$data
+		);
 
-		return $this->send_data( $comment_id, 'comment', $request_action, $fields );
+		return $this->send_data( $comment_id, 'comment', self::$action, $fields );
 
 	}
 

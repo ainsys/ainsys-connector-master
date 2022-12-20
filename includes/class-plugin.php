@@ -14,6 +14,7 @@ use Ainsys\Connector\Master\Webhooks\Handle_Post;
 use Ainsys\Connector\Master\Webhooks\Handle_User;
 use Ainsys\Connector\Master\WP\Process_Attachments;
 use Ainsys\Connector\Master\WP\Process_Comments;
+use Ainsys\Connector\Master\WP\Process_Menus;
 use Ainsys\Connector\Master\WP\Process_Pages;
 use Ainsys\Connector\Master\WP\Process_Posts;
 use Ainsys\Connector\Master\WP\Process_Users;
@@ -71,6 +72,7 @@ class Plugin implements Hooked {
 		$this->components['process_attachments'] = $this->di_container->resolve( Process_Attachments::class );
 		$this->components['process_posts']       = $this->di_container->resolve( Process_Posts::class );
 		$this->components['process_pages']       = $this->di_container->resolve( Process_Pages::class );
+		$this->components['process_menus']       = $this->di_container->resolve( Process_Menus::class );
 
 		$this->components['webhooks']        = $this->di_container->resolve( Webhook_Listener::class );
 		$this->components['webhook_user']    = $this->di_container->resolve( Handle_User::class );

@@ -34,7 +34,7 @@ class Process_Users extends Process implements Hooked {
 
 		self::$action = 'CREATE';
 
-		if ( Conditions::has_entity_disable_create( self::$entity, self::$action ) ) {
+		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
 			return;
 		}
 
@@ -45,6 +45,38 @@ class Process_Users extends Process implements Hooked {
 		);
 
 		$this->send_data( $user_id, self::$entity, self::$action, $fields );
+
+	}
+
+
+	/**
+	 * Sends updated user details to AINSYS.
+	 *
+	 * @param  int   $user_id
+	 * @param  array $userdata
+	 *
+	 * @param  array $old_user_data
+	 * @param  bool  $checking_connected
+	 *
+	 * @return array
+	 * @reference in multisite mode, users are created without a password,
+	 * a password is created automatically or when clicking on a link, because this hook triggers the user creation field
+	 */
+	public function process_update( $user_id, $userdata, $old_user_data, $checking_connected = false ): array {
+
+		self::$action = $this->get_update_action( $checking_connected );
+
+		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
+			return [];
+		}
+
+		$fields = apply_filters(
+			'ainsys_process_update_fields_' . self::$entity,
+			$this->prepare_user_data( $user_id, $userdata ),
+			$userdata
+		);
+
+		return $this->send_data( $user_id, self::$entity, self::$action, $fields );
 
 	}
 
@@ -64,39 +96,6 @@ class Process_Users extends Process implements Hooked {
 		$acf_fields = apply_filters( 'ainsys_prepare_extra_user_data', [], $user_id );
 
 		return array_merge( $data, $acf_fields );
-	}
-
-
-	/**
-	 * Sends updated user details to AINSYS.
-	 *
-	 * @param  int   $user_id
-	 * @param  array $userdata
-	 *
-	 * @param  array $old_user_data
-	 * @param  bool  $checking_connected
-	 *
-	 * @return array
-	 * @reference in multisite mode, users are created without a password,
-	 * a password is created automatically or when clicking on a link, because this hook triggers the user creation field
-	 */
-	public function process_update( $user_id, $userdata, $old_user_data, $checking_connected = false ): array {
-
-		self::$action = $checking_connected ? 'Checking Connected' : 'UPDATE';
-
-		if ( Conditions::has_entity_disable_update( self::$entity, self::$action ) ) {
-
-			return [];
-		}
-
-		$fields = apply_filters(
-			'ainsys_process_update_fields_' . self::$entity,
-			$this->prepare_user_data( $user_id, $userdata ),
-			$userdata
-		);
-
-		return $this->send_data( $user_id, self::$entity, self::$action, $fields );
-
 	}
 
 }

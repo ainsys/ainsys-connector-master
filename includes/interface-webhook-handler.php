@@ -6,10 +6,11 @@ interface Webhook_Handler {
 
 	public function register_webhook_handler( array $handlers );
 
+
 	/**
-	 * @param string $action
-	 * @param array $data
-	 * @param int $object_id
+	 * @param  string $action
+	 * @param  array  $data
+	 * @param  int    $object_id
 	 *
 	 * @return int|string|bool
 	 */

@@ -11,29 +11,11 @@ class Handle_Menu extends Handle implements Hooked, Webhook_Handler {
 	protected static string $entity = 'menu';
 
 
-	/**
-	 * Initializes WordPress hooks for component.
-	 *
-	 * @return void
-	 */
-	public function init_hooks() {
-
-		add_filter( 'ainsys_webhook_action_handlers', [ $this, 'register_webhook_handler' ], 10, 1 );
-	}
-
-
 	public function register_webhook_handler( $handlers = [] ) {
 
 		$handlers[ self::$entity ] = [ $this, 'handler' ];
 
 		return $handlers;
-	}
-
-
-	public function handler( $action, $data, $object_id = 0 ) {
-
-		parent::handler( $data, $action );
-
 	}
 
 
@@ -61,6 +43,8 @@ class Handle_Menu extends Handle implements Hooked, Webhook_Handler {
 
 		return $this->get_message( $result, $data, self::$entity, $action );
 	}
+
+
 	/**
 	 * @param $data
 	 * @param $action

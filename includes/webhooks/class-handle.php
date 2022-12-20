@@ -5,8 +5,11 @@ namespace Ainsys\Connector\Master\Webhooks;
 use Ainsys\Connector\Master\Core;
 use Ainsys\Connector\Master\Logger;
 
-class Handle {
+abstract class Handle {
 
+	/**
+	 * @var string
+	 */
 	protected static string $entity = '';
 
 
@@ -21,7 +24,14 @@ class Handle {
 	}
 
 
-	public function handler( $action, $data, $object_id = 0 ) {
+	/**
+	 * @param  string $action
+	 * @param  array  $data
+	 * @param  int    $object_id
+	 *
+	 * @return string|void
+	 */
+	public function handler( string $action, array $data, int $object_id = 0 ) {
 
 		$response = '';
 
@@ -45,6 +55,77 @@ class Handle {
 	}
 
 
+	/**
+	 * @param  array  $data
+	 * @param  string $action
+	 *
+	 * @return string
+	 */
+	abstract protected function create( array $data, string $action ): string;
+
+
+	/**
+	 * @param $data
+	 * @param $action
+	 * @param $object_id
+	 *
+	 * @return string
+	 */
+	abstract protected function update( $data, $action, $object_id ): string;
+
+
+	/**
+	 * @param $object_id
+	 * @param $data
+	 * @param $action
+	 *
+	 * @return string
+	 */
+	abstract protected function delete( $object_id, $data, $action ): string;
+
+
+	/**
+	 * @param         $result
+	 * @param  array  $data
+	 * @param  string $action
+	 * @param  string $entity
+	 *
+	 * @return string
+	 */
+	public function get_message( $result, array $data, string $entity, string $action ): string {
+
+		if ( is_wp_error( $result ) ) {
+			$error = sprintf( __( 'Error: %s is not %s: ', AINSYS_CONNECTOR_TEXTDOMAIN ), $entity, $this->replace_string()[ $action ] );
+
+			$message = $this->handle_error( $data, $result, $error, $entity, $action );
+		} else {
+			$message = $this->message_success( $entity, $action, $result );
+		}
+
+		Logger::save(
+			[
+				'object_id'       => $result,
+				'entity'          => $entity,
+				'request_action'  => $action,
+				'request_type'    => 'incoming',
+				'request_data'    => serialize( $data ),
+				'server_response' => serialize( $message ),
+			]
+		);
+
+		return $message;
+	}
+
+
+	/**
+	 * @param $data
+	 * @param $result
+	 * @param $message_error
+	 * @param $entity
+	 * @param $action
+	 *
+	 * @return string
+	 */
 	public function handle_error( $data, $result, $message_error, $entity, $action ): string {
 
 		$message = $message_error . $result->get_error_message();
@@ -107,39 +188,6 @@ class Handle {
 			'DELETE' => 'deleted',
 			'READ'   => 'read',
 		];
-	}
-
-
-	/**
-	 * @param         $result
-	 * @param  array  $data
-	 * @param  string $action
-	 * @param  string $entity
-	 *
-	 * @return string
-	 */
-	public function get_message( $result, array $data, string $entity, string $action ): string {
-
-		if ( is_wp_error( $result ) ) {
-			$error = sprintf( __( 'Error: %s is not %s: ', AINSYS_CONNECTOR_TEXTDOMAIN ), $entity, $this->replace_string()[ $action ] );
-
-			$message = $this->handle_error( $data, $result, $error, $entity, $action );
-		} else {
-			$message = $this->message_success( $entity, $action, $result );
-		}
-
-		Logger::save(
-			[
-				'object_id'       => $result,
-				'entity'          => $entity,
-				'request_action'  => $action,
-				'request_type'    => 'incoming',
-				'request_data'    => serialize( $data ),
-				'server_response' => serialize( $message ),
-			]
-		);
-
-		return $message;
 	}
 
 }

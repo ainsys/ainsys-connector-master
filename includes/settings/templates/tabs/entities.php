@@ -39,10 +39,10 @@ $option      = Settings::get_option( 'check_controlling_entity' );
 
 						<?php
 
-						$option_item        = ! empty( $option[ $entity_id ]['general'][ $column_id ] ) ? $option[ $entity_id ]['general'][ $column_id ] : 1;
+						$option_item        = empty( $option[ $entity_id ]['general'][ $column_id ] ) ? $option[ $entity_id ]['general'][ $column_id ] : 1;
 						$option_name_column = sprintf( '-%s', $column_id );
 						$option_name_item   = sprintf( '-%s%s', $entity_id, $option_name_column );
-						$option_on_off      = ! empty( $option[ $entity_id ]['general']['on_off'] ) ? $option[ $entity_id ]['general']['on_off'] : 1;
+						$option_on_off      = empty( $option[ $entity_id ]['general']['on_off'] ) ? $option[ $entity_id ]['general']['on_off'] : 1;
 
 						switch ( $column_id ):
 							case 'arrow' :

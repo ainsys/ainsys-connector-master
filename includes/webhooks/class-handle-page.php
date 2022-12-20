@@ -9,7 +9,7 @@ use Ainsys\Connector\Master\Webhook_Handler;
 
 class Handle_Page extends Handle implements Hooked, Webhook_Handler {
 
-	protected static ?string $entity = 'page';
+	protected static string $entity = 'page';
 
 
 	/**

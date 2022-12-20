@@ -8,8 +8,8 @@ use Ainsys\Connector\Master\Settings\Settings;
 
 class Process {
 
-	protected static ?string $entity = '';
-	protected static ?string $action = '';
+	protected static string $entity = '';
+	protected static string $action = '';
 
 
 	/**

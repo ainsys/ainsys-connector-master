@@ -7,7 +7,7 @@ use Ainsys\Connector\Master\Logger;
 
 class Handle {
 
-	protected static ?string $entity = '';
+	protected static string $entity = '';
 
 
 	public function handle_error( $data, $result, $message_error, $entity, $action ): string {

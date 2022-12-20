@@ -73,7 +73,7 @@ class Handle_Comment extends Handle implements Hooked, Webhook_Handler {
 			return $this->handle_error( $data, $comment_id, $error, self::$entity, $action );
 		}
 
-		$message = $this->message_success( $action, $comment_id );
+		$message = $this->message_success( self::$entity, $action, $comment_id );
 
 		Logger::save(
 			[
@@ -104,7 +104,7 @@ class Handle_Comment extends Handle implements Hooked, Webhook_Handler {
 			return $this->handle_error( $data, $result, $error, self::$entity, $action );
 		}
 
-		$message = $this->message_success( $action, $result );
+		$message = $this->message_success( self::$entity, $action, $result );
 
 		Logger::save(
 			[
@@ -135,7 +135,7 @@ class Handle_Comment extends Handle implements Hooked, Webhook_Handler {
 			return $this->handle_error( $data, $result, $error, self::$entity, $action );
 		}
 
-		$message = $this->message_success( $action, $object_id );
+		$message = $this->message_success( self::$entity, $action, $object_id );
 
 		Logger::save(
 			[

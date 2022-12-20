@@ -72,8 +72,8 @@ class Handle_Page extends Handle implements Hooked, Webhook_Handler {
 			$data['post_type'] = self::$entity;
 		}
 
-		if ( empty( $data['post_status'] ) &&  !in_array( $data['post_status'], $this->statuses(), true)) {
-			$data['post_type'] = 'publish';
+		if ( empty( $data['post_status'] ) && ! in_array( $data['post_status'], $this->statuses(), true ) ) {
+			$data['post_status'] = 'publish';
 		}
 
 		$result = wp_insert_post( $data );
@@ -112,8 +112,8 @@ class Handle_Page extends Handle implements Hooked, Webhook_Handler {
 			$data['post_type'] = self::$entity;
 		}
 
-		if ( empty( $data['post_status'] ) &&  !in_array( $data['post_status'], $this->statuses(), true)) {
-			$data['post_type'] = 'publish';
+		if ( empty( $data['post_status'] ) && ! in_array( $data['post_status'], $this->statuses(), true ) ) {
+			$data['post_status'] = 'publish';
 		}
 
 		$result = wp_update_post( $data );

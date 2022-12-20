@@ -72,8 +72,8 @@ class Handle_Post extends Handle implements Hooked, Webhook_Handler {
 			$data['post_type'] = self::$entity;
 		}
 
-		if ( empty( $data['post_status'] ) &&  !in_array( $data['post_status'], $this->statuses(), true)) {
-			$data['post_type'] = 'publish';
+		if ( empty( $data['post_status'] ) && ! in_array( $data['post_status'], $this->statuses(), true ) ) {
+			$data['post_status'] = 'publish';
 		}
 
 		$result = wp_insert_post( $data );
@@ -85,7 +85,7 @@ class Handle_Post extends Handle implements Hooked, Webhook_Handler {
 			return $this->handle_error( $data, $result, $error, self::$entity, $action );
 		}
 
-		$message = $this->message_success( $action, $result );
+		$message = $this->message_success( self::$entity, $action, $result );
 
 		Logger::save(
 			[
@@ -112,8 +112,8 @@ class Handle_Post extends Handle implements Hooked, Webhook_Handler {
 			$data['post_type'] = self::$entity;
 		}
 
-		if ( empty( $data['post_status'] ) &&  !in_array( $data['post_status'], $this->statuses(), true)) {
-			$data['post_type'] = 'publish';
+		if ( empty( $data['post_status'] ) && ! in_array( $data['post_status'], $this->statuses(), true ) ) {
+			$data['post_status'] = 'publish';
 		}
 
 		$result = wp_update_post( $data );
@@ -124,7 +124,7 @@ class Handle_Post extends Handle implements Hooked, Webhook_Handler {
 			return $this->handle_error( $data, $result, $error, self::$entity, $action );
 		}
 
-		$message = $this->message_success( $action, $result );
+		$message = $this->message_success( self::$entity, $action, $result );
 
 		Logger::save(
 			[
@@ -155,7 +155,7 @@ class Handle_Post extends Handle implements Hooked, Webhook_Handler {
 			return $this->handle_error( $data, $result, $error, self::$entity, $action );
 		}
 
-		$message = $this->message_success( $action, $object_id );
+		$message = $this->message_success( self::$entity, $action, $object_id );
 
 		Logger::save(
 			[

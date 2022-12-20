@@ -118,10 +118,11 @@ class Process_Menus extends Process implements Hooked {
 
 		if ( $menu->count > 0 ) {
 			$menus = [
-				'ID'             => $menu_id,
-				'menu_name'      => $menu->name,
-				'menu_locations' => $this->get_menu_locations( $menu_id ),
-				'menu_items'     => $this->get_menu_items( $menu_id ),
+				'ID'                  => $menu_id,
+				'menu_name'           => $menu->name,
+				'site_menu_locations' => $this->get_menu_locations( $menu_id ),
+				'menu_locations'      => $this->get_menu_locations( $menu_id ),
+				'menu_items'          => $this->get_menu_items( $menu_id ),
 			];
 		}
 

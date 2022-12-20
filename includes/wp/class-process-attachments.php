@@ -7,7 +7,7 @@ use Ainsys\Connector\Master\Hooked;
 
 class Process_Attachments extends Process implements Hooked {
 
-	protected static ?string $entity = 'attachment';
+	protected static string $entity = 'attachment';
 
 
 	/**
@@ -37,7 +37,7 @@ class Process_Attachments extends Process implements Hooked {
 
 		self::$action = 'CREATE';
 
-		if ( Conditions::has_entity_disable_create( self::$entity, self::$action ) ) {
+		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
 			return;
 		}
 
@@ -64,9 +64,9 @@ class Process_Attachments extends Process implements Hooked {
 	 */
 	public function process_update( $attachment_id, $attachment_after, $attachment_before, bool $checking_connected = false ): array {
 
-		self::$action = $checking_connected ? 'Checking Connected' : 'UPDATE';
+		self::$action = $this->get_update_action( $checking_connected );
 
-		if ( Conditions::has_entity_disable_update( self::$entity, self::$action ) ) {
+		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
 			return [];
 		}
 
@@ -92,6 +92,10 @@ class Process_Attachments extends Process implements Hooked {
 	public function process_delete( int $attachment_id, $attachment ): void {
 
 		self::$action = 'DELETE';
+
+		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
+			return;
+		}
 
 		$fields = apply_filters(
 			'ainsys_process_delete_fields_' . self::$entity,

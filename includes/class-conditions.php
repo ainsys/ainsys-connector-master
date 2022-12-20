@@ -50,7 +50,7 @@ class Conditions implements Hooked {
 	}
 
 
-	public static function has_entity_disable_create( $entity, $action = '', $type = 'outgoing' ): bool {
+	public static function has_entity_disable( $entity, $action = '', $type = 'outgoing' ): bool {
 
 		if ( empty( self::get_option_control( $entity ) ) ) {
 			Logger::save(
@@ -84,187 +84,80 @@ class Conditions implements Hooked {
 			return true;
 		}
 
-		if ( ( ! self::get_option_control_create( $entity ) ) ) {
-			Logger::save(
-				[
-					'object_id'       => 0,
-					'entity'          => $entity,
-					'request_action'  => $action,
-					'request_type'    => $type,
-					'request_data'    => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-					'server_response' => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-					'error'           => 1,
-				]
-			);
+		switch ( $action ) {
+			case 'CREATE':
+				if ( ( ! self::get_option_control_create( $entity ) ) ) {
+					Logger::save(
+						[
+							'object_id'       => 0,
+							'entity'          => $entity,
+							'request_action'  => $action,
+							'request_type'    => $type,
+							'request_data'    => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
+							'server_response' => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
+							'error'           => 1,
+						]
+					);
 
-			return true;
+					return true;
 
-		}
+				}
+				break;
+			case 'CHECKING':
+			case 'UPDATE':
+				if ( ( ! self::get_option_control_update( $entity ) ) ) {
+					Logger::save(
+						[
+							'object_id'       => 0,
+							'entity'          => $entity,
+							'request_action'  => $action,
+							'request_type'    => $type,
+							'request_data'    => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
+							'server_response' => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
+							'error'           => 1,
+						]
+					);
 
-		return false;
+					return true;
 
-	}
+				}
+				break;
+			case 'READ':
+				if ( ( ! self::get_option_control_read( $entity ) ) ) {
+					Logger::save(
+						[
+							'object_id'       => 0,
+							'entity'          => $entity,
+							'request_action'  => $action,
+							'request_type'    => $type,
+							'request_data'    => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
+							'server_response' => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
+							'error'           => 1,
+						]
+					);
 
+					return true;
 
-	public static function has_entity_disable_update( $entity, $action = '', $type = 'outgoing' ): bool {
+				}
+				break;
+			case 'DELETE':
+				if ( ( ! self::get_option_control_delete( $entity ) ) ) {
+					Logger::save(
+						[
+							'object_id'       => 0,
+							'entity'          => $entity,
+							'request_action'  => $action,
+							'request_type'    => $type,
+							'request_data'    => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
+							'server_response' => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
+							'error'           => 1,
+						]
+					);
 
-		if ( empty( self::get_option_control( $entity ) ) ) {
-			Logger::save(
-				[
-					'object_id'       => 0,
-					'entity'          => $entity,
-					'request_action'  => $action,
-					'request_type'    => $type,
-					'request_data'    => '',
-					'server_response' => serialize( 'Error: No url provided' ),
-					'error'           => 1,
-				]
-			);
+					return true;
 
-			return true;
-		}
-
-		if ( ! self::get_option_control_on_off( $entity ) ) {
-			Logger::save(
-				[
-					'object_id'       => 0,
-					'entity'          => $entity,
-					'request_action'  => $type,
-					'request_type'    => 'outgoing',
-					'request_data'    => serialize( __( 'Error: Data transfer is completely disabled. Check the Entities export settings tab', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-					'server_response' => serialize( __( 'Error: Data transfer is completely disabled. Check the Entities export settings tab', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-					'error'           => 1,
-				]
-			);
-
-			return true;
-		}
-
-		if ( ( ! self::get_option_control_update( $entity ) ) ) {
-			Logger::save(
-				[
-					'object_id'       => 0,
-					'entity'          => $entity,
-					'request_action'  => $type,
-					'request_type'    => 'outgoing',
-					'request_data'    => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-					'server_response' => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-					'error'           => 1,
-				]
-			);
-
-			return true;
-
-		}
-
-		return false;
-	}
-
-
-	public static function has_entity_disable_read( $entity, $action = '', $type = 'outgoing' ): bool {
-
-		if ( empty( self::get_option_control( $entity ) ) ) {
-			Logger::save(
-				[
-					'object_id'       => 0,
-					'entity'          => $entity,
-					'request_action'  => $action,
-					'request_type'    => $type,
-					'request_data'    => '',
-					'server_response' => serialize( 'Error: No url provided' ),
-					'error'           => 1,
-				]
-			);
-
-			return true;
-		}
-
-		if ( ! self::get_option_control_on_off( $entity ) ) {
-			Logger::save(
-				[
-					'object_id'       => 0,
-					'entity'          => $entity,
-					'request_action'  => $action,
-					'request_type'    => $type,
-					'request_data'    => serialize( __( 'Error: Data transfer is completely disabled. Check the Entities export settings tab', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-					'server_response' => serialize( __( 'Error: Data transfer is completely disabled. Check the Entities export settings tab', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-					'error'           => 1,
-				]
-			);
-
-			return true;
-		}
-
-		if ( ( ! self::get_option_control_read( $entity ) ) ) {
-			Logger::save(
-				[
-					'object_id'       => 0,
-					'entity'          => $entity,
-					'request_action'  => $action,
-					'request_type'    => $type,
-					'request_data'    => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-					'server_response' => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-					'error'           => 1,
-				]
-			);
-
-			return true;
-
-		}
-
-		return false;
-	}
-
-
-	public static function has_entity_disable_delete( $entity, $action = '', $type = 'outgoing' ): bool {
-
-		if ( empty( self::get_option_control( $entity ) ) ) {
-			Logger::save(
-				[
-					'object_id'       => 0,
-					'entity'          => $entity,
-					'request_action'  => $action,
-					'request_type'    => $type,
-					'request_data'    => '',
-					'server_response' => serialize( 'Error: No url provided' ),
-					'error'           => 1,
-				]
-			);
-
-			return true;
-		}
-
-		if ( ! self::get_option_control_on_off( $entity ) ) {
-			Logger::save(
-				[
-					'object_id'       => 0,
-					'entity'          => $entity,
-					'request_action'  => $action,
-					'request_type'    => $type,
-					'request_data'    => serialize( __( 'Error: Data transfer is completely disabled. Check the Entities export settings tab', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-					'server_response' => serialize( __( 'Error: Data transfer is completely disabled. Check the Entities export settings tab', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-					'error'           => 1,
-				]
-			);
-
-			return true;
-		}
-
-		if ( ( ! self::get_option_control_delete( $entity ) ) ) {
-			Logger::save(
-				[
-					'object_id'       => 0,
-					'entity'          => $entity,
-					'request_action'  => $action,
-					'request_type'    => $type,
-					'request_data'    => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-					'server_response' => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-					'error'           => 1,
-				]
-			);
-
-			return true;
-
+				}
+				break;
 		}
 
 		return false;

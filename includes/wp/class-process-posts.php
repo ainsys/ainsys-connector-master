@@ -7,7 +7,7 @@ use Ainsys\Connector\Master\Hooked;
 
 class Process_Posts extends Process implements Hooked {
 
-	protected static ?string $entity = 'post';
+	protected static string $entity = 'post';
 
 
 	/**
@@ -38,7 +38,7 @@ class Process_Posts extends Process implements Hooked {
 
 		self::$action = 'CREATE';
 
-		if ( Conditions::has_entity_disable_create( self::$entity, self::$action ) ) {
+		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
 			return;
 		}
 
@@ -73,9 +73,9 @@ class Process_Posts extends Process implements Hooked {
 	 */
 	public function process_update( $post_id, $post, $update, bool $checking_connected = false ): array {
 
-		self::$action = $checking_connected ? 'Checking Connected' : 'UPDATE';
+		self::$action = $this->get_update_action( $checking_connected );
 
-		if ( Conditions::has_entity_disable_update( self::$entity, self::$action ) ) {
+		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
 			return [];
 		}
 
@@ -108,6 +108,10 @@ class Process_Posts extends Process implements Hooked {
 	public function process_delete( int $post_id, $post ): void {
 
 		self::$action = 'DELETE';
+
+		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
+			return;
+		}
 
 		$fields = apply_filters(
 			'ainsys_process_delete_fields_' . self::$entity,
@@ -158,5 +162,8 @@ class Process_Posts extends Process implements Hooked {
 			'meta_input'     => get_post_meta( $post->ID ),
 		];
 	}
+
+
+
 
 }

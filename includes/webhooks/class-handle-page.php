@@ -4,12 +4,11 @@ namespace Ainsys\Connector\Master\Webhooks;
 
 use Ainsys\Connector\Master\Conditions;
 use Ainsys\Connector\Master\Hooked;
-use Ainsys\Connector\Master\Logger;
 use Ainsys\Connector\Master\Webhook_Handler;
 
 class Handle_Page extends Handle implements Hooked, Webhook_Handler {
 
-	protected static ?string $entity = 'page';
+	protected static string $entity = 'page';
 
 
 	/**
@@ -57,14 +56,14 @@ class Handle_Page extends Handle implements Hooked, Webhook_Handler {
 
 
 	/**
-	 * @param  array $data
-	 * @param        $action
+	 * @param  array  $data
+	 * @param  string $action
 	 *
 	 * @return string
 	 */
-	protected function create( array $data, $action ): string {
+	protected function create( array $data, string $action ): string {
 
-		if ( Conditions::has_entity_disable_create( self::$entity, $action, 'incoming' ) ) {
+		if ( Conditions::has_entity_disable( self::$entity, $action, 'incoming' ) ) {
 			return sprintf( __( 'Error: %s creation is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
 		}
 
@@ -72,39 +71,26 @@ class Handle_Page extends Handle implements Hooked, Webhook_Handler {
 			$data['post_type'] = self::$entity;
 		}
 
-		if ( empty( $data['post_status'] ) &&  !in_array( $data['post_status'], $this->statuses(), true)) {
-			$data['post_type'] = 'publish';
+		if ( empty( $data['post_status'] ) && ! in_array( $data['post_status'], $this->statuses(), true ) ) {
+			$data['post_status'] = 'publish';
 		}
 
 		$result = wp_insert_post( $data );
 
-		if ( is_wp_error( $result ) ) {
-
-			$error = sprintf( __( 'Error: %s is not created: ', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
-
-			return $this->handle_error( $data, $result, $error, self::$entity, $action );
-		}
-
-		$message = $this->message_success( self::$entity, $action, $result );
-
-		Logger::save(
-			[
-				'object_id'       => $result,
-				'entity'          => self::$entity,
-				'request_action'  => $action,
-				'request_type'    => 'incoming',
-				'request_data'    => serialize( $data ),
-				'server_response' => serialize( $message ),
-			]
-		);
-
-		return $message;
+		return $this->get_message( $result, $data, self::$entity, $action );
 	}
 
 
-	protected function update( $data, $action ): string {
+	/**
+	 * @param $data
+	 * @param $action
+	 * @param $object_id
+	 *
+	 * @return string
+	 */
+	protected function update( $data, $action, $object_id ): string {
 
-		if ( Conditions::has_entity_disable_update( self::$entity, $action, 'incoming' ) ) {
+		if ( Conditions::has_entity_disable( self::$entity, $action, 'incoming' ) ) {
 			return sprintf( __( 'Error: %s update is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
 		}
 
@@ -112,63 +98,32 @@ class Handle_Page extends Handle implements Hooked, Webhook_Handler {
 			$data['post_type'] = self::$entity;
 		}
 
-		if ( empty( $data['post_status'] ) &&  !in_array( $data['post_status'], $this->statuses(), true)) {
-			$data['post_type'] = 'publish';
+		if ( empty( $data['post_status'] ) && ! in_array( $data['post_status'], $this->statuses(), true ) ) {
+			$data['post_status'] = 'publish';
 		}
 
 		$result = wp_update_post( $data );
 
-		if ( is_wp_error( $result ) ) {
-			$error = sprintf( __( 'Error: Perhaps such a %s does not exist', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
-
-			return $this->handle_error( $data, $result, $error, self::$entity, $action );
-		}
-
-		$message = $this->message_success( self::$entity, $action, $result );
-
-		Logger::save(
-			[
-				'object_id'       => $result,
-				'entity'          => self::$entity,
-				'request_action'  => $action,
-				'request_type'    => 'incoming',
-				'request_data'    => serialize( $data ),
-				'server_response' => serialize( $message ),
-			]
-		);
-
-		return $message;
+		return $this->get_message( $result, $data, self::$entity, $action );
 	}
 
 
+	/**
+	 * @param $object_id
+	 * @param $data
+	 * @param $action
+	 *
+	 * @return string
+	 */
 	protected function delete( $object_id, $data, $action ): string {
 
-		if ( Conditions::has_entity_disable_delete( self::$entity, $action, 'incoming' ) ) {
+		if ( Conditions::has_entity_disable( self::$entity, $action, 'incoming' ) ) {
 			return sprintf( __( 'Error: %s delete is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
 		}
 
 		$result = wp_delete_post( $object_id );
 
-		if ( is_wp_error( $result ) ) {
-			$error = sprintf( __( 'Error: %s is not deleted', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
-
-			return $this->handle_error( $data, $result, $error, self::$entity, $action );
-		}
-
-		$message = $this->message_success( self::$entity, $action, $result );
-
-		Logger::save(
-			[
-				'object_id'       => $result,
-				'entity'          => self::$entity,
-				'request_action'  => $action,
-				'request_type'    => 'incoming',
-				'request_data'    => serialize( $data ),
-				'server_response' => serialize( $message ),
-			]
-		);
-
-		return $message;
+		return $this->get_message( $result, $data, self::$entity, $action );
 	}
 
 }

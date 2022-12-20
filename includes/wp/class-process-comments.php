@@ -7,7 +7,7 @@ use Ainsys\Connector\Master\Hooked;
 
 class Process_Comments extends Process implements Hooked {
 
-	protected static ?string $entity = 'comment';
+	protected static string $entity = 'comment';
 
 
 	/**
@@ -34,7 +34,7 @@ class Process_Comments extends Process implements Hooked {
 
 		self::$action = 'CREATE';
 
-		if ( Conditions::has_entity_disable_create( self::$entity, self::$action ) ) {
+		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
 			return;
 		}
 
@@ -47,7 +47,32 @@ class Process_Comments extends Process implements Hooked {
 		$this->send_data( $comment_id, 'comment', self::$action, $fields );
 
 	}
+	/**
+	 * Sends updated WP comment details to AINSYS.
+	 *
+	 * @param  int   $comment_id
+	 * @param  array $data
+	 * @param  bool  $checking_connected
+	 *
+	 * @return array
+	 */
+	public function process_update( $comment_id, $data, $checking_connected = false ): array {
 
+		self::$action = $this->get_update_action( $checking_connected );
+
+		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
+			return [];
+		}
+
+		$fields = apply_filters(
+			'ainsys_process_update_fields_' . self::$entity,
+			$this->prepare_comment_data( $comment_id, $data ),
+			$data
+		);
+
+		return $this->send_data( $comment_id, 'comment', self::$action, $fields );
+
+	}
 
 	/**
 	 * Prepares WP comment data. Adds ACF fields if there are any.
@@ -67,31 +92,6 @@ class Process_Comments extends Process implements Hooked {
 	}
 
 
-	/**
-	 * Sends updated WP comment details to AINSYS.
-	 *
-	 * @param  int   $comment_id
-	 * @param  array $data
-	 * @param  bool  $checking_connected
-	 *
-	 * @return array
-	 */
-	public function process_update( $comment_id, $data, $checking_connected = false ): array {
 
-		self::$action = $checking_connected ? 'Checking Connected' : 'UPDATE';
-
-		if ( Conditions::has_entity_disable_update( 'comment', self::$action ) ) {
-			return [];
-		}
-
-		$fields = apply_filters(
-			'ainsys_process_update_fields_' . self::$entity,
-			$this->prepare_comment_data( $comment_id, $data ),
-			$data
-		);
-
-		return $this->send_data( $comment_id, 'comment', self::$action, $fields );
-
-	}
 
 }

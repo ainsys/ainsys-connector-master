@@ -4,12 +4,11 @@ namespace Ainsys\Connector\Master\WP;
 
 use Ainsys\Connector\Master\Core;
 use Ainsys\Connector\Master\Logger;
-use Ainsys\Connector\Master\Settings\Settings;
 
 class Process {
 
-	protected static ?string $entity = '';
-	protected static ?string $action = '';
+	protected static string $entity = '';
+	protected static string $action = '';
 
 
 	/**
@@ -115,4 +114,13 @@ class Process {
 		return true;
 	}
 
+	/**
+	 * @param  bool $checking_connected
+	 *
+	 * @return string
+	 */
+	protected function get_update_action( bool $checking_connected ): string {
+
+		return $checking_connected ? 'CHECKING' : 'UPDATE';
+	}
 }

@@ -6,6 +6,7 @@ use Ainsys\Connector\Master\Hooked;
 use Ainsys\Connector\Master\Logger;
 use Ainsys\Connector\Master\WP\Process_Attachments;
 use Ainsys\Connector\Master\WP\Process_Comments;
+use Ainsys\Connector\Master\WP\Process_Menus;
 use Ainsys\Connector\Master\WP\Process_Pages;
 use Ainsys\Connector\Master\WP\Process_Posts;
 use Ainsys\Connector\Master\WP\Process_Users;
@@ -77,6 +78,12 @@ class Admin_UI_Entities_Checking implements Hooked {
 			case 'page':
 				$make_request  = true;
 				$result_test   = $this->get_page_for_test();
+				$result_entity = Settings::get_option( 'check_connection_entity' );
+				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
+				break;
+			case 'menu':
+				$make_request  = true;
+				$result_test   = $this->get_menu_for_test();
 				$result_entity = Settings::get_option( 'check_connection_entity' );
 				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
 				break;
@@ -222,6 +229,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 		return ( new Process_Posts )->process_update( (int) $post_id, $post, true, true );
 	}
 
+
 	/**
 	 * @return array
 	 */
@@ -245,6 +253,27 @@ class Admin_UI_Entities_Checking implements Hooked {
 		$post_id = $post->ID;
 
 		return ( new Process_Pages )->process_update( (int) $post_id, $post, true, true );
+	}
+
+
+	/**
+	 * @return array
+	 */
+	protected function get_menu_for_test(): array {
+
+		$menus = wp_get_nav_menus();
+
+		if ( empty( $menus ) ) {
+			return [
+				'request'  => '',
+				'response' => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			];
+		}
+
+		$menu    = end( $menus );
+		$menu_id = (int) $menu->term_id;
+
+		return ( new Process_Menus() )->process_update( $menu_id, true );
 	}
 
 

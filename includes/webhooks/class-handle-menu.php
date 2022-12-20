@@ -6,9 +6,9 @@ use Ainsys\Connector\Master\Conditions;
 use Ainsys\Connector\Master\Hooked;
 use Ainsys\Connector\Master\Webhook_Handler;
 
-class Handle_Comment extends Handle implements Hooked, Webhook_Handler {
+class Handle_Menu extends Handle implements Hooked, Webhook_Handler {
 
-	protected static string $entity = 'comment';
+	protected static string $entity = 'menu';
 
 
 	/**
@@ -32,23 +32,8 @@ class Handle_Comment extends Handle implements Hooked, Webhook_Handler {
 
 	public function handler( $action, $data, $object_id = 0 ) {
 
-		$data = (array) $data;
+		parent::handler( $data, $action );
 
-		$response = __( 'Action not registered, Please implement actions for Comments', AINSYS_CONNECTOR_TEXTDOMAIN );
-
-		switch ( $action ) {
-			case 'CREATE':
-				$response = $this->create( $data, $action );
-				break;
-			case 'UPDATE':
-				$response = $this->update( $data, $action, $object_id );
-				break;
-			case 'DELETE':
-				$response = $this->delete( $object_id, $data, $action );
-				break;
-		}
-
-		return $response;
 	}
 
 
@@ -64,12 +49,18 @@ class Handle_Comment extends Handle implements Hooked, Webhook_Handler {
 			return sprintf( __( 'Error: %s creation is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
 		}
 
-		$result = wp_insert_comment( wp_slash( $data ) );
+		if ( empty( $data['post_type'] ) && $data['post_type'] !== self::$entity ) {
+			$data['post_type'] = self::$entity;
+		}
+
+		if ( empty( $data['post_status'] ) && ! in_array( $data['post_status'], $this->statuses(), true ) ) {
+			$data['post_status'] = 'publish';
+		}
+
+		$result = wp_insert_post( $data );
 
 		return $this->get_message( $result, $data, self::$entity, $action );
 	}
-
-
 	/**
 	 * @param $data
 	 * @param $action
@@ -83,7 +74,15 @@ class Handle_Comment extends Handle implements Hooked, Webhook_Handler {
 			return sprintf( __( 'Error: %s update is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
 		}
 
-		$result = wp_update_comment( wp_slash( $data ), true );
+		if ( empty( $data['post_type'] ) && $data['post_type'] !== self::$entity ) {
+			$data['post_type'] = self::$entity;
+		}
+
+		if ( empty( $data['post_status'] ) && ! in_array( $data['post_status'], $this->statuses(), true ) ) {
+			$data['post_status'] = 'publish';
+		}
+
+		$result = wp_update_post( $data );
 
 		return $this->get_message( $result, $data, self::$entity, $action );
 	}
@@ -102,7 +101,7 @@ class Handle_Comment extends Handle implements Hooked, Webhook_Handler {
 			return sprintf( __( 'Error: %s delete is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
 		}
 
-		$result = wp_delete_comment( $object_id, true );
+		$result = wp_delete_post( $object_id );
 
 		return $this->get_message( $result, $data, self::$entity, $action );
 	}

@@ -16,7 +16,7 @@ $active      = $args['active'];
 $columns     = Admin_UI_Entities_Controlling::columns_entities_controlling();
 $option_name = Settings::get_option_name( 'check_controlling_entity' );
 $option      = Settings::get_option( 'check_controlling_entity' );
-
+do_action( 'qm/info',$option);
 ?>
 
 <div id="setting-section-entities" class="tab-target">
@@ -39,10 +39,10 @@ $option      = Settings::get_option( 'check_controlling_entity' );
 
 						<?php
 
-						$option_item        = ! empty( $option[ $entity_id ]['general'][ $column_id ] ) ? $option[ $entity_id ]['general'][ $column_id ] : 1;
+						$option_item        = $option[ $entity_id ]['general'][ $column_id ] ?? 1;
 						$option_name_column = sprintf( '-%s', $column_id );
 						$option_name_item   = sprintf( '-%s%s', $entity_id, $option_name_column );
-						$option_on_off      = ! empty( $option[ $entity_id ]['general']['on_off'] ) ? $option[ $entity_id ]['general']['on_off'] : 1;
+						$option_on_off      = $option[ $entity_id ]['general']['on_off'] ?? 1;
 
 						switch ( $column_id ):
 							case 'arrow' :

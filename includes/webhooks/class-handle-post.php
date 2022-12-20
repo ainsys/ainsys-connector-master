@@ -123,12 +123,6 @@ class Handle_Post extends Handle implements Hooked, Webhook_Handler {
 
 		$result = wp_delete_post( $object_id );
 
-		if ( is_wp_error( $result ) ) {
-			$error = sprintf( __( 'Error: %s is not deleted', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
-
-			return $this->handle_error( $data, $result, $error, self::$entity, $action );
-		}
-
 		return $this->get_message( $result, $data, self::$entity, $action );;
 	}
 

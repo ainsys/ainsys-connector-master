@@ -8,7 +8,7 @@ use Ainsys\Connector\Master\Webhook_Handler;
 
 class Handle_Comment extends Handle implements Hooked, Webhook_Handler {
 
-	protected static string $entity = 'comment';
+	protected static ?string $entity = 'comment';
 
 
 	/**

@@ -7,7 +7,7 @@ use Ainsys\Connector\Master\Hooked;
 
 class Process_Comments extends Process implements Hooked {
 
-	protected static string $entity = 'comment';
+	protected static ?string $entity = 'comment';
 
 
 	/**

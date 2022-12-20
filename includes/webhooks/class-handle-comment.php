@@ -4,7 +4,6 @@ namespace Ainsys\Connector\Master\Webhooks;
 
 use Ainsys\Connector\Master\Conditions;
 use Ainsys\Connector\Master\Hooked;
-use Ainsys\Connector\Master\Logger;
 use Ainsys\Connector\Master\Webhook_Handler;
 
 class Handle_Comment extends Handle implements Hooked, Webhook_Handler {
@@ -54,101 +53,58 @@ class Handle_Comment extends Handle implements Hooked, Webhook_Handler {
 
 
 	/**
-	 * @param  array $data
-	 * @param        $action
+	 * @param  array  $data
+	 * @param  string $action
 	 *
 	 * @return string
 	 */
-	protected function create( array $data, $action ): string {
+	protected function create( array $data, string $action ): string {
 
-		if ( Conditions::has_entity_disable_create( self::$entity, $action, 'incoming' ) ) {
+		if ( Conditions::has_entity_disable( self::$entity, $action, 'incoming' ) ) {
 			return sprintf( __( 'Error: %s creation is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
 		}
 
-		$error = __( 'Error: Failed to create a comment', AINSYS_CONNECTOR_TEXTDOMAIN );
+		$result = wp_insert_comment( wp_slash( $data ) );
 
-		$comment_id = wp_insert_comment( wp_slash( $data ) );
-
-		if ( is_wp_error( $comment_id ) ) {
-			return $this->handle_error( $data, $comment_id, $error, self::$entity, $action );
-		}
-
-		$message = $this->message_success( self::$entity, $action, $comment_id );
-
-		Logger::save(
-			[
-				'object_id'       => $comment_id,
-				'entity'          => self::$entity,
-				'request_action'  => $action,
-				'request_type'    => 'incoming',
-				'request_data'    => serialize( $data ),
-				'server_response' => serialize( $message ),
-			]
-		);
-
-		return $message;
+		return $this->get_message( $result, $data, self::$entity, $action );
 	}
 
 
-	protected function update( $data, $action ): string {
+	/**
+	 * @param $data
+	 * @param $action
+	 * @param $object_id
+	 *
+	 * @return string
+	 */
+	protected function update( $data, $action, $object_id ): string {
 
-		if ( Conditions::has_entity_disable_update( self::$entity, $action, 'incoming' ) ) {
+		if ( Conditions::has_entity_disable( self::$entity, $action, 'incoming' ) ) {
 			return sprintf( __( 'Error: %s update is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
 		}
 
-		$error = __( 'Error: Perhaps such a comment does not exist', AINSYS_CONNECTOR_TEXTDOMAIN );
-
 		$result = wp_update_comment( wp_slash( $data ), true );
 
-		if ( is_wp_error( $result ) ) {
-			return $this->handle_error( $data, $result, $error, self::$entity, $action );
-		}
-
-		$message = $this->message_success( self::$entity, $action, $result );
-
-		Logger::save(
-			[
-				'object_id'       => $result,
-				'entity'          => self::$entity,
-				'request_action'  => $action,
-				'request_type'    => 'incoming',
-				'request_data'    => serialize( $data ),
-				'server_response' => serialize( $message ),
-			]
-		);
-
-		return $message;
+		return $this->get_message( $result, $data, self::$entity, $action );
 	}
 
 
+	/**
+	 * @param $object_id
+	 * @param $data
+	 * @param $action
+	 *
+	 * @return string
+	 */
 	protected function delete( $object_id, $data, $action ): string {
 
-		if ( Conditions::has_entity_disable_delete( self::$entity, $action, 'incoming' ) ) {
+		if ( Conditions::has_entity_disable( self::$entity, $action, 'incoming' ) ) {
 			return sprintf( __( 'Error: %s delete is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
 		}
 
-		$error = __( 'Error: user is not deleted', AINSYS_CONNECTOR_TEXTDOMAIN );
-
 		$result = wp_delete_comment( $object_id, true );
 
-		if ( is_wp_error( $result ) ) {
-			return $this->handle_error( $data, $result, $error, self::$entity, $action );
-		}
-
-		$message = $this->message_success( self::$entity, $action, $object_id );
-
-		Logger::save(
-			[
-				'object_id'       => $result,
-				'entity'          => self::$entity,
-				'request_action'  => $action,
-				'request_type'    => 'incoming',
-				'request_data'    => serialize( $data ),
-				'server_response' => serialize( $message ),
-			]
-		);
-
-		return $message;
+		return $this->get_message( $result, $data, self::$entity, $action );
 	}
 
 }

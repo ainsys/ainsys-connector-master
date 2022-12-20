@@ -7,7 +7,7 @@ use Ainsys\Connector\Master\Hooked;
 
 class Process_Posts extends Process implements Hooked {
 
-	protected static ?string $entity = 'post';
+	protected static string $entity = 'post';
 
 
 	/**

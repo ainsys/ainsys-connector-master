@@ -114,12 +114,18 @@ class Process_Menus extends Process implements Hooked {
 
 		$menu = wp_get_nav_menu_object( $menu_id );
 
-		return [
-			'ID'             => $menu_id,
-			'menu_name'      => $menu->name,
-			'menu_locations' => $this->get_menu_locations( $menu_id ),
-			'menu_items'     => $this->get_menu_items( $menu_id ),
-		];
+		$menus = [];
+
+		if ( $menu->count > 0 ) {
+			$menus = [
+				'ID'             => $menu_id,
+				'menu_name'      => $menu->name,
+				'menu_locations' => $this->get_menu_locations( $menu_id ),
+				'menu_items'     => $this->get_menu_items( $menu_id ),
+			];
+		}
+
+		return $menus;
 	}
 
 
@@ -156,19 +162,22 @@ class Process_Menus extends Process implements Hooked {
 		$menu_items = wp_get_nav_menu_items( $menu_id );
 
 		foreach ( (array) $menu_items as $key => $menu_item ) {
+			$parent_item = get_post( (int) $menu_item->menu_item_parent );
+
 			$items[] = [
-				'title'            => $menu_item->title,
-				'url'              => $menu_item->url,
-				'menu_item_parent' => $menu_item->menu_item_parent,
-				'object_id'        => $menu_item->object_id,
-				'object'           => $menu_item->object,
-				'type'             => $menu_item->type,
-				'type_label'       => $menu_item->type_label,
-				'target'           => $menu_item->target,
-				'attr_title'       => $menu_item->attr_title,
-				'description'      => $menu_item->description,
-				'classes'          => $menu_item->classes,
-				'xfn'              => $menu_item->xfn,
+				'title'       => $menu_item->title,
+				'url'         => $menu_item->url,
+				'parent_id'   => $menu_item->menu_item_parent,
+				'parent_name' => empty( $parent_item->post_title ) ? '' : $parent_item->post_title,
+				'object_id'   => $menu_item->object_id,
+				'object'      => $menu_item->object,
+				'type'        => $menu_item->type,
+				'type_label'  => $menu_item->type_label,
+				'target'      => $menu_item->target,
+				'attr_title'  => $menu_item->attr_title,
+				'description' => $menu_item->description,
+				'classes'     => $menu_item->classes,
+				'xfn'         => $menu_item->xfn,
 			];
 		}
 

@@ -13,18 +13,6 @@ class Webhook_Listener implements Hooked {
 
 	use Is_Singleton;
 
-	/**
-	 * @var Logger
-	 */
-	private Logger $logger;
-
-
-	public function __construct( Logger $logger ) {
-
-		$this->logger = $logger;
-	}
-
-
 	public function init_hooks() {
 
 		add_action( 'init', [ $this, 'webhook_listener' ] );
@@ -59,7 +47,7 @@ class Webhook_Listener implements Hooked {
 			$response      = $exception->getMessage();
 			$response_code = 500;
 
-			$this->logger::save(
+			Logger::save(
 				[
 					'object_id'       => 0,
 					'entity'          => 'Webhook_Listener',
@@ -94,7 +82,7 @@ class Webhook_Listener implements Hooked {
 				$response      = $exception->getMessage();
 				$response_code = 500;
 
-				$this->logger::save(
+				Logger::save(
 					[
 						'object_id'       => 0,
 						'entity'          => 'Webhook_Listener',

@@ -11,44 +11,11 @@ class Handle_Comment extends Handle implements Hooked, Webhook_Handler {
 	protected static string $entity = 'comment';
 
 
-	/**
-	 * Initializes WordPress hooks for component.
-	 *
-	 * @return void
-	 */
-	public function init_hooks() {
-
-		add_filter( 'ainsys_webhook_action_handlers', [ $this, 'register_webhook_handler' ], 10, 1 );
-	}
-
-
 	public function register_webhook_handler( $handlers = [] ) {
 
 		$handlers[ self::$entity ] = [ $this, 'handler' ];
 
 		return $handlers;
-	}
-
-
-	public function handler( $action, $data, $object_id = 0 ) {
-
-		$data = (array) $data;
-
-		$response = __( 'Action not registered, Please implement actions for Comments', AINSYS_CONNECTOR_TEXTDOMAIN );
-
-		switch ( $action ) {
-			case 'CREATE':
-				$response = $this->create( $data, $action );
-				break;
-			case 'UPDATE':
-				$response = $this->update( $data, $action, $object_id );
-				break;
-			case 'DELETE':
-				$response = $this->delete( $object_id, $data, $action );
-				break;
-		}
-
-		return $response;
 	}
 
 

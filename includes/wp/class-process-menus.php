@@ -41,7 +41,7 @@ class Process_Menus extends Process implements Hooked {
 
 		$fields = apply_filters(
 			'ainsys_process_create_fields_' . self::$entity,
-			$this->prepare_post_data( $menu_id ),
+			$this->prepare_data( $menu_id ),
 			$menu_id
 		);
 
@@ -73,7 +73,7 @@ class Process_Menus extends Process implements Hooked {
 
 		$fields = apply_filters(
 			'ainsys_process_update_fields_' . self::$entity,
-			$this->prepare_post_data( $menu_id ),
+			$this->prepare_data( $menu_id ),
 			$menu_id
 		);
 
@@ -98,7 +98,7 @@ class Process_Menus extends Process implements Hooked {
 
 		$fields = apply_filters(
 			'ainsys_process_delete_fields_' . self::$entity,
-			$this->prepare_post_data( $menu_id ),
+			$this->prepare_data( $menu_id ),
 			$menu_id
 		);
 
@@ -113,7 +113,7 @@ class Process_Menus extends Process implements Hooked {
 	 *
 	 * @return array
 	 */
-	protected function prepare_post_data( int $menu_id ): array {
+	protected function prepare_data( int $menu_id ): array {
 
 		$menu = wp_get_nav_menu_object( $menu_id );
 
@@ -123,7 +123,7 @@ class Process_Menus extends Process implements Hooked {
 			$menus = [
 				'ID'                  => $menu_id,
 				'menu_name'           => $menu->name,
-				'site_menu_locations' => $this->get_menu_locations( $menu_id ),
+				'site_menu_locations' => get_registered_nav_menus(),
 				'menu_locations'      => $this->get_menu_locations( $menu_id ),
 				'menu_items'          => $this->get_menu_items( $menu_id ),
 			];
@@ -169,19 +169,23 @@ class Process_Menus extends Process implements Hooked {
 			$parent_item = get_post( (int) $menu_item->menu_item_parent );
 
 			$items[] = [
-				'title'       => $menu_item->title,
-				'url'         => $menu_item->url,
-				'parent_id'   => $menu_item->menu_item_parent,
-				'parent_name' => empty( $parent_item->post_title ) ? '' : $parent_item->post_title,
-				'object_id'   => $menu_item->object_id,
-				'object'      => $menu_item->object,
-				'type'        => $menu_item->type,
-				'type_label'  => $menu_item->type_label,
-				'target'      => $menu_item->target,
-				'attr_title'  => $menu_item->attr_title,
-				'description' => $menu_item->description,
-				'classes'     => $menu_item->classes,
-				'xfn'         => $menu_item->xfn,
+				'title'         => $menu_item->title,
+				'url'           => $menu_item->url,
+				'parent_id'     => $menu_item->menu_item_parent,
+				'parent_name'   => empty( $parent_item->post_title ) ? '' : $parent_item->post_title,
+				'object_id'     => $menu_item->object_id,
+				'object'        => $menu_item->object,
+				'type'          => $menu_item->type,
+				'type_label'    => $menu_item->type_label,
+				'target'        => $menu_item->target,
+				'attr_title'    => $menu_item->attr_title,
+				'description'   => $menu_item->description,
+				'classes'       => $menu_item->classes,
+				'xfn'           => $menu_item->xfn,
+				'status'        => $menu_item->post_status,
+				'post_date'     => $menu_item->post_date,
+				'post_date_gmt' => $menu_item->post_date_gmt,
+				'position'      => $menu_item->menu_order,
 			];
 		}
 

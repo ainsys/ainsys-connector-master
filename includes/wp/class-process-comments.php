@@ -40,7 +40,7 @@ class Process_Comments extends Process implements Hooked {
 
 		$fields = apply_filters(
 			'ainsys_process_create_fields_' . self::$entity,
-			$this->prepare_comment_data( $comment_id, $data ),
+			$this->prepare_data( $comment_id, $data ),
 			$data
 		);
 
@@ -66,7 +66,7 @@ class Process_Comments extends Process implements Hooked {
 
 		$fields = apply_filters(
 			'ainsys_process_update_fields_' . self::$entity,
-			$this->prepare_comment_data( $comment_id, $data ),
+			$this->prepare_data( $comment_id, $data ),
 			$data
 		);
 
@@ -82,7 +82,7 @@ class Process_Comments extends Process implements Hooked {
 	 *
 	 * @return array
 	 */
-	private function prepare_comment_data( $comment_id, $data ) {
+	private function prepare_data( $comment_id, $data ) {
 
 		$data['id'] = $comment_id;
 		/// Get ACF fields

@@ -43,7 +43,7 @@ class Process_Attachments extends Process implements Hooked {
 
 		$fields = apply_filters(
 			'ainsys_process_create_fields_' . self::$entity,
-			$this->prepare_attachment_data( $attachment_id ),
+			$this->prepare_data( $attachment_id ),
 			$attachment_id
 		);
 
@@ -72,7 +72,7 @@ class Process_Attachments extends Process implements Hooked {
 
 		$fields = apply_filters(
 			'ainsys_process_update_fields_' . self::$entity,
-			$this->prepare_attachment_data( $attachment_id ),
+			$this->prepare_data( $attachment_id ),
 			$attachment_after,
 			$attachment_before
 		);
@@ -99,7 +99,7 @@ class Process_Attachments extends Process implements Hooked {
 
 		$fields = apply_filters(
 			'ainsys_process_delete_fields_' . self::$entity,
-			$this->prepare_attachment_data( $attachment_id ),
+			$this->prepare_data( $attachment_id ),
 			$attachment_id,
 			$attachment
 		);
@@ -157,7 +157,7 @@ class Process_Attachments extends Process implements Hooked {
 	 *
 	 * @return array
 	 */
-	protected function prepare_attachment_data( int $post_ID ): array {
+	protected function prepare_data( int $post_ID ): array {
 
 		$attachment = get_post( $post_ID );
 

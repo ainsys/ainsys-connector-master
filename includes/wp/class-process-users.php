@@ -40,7 +40,7 @@ class Process_Users extends Process implements Hooked {
 
 		$fields = apply_filters(
 			'ainsys_process_create_fields_' . self::$entity,
-			$this->prepare_user_data( $user_id, $userdata ),
+			$this->prepare_data( $user_id, $userdata ),
 			$userdata
 		);
 
@@ -72,7 +72,7 @@ class Process_Users extends Process implements Hooked {
 
 		$fields = apply_filters(
 			'ainsys_process_update_fields_' . self::$entity,
-			$this->prepare_user_data( $user_id, $userdata ),
+			$this->prepare_data( $user_id, $userdata ),
 			$userdata
 		);
 
@@ -89,7 +89,7 @@ class Process_Users extends Process implements Hooked {
 	 *
 	 * @return array
 	 */
-	private function prepare_user_data( $user_id, $data ) {
+	private function prepare_data( $user_id, $data ) {
 
 		//$data['id'] = $user_id;
 		/// Get ACF fields

@@ -52,7 +52,7 @@ class Process_Pages extends Process implements Hooked {
 
 		$fields = apply_filters(
 			'ainsys_process_create_fields_' . self::$entity,
-			$this->prepare_post_data( $post_id, $post ),
+			$this->prepare_data( $post_id, $post ),
 			$post_id
 		);
 
@@ -89,7 +89,7 @@ class Process_Pages extends Process implements Hooked {
 
 		$fields = apply_filters(
 			'ainsys_process_update_fields_' . self::$entity,
-			$this->prepare_post_data( $post_id, $post ),
+			$this->prepare_data( $post_id, $post ),
 			$post_id
 		);
 
@@ -115,7 +115,7 @@ class Process_Pages extends Process implements Hooked {
 
 		$fields = apply_filters(
 			'ainsys_process_delete_fields_' . self::$entity,
-			$this->prepare_post_data( $post_id, $post ),
+			$this->prepare_data( $post_id, $post ),
 			$post_id
 		);
 
@@ -132,7 +132,7 @@ class Process_Pages extends Process implements Hooked {
 	 *
 	 * @return array
 	 */
-	protected function prepare_post_data( int $post_ID, $post ) {
+	protected function prepare_data( int $post_ID, $post ) {
 
 		if ( ! $post ) {
 			$post = get_post( $post_ID );

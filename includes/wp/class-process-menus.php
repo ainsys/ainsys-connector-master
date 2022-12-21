@@ -41,7 +41,7 @@ class Process_Menus extends Process implements Hooked {
 
 		$fields = apply_filters(
 			'ainsys_process_create_fields_' . self::$entity,
-			$this->prepare_post_data( $menu_id ),
+			$this->prepare_data( $menu_id ),
 			$menu_id
 		);
 
@@ -73,7 +73,7 @@ class Process_Menus extends Process implements Hooked {
 
 		$fields = apply_filters(
 			'ainsys_process_update_fields_' . self::$entity,
-			$this->prepare_post_data( $menu_id ),
+			$this->prepare_data( $menu_id ),
 			$menu_id
 		);
 
@@ -98,7 +98,7 @@ class Process_Menus extends Process implements Hooked {
 
 		$fields = apply_filters(
 			'ainsys_process_delete_fields_' . self::$entity,
-			$this->prepare_post_data( $menu_id ),
+			$this->prepare_data( $menu_id ),
 			$menu_id
 		);
 
@@ -113,7 +113,7 @@ class Process_Menus extends Process implements Hooked {
 	 *
 	 * @return array
 	 */
-	protected function prepare_post_data( int $menu_id ): array {
+	protected function prepare_data( int $menu_id ): array {
 
 		$menu = wp_get_nav_menu_object( $menu_id );
 
@@ -123,7 +123,7 @@ class Process_Menus extends Process implements Hooked {
 			$menus = [
 				'ID'                  => $menu_id,
 				'menu_name'           => $menu->name,
-				'site_menu_locations' => $this->get_menu_locations( $menu_id ),
+				'site_menu_locations' => get_nav_menu_locations(),
 				'menu_locations'      => $this->get_menu_locations( $menu_id ),
 				'menu_items'          => $this->get_menu_items( $menu_id ),
 			];

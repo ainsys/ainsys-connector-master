@@ -67,24 +67,21 @@ class Process_Pages extends Process implements Hooked {
 	 * @param       $post_id
 	 * @param       $post
 	 * @param       $update
-	 * @param  bool $checking_connected
-	 *
-	 * @return array
 	 */
-	public function process_update( $post_id, $post, $update, bool $checking_connected = false ): array {
+	public function process_update( $post_id, $post, $update ): void {
 
-		self::$action = $this->get_update_action( $checking_connected );
+		self::$action = 'UPDATE';
 
 		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
-			return [];
+			return;
 		}
 
 		if ( ! $this->is_updated( $post_id, $update ) ) {
-			return [];
+			return;
 		}
 
 		if ( $post->post_type !== self::$entity ) {
-			return [];
+			return;
 		}
 
 		$fields = apply_filters(
@@ -93,7 +90,7 @@ class Process_Pages extends Process implements Hooked {
 			$post_id
 		);
 
-		return $this->send_data( $post_id, self::$entity, self::$action, $fields );
+		$this->send_data( $post_id, self::$entity, self::$action, $fields );
 	}
 
 
@@ -125,6 +122,41 @@ class Process_Pages extends Process implements Hooked {
 
 
 	/**
+	 * Sends updated post details to AINSYS.
+	 *
+	 * @param       $post_id
+	 * @param       $post
+	 * @param       $update
+	 *
+	 * @return array
+	 */
+	public function process_checking( $post_id, $post, $update ): array {
+
+		self::$action = 'CHECKING';
+
+		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
+			return [];
+		}
+
+		if ( ! $this->is_updated( $post_id, $update ) ) {
+			return [];
+		}
+
+		if ( $post->post_type !== self::$entity ) {
+			return [];
+		}
+
+		$fields = apply_filters(
+			'ainsys_process_update_fields_' . self::$entity,
+			$this->prepare_data( $post_id, $post ),
+			$post_id
+		);
+
+		return $this->send_data( $post_id, self::$entity, self::$action, $fields );
+	}
+
+
+	/**
 	 * Function for `add_attachment` action-hook.
 	 *
 	 * @param  int $post_ID Post ID.
@@ -132,7 +164,7 @@ class Process_Pages extends Process implements Hooked {
 	 *
 	 * @return array
 	 */
-	protected function prepare_data( int $post_ID, $post ) {
+	protected function prepare_data( int $post_ID, $post ): array {
 
 		if ( ! $post ) {
 			$post = get_post( $post_ID );

@@ -58,16 +58,13 @@ class Process_Attachments extends Process implements Hooked {
 	 * @param       $attachment_id
 	 * @param       $attachment_after
 	 * @param       $attachment_before
-	 * @param  bool $checking_connected
-	 *
-	 * @return array
 	 */
-	public function process_update( $attachment_id, $attachment_after, $attachment_before, bool $checking_connected = false ): array {
+	public function process_update( $attachment_id, $attachment_after, $attachment_before ): void {
 
-		self::$action = $this->get_update_action( $checking_connected );
+		self::$action = 'UPDATE';
 
 		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
-			return [];
+			return;
 		}
 
 		$fields = apply_filters(
@@ -77,7 +74,7 @@ class Process_Attachments extends Process implements Hooked {
 			$attachment_before
 		);
 
-		return $this->send_data( $attachment_id, self::$entity, self::$action, $fields );
+		$this->send_data( $attachment_id, self::$entity, self::$action, $fields );
 	}
 
 
@@ -106,6 +103,33 @@ class Process_Attachments extends Process implements Hooked {
 
 		$this->send_data( $attachment_id, self::$entity, self::$action, $fields );
 
+	}
+
+
+	/**
+	 *
+	 * @param       $attachment_id
+	 * @param       $attachment_after
+	 * @param       $attachment_before
+	 *
+	 * @return array
+	 */
+	public function process_checking( $attachment_id, $attachment_after, $attachment_before ): array {
+
+		self::$action = 'CHECKING';
+
+		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
+			return [];
+		}
+
+		$fields = apply_filters(
+			'ainsys_process_update_fields_' . self::$entity,
+			$this->prepare_data( $attachment_id ),
+			$attachment_after,
+			$attachment_before
+		);
+
+		return $this->send_data( $attachment_id, self::$entity, self::$action, $fields );
 	}
 
 

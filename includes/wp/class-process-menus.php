@@ -56,19 +56,19 @@ class Process_Menus extends Process implements Hooked {
 	 * @param  int  $menu_id
 	 * @param  bool $checking_connected
 	 *
-	 * @return array
+	 * @return void
 	 */
-	public function process_update( int $menu_id, bool $checking_connected = false ): array {
+	public function process_update( int $menu_id, bool $checking_connected = false ): void {
 
 		self::$action = $this->get_update_action( $checking_connected );
 
 		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
-			return [];
+			return;
 		}
 
 		// Check if it is a REST Request
 		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-			return [];
+			return;
 		}
 
 		$fields = apply_filters(
@@ -77,7 +77,7 @@ class Process_Menus extends Process implements Hooked {
 			$menu_id
 		);
 
-		return $this->send_data( $menu_id, self::$entity, self::$action, $fields );
+		$this->send_data( $menu_id, self::$entity, self::$action, $fields );
 	}
 
 
@@ -104,6 +104,36 @@ class Process_Menus extends Process implements Hooked {
 
 		$this->send_data( $menu_id, self::$entity, self::$action, $fields );
 
+	}
+
+
+	/**
+	 * Sends updated post details to AINSYS.
+	 *
+	 * @param  int $menu_id
+	 *
+	 * @return array
+	 */
+	public function process_checking( int $menu_id ): array {
+
+		self::$action = 'CHECKING';
+
+		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
+			return [];
+		}
+
+		// Check if it is a REST Request
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			return [];
+		}
+
+		$fields = apply_filters(
+			'ainsys_process_update_fields_' . self::$entity,
+			$this->prepare_data( $menu_id ),
+			$menu_id
+		);
+
+		return $this->send_data( $menu_id, self::$entity, self::$action, $fields );
 	}
 
 

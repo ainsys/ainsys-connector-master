@@ -87,7 +87,7 @@ class Handle_Post extends Handle implements Hooked, Webhook_Handler {
 
 		$result = wp_delete_post( $object_id );
 
-		return $this->get_message( $result, $data, self::$entity, $action );;
+		return $this->get_message( $result, $data, self::$entity, $action );
 	}
 
 }

@@ -62,7 +62,7 @@ class Handle_Menu extends Handle implements Hooked, Webhook_Handler {
 		if ( Conditions::has_entity_disable( self::$entity, $action, 'incoming' ) ) {
 			return sprintf( __( 'Error: %s update is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
 		}
-		error_log( print_r( $data, 1 ) );
+
 		$menu_id = wp_update_nav_menu_object( $data['ID'], $data );
 
 		$this->set_menu_locations( $data, $menu_id );

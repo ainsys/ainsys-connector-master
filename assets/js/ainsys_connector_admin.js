@@ -196,9 +196,9 @@ jQuery( function ( $ ) {
 		}
 		const entity          = $( this ).data( 'entity-name' );
 		const requestTdShort  = $( this ).closest( 'tr' ).find( '.ainsys-table-table__cell-outgoing' ).find( '.ainsys-response-short' );
-		const requestTdFull   = $( this ).closest( 'tr' ).find( '.ainsys-table-table__cell-outgoing' ).find( '.ainsys-response-full' );
+		const requestTdFull   = $( this ).closest( 'tr' ).find( '.ainsys-table-table__cell-outgoing' ).find( '.ainsys-response-full pre' );
 		const responseTdShort = $( this ).closest( 'tr' ).find( '.ainsys-table-table__cell-server_response' ).find( '.ainsys-response-short' );
-		const responseTdFull  = $( this ).closest( 'tr' ).find( '.ainsys-table-table__cell-server_response' ).find( '.ainsys-response-full' );
+		const responseTdFull  = $( this ).closest( 'tr' ).find( '.ainsys-table-table__cell-server_response' ).find( '.ainsys-response-full pre' );
 		const responseTime    = $( this ).closest( 'tr' ).find( '.ainsys-table-table__cell--time--inside' );
 		const responseStatus  = $( this ).closest( 'tr' ).find( '.ainsys-table-table__cell--status--inside' );
 
@@ -450,11 +450,23 @@ jQuery( function ( $ ) {
 	$( '.ainsys-settings-wrap' ).on( 'click', '.ainsys-response-short', function ( e ) {
 		const fullResponse = $( this ).siblings( '.ainsys-response-full' ).html();
 		$( 'body' ).append( '<div class="ainsys-overlay"><div class="ainsys-popup"><div class="ainsys-popup-body"><div class="ainsys-popup-response">' + fullResponse
-		                    + '</div></div><div class="ainsys-popup-btns"><span class="btn btn-primary ainsys-popup-copy">Copy to Clipboard</span><span class="btn btn-tertiary ainsys-popup-close">Close</span></div></div></div>' );
+		                    + '</div></div><div class="ainsys-popup-btns"><span class="btn btn-primary ainsys-popup-copy" data-clipboard-target=".ainsys-overlay'
+		                    + ' .ainsys-popup-response pre">Copy to Clipboard</span><span class="btn btn-tertiary'
+		                    + ' ainsys-popup-close">Close</span></div></div></div>' );
 		const respHeight = $( '.ainsys-popup' ).height() - $( '.ainsys-popup-btns' ).outerHeight() - 40;
 		$( '.ainsys-popup-response' ).css( 'height', respHeight );
 
+		new ClipboardJS( '.ainsys-popup-copy' ).on( 'success', function ( e ) {
+			console.log( e.trigger );
+			$( e.trigger ).text( 'Copied!' );
+			setTimeout( function () {
+				$( e.trigger ).text( 'Copy to Clipboard' );
+			}, 1000 );
+			e.clearSelection();
+		} );
+
 	} );
+
 	$( window ).on( 'resize', function () {
 		if ( $( '.ainsys-popup-response' ).length > 0 ) {
 			const respHeight = $( '.ainsys-popup' ).height() - $( '.ainsys-popup-btns' ).outerHeight() - 40;
@@ -464,14 +476,5 @@ jQuery( function ( $ ) {
 	$( document ).on( 'click', '.ainsys-popup-close', function ( e ) {
 		$( '.ainsys-overlay' ).remove();
 	} );
-
-	$( document ).on( 'click', '.ainsys-popup-copy', function ( e ) {
-		var $temp = $( '<input>' );
-		$( 'body' ).append( $temp );
-		$temp.val( $( '.ainsys-popup-response' ).text() ).select();
-		document.execCommand( 'copy' );
-		$temp.remove();
-	} );
-
 
 } );

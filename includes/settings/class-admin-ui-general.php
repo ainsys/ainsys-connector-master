@@ -97,25 +97,25 @@ class Admin_UI_General implements Hooked {
 	public function get_statuses_addons() {
 
 		$status = [
-			'woocommerce' => [
+			'ainsys_woocommerce' => [
 				'title'   => 'AINSYS Woocommerce Integration',
 				'slug'    => 'ainsys-connector-woocommerce',
 				'active'  => $this->admin_ui->is_plugin_active( 'ainsys-connector-woocommerce/plugin.php' ),
 				'install' => $this->admin_ui->is_plugin_install( 'ainsys-connector-woocommerce/plugin.php' ),
 			],
-			'content'     => [
+			'ainsys_content'     => [
 				'title'   => 'AINSYS Headless CMS',
 				'slug'    => 'ainsys-connector-content',
 				'active'  => $this->admin_ui->is_plugin_active( 'ainsys-connector-content/plugin.php' ),
 				'install' => $this->admin_ui->is_plugin_install( 'ainsys-connector-content/plugin.php' ),
 			],
-			'acf'         => [
+			'ainsys_acf'         => [
 				'title'   => 'AINSYS ACF Integration',
 				'slug'    => 'ainsys-connector-acf',
 				'active'  => $this->admin_ui->is_plugin_active( '1ainsys-connector-acf/plugin.php' ),
 				'install' => $this->admin_ui->is_plugin_install( '1ainsys-connector-acf/plugin.php' ),
 			],
-			'wpcf7'       => [
+			'ainsys_wpcf7'       => [
 				'title'   => 'AINSYS WPCF7 Integration',
 				'slug'    => 'ainsys-connector-wpcf7',
 				'active'  => $this->admin_ui->is_plugin_active( 'ainsys-connector-wpcf7/plugin.php' ),

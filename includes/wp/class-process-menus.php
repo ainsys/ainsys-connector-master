@@ -56,19 +56,19 @@ class Process_Menus extends Process implements Hooked {
 	 * @param  int  $menu_id
 	 * @param  bool $checking_connected
 	 *
-	 * @return array
+	 * @return void
 	 */
-	public function process_update( int $menu_id, bool $checking_connected = false ): array {
+	public function process_update( int $menu_id, bool $checking_connected = false ): void {
 
 		self::$action = $this->get_update_action( $checking_connected );
 
 		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
-			return [];
+			return;
 		}
 
 		// Check if it is a REST Request
 		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-			return [];
+			return;
 		}
 
 		$fields = apply_filters(
@@ -77,7 +77,7 @@ class Process_Menus extends Process implements Hooked {
 			$menu_id
 		);
 
-		return $this->send_data( $menu_id, self::$entity, self::$action, $fields );
+		$this->send_data( $menu_id, self::$entity, self::$action, $fields );
 	}
 
 
@@ -108,6 +108,36 @@ class Process_Menus extends Process implements Hooked {
 
 
 	/**
+	 * Sends updated post details to AINSYS.
+	 *
+	 * @param  int $menu_id
+	 *
+	 * @return array
+	 */
+	public function process_checking( int $menu_id ): array {
+
+		self::$action = 'CHECKING';
+
+		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
+			return [];
+		}
+
+		// Check if it is a REST Request
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			return [];
+		}
+
+		$fields = apply_filters(
+			'ainsys_process_update_fields_' . self::$entity,
+			$this->prepare_data( $menu_id ),
+			$menu_id
+		);
+
+		return $this->send_data( $menu_id, self::$entity, self::$action, $fields );
+	}
+
+
+	/**
 	 *
 	 * @param  int $menu_id
 	 *
@@ -122,7 +152,7 @@ class Process_Menus extends Process implements Hooked {
 		if ( $menu->count > 0 ) {
 			$menus = [
 				'ID'                  => $menu_id,
-				'menu_name'           => $menu->name,
+				'menu-name'           => $menu->name,
 				'site_menu_locations' => get_registered_nav_menus(),
 				'menu_locations'      => $this->get_menu_locations( $menu_id ),
 				'menu_items'          => $this->get_menu_items( $menu_id ),
@@ -169,6 +199,7 @@ class Process_Menus extends Process implements Hooked {
 			$parent_item = get_post( (int) $menu_item->menu_item_parent );
 
 			$items[] = [
+				'db_id'         => $menu_item->ID,
 				'title'         => $menu_item->title,
 				'url'           => $menu_item->url,
 				'parent_id'     => $menu_item->menu_item_parent,

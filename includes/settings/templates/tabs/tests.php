@@ -15,7 +15,7 @@ use Ainsys\Connector\Master\Settings\Settings;
 
 $admin_ui     = $args['admin_ui'];
 $active       = $args['active'];
-$columns     = Admin_UI_Entities_Checking::columns_checking_entities();
+$columns      = Admin_UI_Entities_Checking::columns_checking_entities();
 $check_entity = Settings::get_option( 'check_connection_entity' );
 
 ?>
@@ -66,12 +66,13 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 											<div class="ainsys-response-short"><?php esc_html_e( 'No data', AINSYS_CONNECTOR_TEXTDOMAIN ) ?></div>
 											<div class="ainsys-response-full"></div>
 										<?php else: ?>
-
 											<div class="ainsys-response-short">
-												<?php echo mb_substr( serialize( $check_entity[ $entity_id ]['request'] ), 0, 40 ) . ' ... ' ?>
+												<?php echo mb_substr( Logger::convert_response( $check_entity[ $entity_id ]['request'] ), 0, 40 ) . ' ... ' ?>
 											</div>
 											<div class="ainsys-response-full">
-												<?php echo Logger::convert_response( $check_entity[ $entity_id ]['request'] ); ?>
+												<pre>
+													<?php echo Logger::convert_response( $check_entity[ $entity_id ]['request'] ); ?>
+												</pre>
 											</div>
 										<?php endif; ?>
 
@@ -86,10 +87,12 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 											<div class="ainsys-response-full"></div>
 										<?php else: ?>
 											<div class="ainsys-response-short">
-												<?php echo mb_substr( serialize( $check_entity[ $entity_id ]['response'] ), 0, 40 ) . ' ... ' ?>
+												<?php echo mb_substr( $check_entity[ $entity_id ]['response'], 0, 40 ) . ' ... ' ?>
 											</div>
 											<div class="ainsys-response-full">
-												<?php echo $check_entity[ $entity_id ]['response']; ?>
+												<pre>
+													<?php echo Logger::convert_response( $check_entity[ $entity_id ]['response'] ); ?>
+												</pre>
 											</div>
 										<?php endif; ?>
 									</div>

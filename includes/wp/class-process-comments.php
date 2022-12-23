@@ -47,18 +47,45 @@ class Process_Comments extends Process implements Hooked {
 		$this->send_data( $comment_id, 'comment', self::$action, $fields );
 
 	}
+
+
 	/**
 	 * Sends updated WP comment details to AINSYS.
 	 *
 	 * @param  int   $comment_id
 	 * @param  array $data
-	 * @param  bool  $checking_connected
+	 *
+	 */
+	public function process_update( int $comment_id, array $data ): void {
+
+		self::$action = 'UPDATE';
+
+		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
+			return;
+		}
+
+		$fields = apply_filters(
+			'ainsys_process_update_fields_' . self::$entity,
+			$this->prepare_data( $comment_id, $data ),
+			$data
+		);
+
+		$this->send_data( $comment_id, 'comment', self::$action, $fields );
+
+	}
+
+
+	/**
+	 * Sends updated WP comment details to AINSYS.
+	 *
+	 * @param  int   $comment_id
+	 * @param  array $data
 	 *
 	 * @return array
 	 */
-	public function process_update( $comment_id, $data, $checking_connected = false ): array {
+	public function process_checking( int $comment_id, array $data ): array {
 
-		self::$action = $this->get_update_action( $checking_connected );
+		self::$action = 'CHECKING';
 
 		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
 			return [];
@@ -73,6 +100,7 @@ class Process_Comments extends Process implements Hooked {
 		return $this->send_data( $comment_id, 'comment', self::$action, $fields );
 
 	}
+
 
 	/**
 	 * Prepares WP comment data. Adds ACF fields if there are any.
@@ -90,8 +118,5 @@ class Process_Comments extends Process implements Hooked {
 
 		return array_merge( $data, $acf_fields );
 	}
-
-
-
 
 }

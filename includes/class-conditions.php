@@ -93,8 +93,8 @@ class Conditions implements Hooked {
 							'entity'          => $entity,
 							'request_action'  => $action,
 							'request_type'    => $type,
-							'request_data'    => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-							'server_response' => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
+							'request_data'    => serialize( __( 'Error: Data transfer for creation is disabled in the settings', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
+							'server_response' => serialize( __( 'Error: Data transfer for creation is disabled in the settings', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
 							'error'           => 1,
 						]
 					);
@@ -112,8 +112,8 @@ class Conditions implements Hooked {
 							'entity'          => $entity,
 							'request_action'  => $action,
 							'request_type'    => $type,
-							'request_data'    => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-							'server_response' => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
+							'request_data'    => serialize( __( 'Error: Data transfer for update is disabled in the settings', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
+							'server_response' => serialize( __( 'Error: Data transfer for update is disabled in the settings', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
 							'error'           => 1,
 						]
 					);
@@ -130,8 +130,8 @@ class Conditions implements Hooked {
 							'entity'          => $entity,
 							'request_action'  => $action,
 							'request_type'    => $type,
-							'request_data'    => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-							'server_response' => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
+							'request_data'    => serialize( __( 'Error: Data transfer for read is disabled in the settings', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
+							'server_response' => serialize( __( 'Error: Data transfer for read is disabled in the settings', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
 							'error'           => 1,
 						]
 					);
@@ -148,8 +148,8 @@ class Conditions implements Hooked {
 							'entity'          => $entity,
 							'request_action'  => $action,
 							'request_type'    => $type,
-							'request_data'    => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-							'server_response' => serialize( __( 'Error: Data transfer is disabled', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
+							'request_data'    => serialize( __( 'Error: Data transfer for delete is disabled in the setting', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
+							'server_response' => serialize( __( 'Error: Data transfer for delete is disabled in the setting', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
 							'error'           => 1,
 						]
 					);

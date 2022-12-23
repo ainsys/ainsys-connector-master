@@ -4,6 +4,21 @@ body.toplevel_page_ainsys-connector .nav-tab-active {
 	background: #fff;
 }
 
+body.toplevel_page_ainsys-connector pre{
+	background: #fff;
+	border: none;
+	display: block;
+	padding: 0;
+	margin: 0;
+	line-height: 1.22857143;
+	color: #333;
+	word-break: break-all;
+	word-wrap: break-word;
+	border-radius: 0;
+	white-space: pre-wrap;
+	overflow: auto;
+}
+
 .ainsys-logo {
 	opacity: 0;
 	transition: .5s all linear;

@@ -53,37 +53,37 @@ class Admin_UI_Entities_Checking implements Hooked {
 		switch ( $entity ) {
 			case 'user':
 				$make_request  = true;
-				$result_test   = $this->get_user_for_test();
+				$result_test   = $this->get_user();
 				$result_entity = Settings::get_option( 'check_connection_entity' );
 				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
 				break;
 			case 'comment':
 				$make_request  = true;
-				$result_test   = $this->get_comment_for_test();
+				$result_test   = $this->get_comment();
 				$result_entity = Settings::get_option( 'check_connection_entity' );
 				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
 				break;
 			case 'attachment':
 				$make_request  = true;
-				$result_test   = $this->get_attachment_for_test();
+				$result_test   = $this->get_attachment();
 				$result_entity = Settings::get_option( 'check_connection_entity' );
 				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
 				break;
 			case 'post':
 				$make_request  = true;
-				$result_test   = $this->get_post_for_test();
+				$result_test   = $this->get_post();
 				$result_entity = Settings::get_option( 'check_connection_entity' );
 				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
 				break;
 			case 'page':
 				$make_request  = true;
-				$result_test   = $this->get_page_for_test();
+				$result_test   = $this->get_page();
 				$result_entity = Settings::get_option( 'check_connection_entity' );
 				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
 				break;
 			case 'menu':
 				$make_request  = true;
-				$result_test   = $this->get_menu_for_test();
+				$result_test   = $this->get_menu();
 				$result_entity = Settings::get_option( 'check_connection_entity' );
 				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
 				break;
@@ -131,7 +131,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 	/**
 	 * @return array
 	 */
-	protected function get_user_for_test(): array {
+	protected function get_user(): array {
 
 		$users_args = [
 			'fields' => 'all',
@@ -144,19 +144,14 @@ class Admin_UI_Entities_Checking implements Hooked {
 		$users     = get_users( $users_args );
 		$user_test = end( $users );
 
-		return ( new Process_Users )->process_update(
-			(int) $user_test->ID,
-			(array) $user_test->data,
-			(array) $user_test->data,
-			true
-		);
+		return ( new Process_Users )->process_checking( (int) $user_test->ID, (array) $user_test->data, (array) $user_test->data );
 	}
 
 
 	/**
 	 * @return array
 	 */
-	protected function get_comment_for_test(): array {
+	protected function get_comment(): array {
 
 		$comments = get_comments( [
 			'status' => 'approve',
@@ -174,14 +169,14 @@ class Admin_UI_Entities_Checking implements Hooked {
 		$comment_id = $comment['comment_ID'];
 		unset( $comment['comment_ID'] );
 
-		return ( new Process_Comments )->process_update( (int) $comment_id, $comment, true );
+		return ( new Process_Comments )->process_checking( (int) $comment_id, $comment );
 	}
 
 
 	/**
 	 * @return array
 	 */
-	protected function get_attachment_for_test(): array {
+	protected function get_attachment(): array {
 
 		$attachments = get_posts( [
 			'post_type'      => 'attachment',
@@ -198,16 +193,16 @@ class Admin_UI_Entities_Checking implements Hooked {
 		}
 
 		$attachment    = (array) end( $attachments );
-		$attachment_id = $attachment['ID'];
+		$attachment_id = (int) $attachment['ID'];
 
-		return ( new Process_Attachments )->process_update( (int) $attachment_id, $attachment, true );
+		return ( new Process_Attachments )->process_checking( $attachment_id, $attachment, true );
 	}
 
 
 	/**
 	 * @return array
 	 */
-	protected function get_post_for_test(): array {
+	protected function get_post(): array {
 
 		$posts = get_posts( [
 			'post_type'      => 'post',
@@ -224,16 +219,16 @@ class Admin_UI_Entities_Checking implements Hooked {
 		}
 
 		$post    = end( $posts );
-		$post_id = $post->ID;
+		$post_id = (int) $post->ID;
 
-		return ( new Process_Posts )->process_update( (int) $post_id, $post, true, true );
+		return ( new Process_Posts )->process_checking( $post_id, $post, true );
 	}
 
 
 	/**
 	 * @return array
 	 */
-	protected function get_page_for_test(): array {
+	protected function get_page(): array {
 
 		$posts = get_posts( [
 			'post_type'      => 'page',
@@ -250,16 +245,16 @@ class Admin_UI_Entities_Checking implements Hooked {
 		}
 
 		$post    = end( $posts );
-		$post_id = $post->ID;
+		$post_id = (int) $post->ID;
 
-		return ( new Process_Pages )->process_update( (int) $post_id, $post, true, true );
+		return ( new Process_Pages )->process_checking( $post_id, $post, true );
 	}
 
 
 	/**
 	 * @return array
 	 */
-	protected function get_menu_for_test(): array {
+	protected function get_menu(): array {
 
 		$menus = wp_get_nav_menus();
 
@@ -273,7 +268,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 		$menu    = end( $menus );
 		$menu_id = (int) $menu->term_id;
 
-		return ( new Process_Menus() )->process_update( $menu_id, true );
+		return ( new Process_Menus() )->process_checking( $menu_id );
 	}
 
 
@@ -289,7 +284,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 		if ( ! empty( $result_test['request'] ) ) {
 			$result_request = $result_test['request'];
 		} else {
-			$result_request = '';
+			$result_request = 'Error: Data transfer is disabled. Check the Entities export settings tab';
 		}
 
 		if ( ! empty( $result_test['response'] ) ) {
@@ -298,16 +293,13 @@ class Admin_UI_Entities_Checking implements Hooked {
 			$result_response = __( 'Error: Data transfer is disabled. Check the Entities export settings tab', AINSYS_CONNECTOR_TEXTDOMAIN );
 		}
 
-		$full_response = Logger::convert_response( $result_response );
-		$full_request  = Logger::convert_response( $result_request );
-
 		$result_entity[ $entity ] = [
 			'request'        => $result_request,
 			'response'       => $result_response,
-			'short_request'  => mb_substr( serialize( $result_request ), 0, 40 ) . ' ... ',
-			'full_request'   => $full_request,//Logger::render_json( $result_request ),
-			'short_response' => mb_substr( serialize( $result_response ), 0, 40 ) . ' ... ',
-			'full_response'  => $full_response,
+			'short_request'  => mb_substr( Logger::convert_response( $result_request ), 0, 40 ) . ' ... ',
+			'full_request'   => Logger::convert_response( $result_request ),
+			'short_response' => mb_substr( Logger::convert_response( $result_response ), 0, 40 ) . ' ... ',
+			'full_response'  => Logger::convert_response( $result_response ),
 			'time'           => current_time( 'mysql' ),
 			'status'         => false === strpos( $result_response, 'Error:' ),
 		];

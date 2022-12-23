@@ -224,10 +224,12 @@ class Admin_UI implements Hooked {
 			AINSYS_CONNECTOR_VERSION
 		);
 
+		wp_enqueue_script( 'clipboard' );
+
 		wp_enqueue_script(
 			'ainsys_connector_admin_handle',
 			plugins_url( 'assets/js/ainsys_connector_admin.js', AINSYS_CONNECTOR_PLUGIN ),
-			[ 'jquery', 'dataTables_script_handle' ],
+			[ 'jquery','clipboard', 'dataTables_script_handle' ],
 			AINSYS_CONNECTOR_VERSION,
 			true
 		);

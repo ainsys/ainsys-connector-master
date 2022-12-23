@@ -92,7 +92,11 @@ class Logger implements Hooked {
 		if ( is_string( $value_out ) ) {
 			$full_response = $value_out;
 		} else {
-			$full_response = self::render_json( $value_out );
+			try {
+				$full_response = json_encode( $value_out, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE  );
+			} catch ( \JsonException $exception ) {
+				$full_response = $exception->getMessage();
+			}
 		}
 
 		return $full_response;

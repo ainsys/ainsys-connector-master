@@ -28,15 +28,15 @@ class Admin_UI_Logs implements Hooked {
 		return apply_filters(
 			'ainsys_select_time_logs',
 			[
-				'60'  => __( '1 min', AINSYS_CONNECTOR_TEXTDOMAIN ),
-				'900'  => __( '15 min', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'60'    => __( '1 min', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'900'   => __( '15 min', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'1800'  => __( '30 min', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'3600'  => __( '1 hour', AINSYS_CONNECTOR_TEXTDOMAIN ),
-				'10800'  => __( '3 hours', AINSYS_CONNECTOR_TEXTDOMAIN ),
-				'21600'  => __( '6 hours', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'10800' => __( '3 hours', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'21600' => __( '6 hours', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'43200' => __( '12 hours', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'86400' => __( '24 hours', AINSYS_CONNECTOR_TEXTDOMAIN ),
-				'-1' => __( 'Unlimited', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'-1'    => __( 'Unlimited', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			]
 		);
 	}
@@ -165,8 +165,8 @@ class Admin_UI_Logs implements Hooked {
 					if ( empty( $value ) ) {
 						$log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN );
 					} else {
-						$log_html_body .= sprintf( '<div class="ainsys-response-short">%s ... </div>', mb_substr( serialize( $value ), 0, 40 ) );
-						$log_html_body .= sprintf( '<div class="ainsys-response-full">%s</div>', Logger::convert_response( $value ) );
+						$log_html_body .= sprintf( '<div class="ainsys-response-short">%s ... </div>', mb_substr( Logger::convert_response( $value ), 0, 40 ) );
+						$log_html_body .= sprintf( '<div class="ainsys-response-full"><pre>%s</pre></div>', Logger::convert_response( $value ) );
 					}
 
 				} else {

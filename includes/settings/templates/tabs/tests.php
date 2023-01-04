@@ -64,7 +64,7 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 										<?php if ( empty( $check_entity[ $entity_id ]['request'] ) ): ?>
 
 											<div class="ainsys-response-short"><?php esc_html_e( 'No data', AINSYS_CONNECTOR_TEXTDOMAIN ) ?></div>
-											<div class="ainsys-response-full"></div>
+											<div class="ainsys-response-full"><pre></pre></div>
 										<?php else: ?>
 											<div class="ainsys-response-short">
 												<?php echo mb_substr( Logger::convert_response( $check_entity[ $entity_id ]['request'] ), 0, 40 ) . ' ... ' ?>
@@ -84,7 +84,7 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 										<?php if ( empty( $check_entity[ $entity_id ]['response'] ) ): ?>
 
 											<div class="ainsys-response-short"><?php esc_html_e( 'No data', AINSYS_CONNECTOR_TEXTDOMAIN ) ?></div>
-											<div class="ainsys-response-full"></div>
+											<div class="ainsys-response-full"><pre></pre></div>
 										<?php else: ?>
 											<div class="ainsys-response-short">
 												<?php echo mb_substr( $check_entity[ $entity_id ]['response'], 0, 40 ) . ' ... ' ?>

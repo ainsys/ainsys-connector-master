@@ -36,7 +36,7 @@ class Webhook_Listener implements Hooked {
 
 			$json_file = ABSPATH . 'testings-development.json';
 
-			$entityBody = file_get_contents( $json_file, false, stream_context_create( $options ) );
+			$entityBody = file_exists( $json_file ) ? file_get_contents( $json_file, false, stream_context_create( $options ) ) : '';
 
 		} else {
 

@@ -58,11 +58,41 @@ class Admin_UI implements Hooked {
 	}
 
 
+	public function add_admin_menu_separator( $position ): void {
+
+		global $menu;
+
+		static $index;
+		if ( empty( $index ) ) {
+			$index = 1;
+		}
+
+		foreach ( $menu as $mindex => $section ) {
+
+			if ( $mindex >= $position ) {
+
+				while ( isset( $menu[ $position ] ) ) {
+					++ $position;
+				}
+
+				$menu[ $position ] = [ '', 'read', "separator-my$index", '', 'wp-menu-separator' ];
+
+				$index ++;
+				break;
+			}
+		}
+
+		ksort( $menu );
+	}
+
+
 	/**
 	 * Registers the plugin settings page in WP menu
 	 *
 	 */
 	public function add_admin_menu() {
+
+		$this->add_admin_menu_separator( 54 );
 
 		add_menu_page(
 			__( 'AINSYS connector integration', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
@@ -229,7 +259,7 @@ class Admin_UI implements Hooked {
 		wp_enqueue_script(
 			'ainsys_connector_admin_handle',
 			plugins_url( 'assets/js/ainsys_connector_admin.js', AINSYS_CONNECTOR_PLUGIN ),
-			[ 'jquery','clipboard', 'dataTables_script_handle' ],
+			[ 'jquery', 'clipboard', 'dataTables_script_handle' ],
 			AINSYS_CONNECTOR_VERSION,
 			true
 		);

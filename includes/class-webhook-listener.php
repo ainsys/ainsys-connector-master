@@ -25,17 +25,33 @@ class Webhook_Listener implements Hooked {
 	 */
 	public function webhook_listener(): void {
 
-		if ( empty( $_SERVER['QUERY_STRING'] ) ) {
-			return;
+		if ( ! empty( $_GET['ainsys_webhook'] ) && 'development' === wp_get_environment_type() ) {
+
+			$options = [
+				'ssl' => [
+					'verify_peer'      => false,
+					'verify_peer_name' => false,
+				],
+			];
+
+			$json_file = ABSPATH . 'testings-development.json';
+
+			$entityBody = file_get_contents( $json_file, false, stream_context_create( $options ) );
+
+		} else {
+
+			if ( empty( $_SERVER['QUERY_STRING'] ) ) {
+				return;
+			}
+
+			parse_str( $_SERVER['QUERY_STRING'], $query_vars );
+
+			if ( ! isset( $query_vars['ainsys_webhook'] ) ) {
+				return;
+			}
+
+			$entityBody = file_get_contents( 'php://input' );
 		}
-
-		parse_str( $_SERVER['QUERY_STRING'], $query_vars );
-
-		if ( ! isset( $query_vars['ainsys_webhook'] ) ) {
-			return;
-		}
-
-		$entityBody = file_get_contents( 'php://input' );
 
 		// by default, we respond with bad request - if it's right action it will be set below.
 		$response_code = 400;
@@ -99,15 +115,16 @@ class Webhook_Listener implements Hooked {
 			$response_code = 404;
 		}
 
-		wp_send_json(
-			[
-				'entityType'   => $entityType,
-				'request_data' => $data,
-				'response'     => $response,
-			],
-			$response_code
-		);
-
+		if ( 'development' !== wp_get_environment_type() ) {
+			wp_send_json(
+				[
+					'entityType'   => $entityType,
+					'request_data' => $data,
+					'response'     => $response,
+				],
+				$response_code
+			);
+		}
 	}
 
 

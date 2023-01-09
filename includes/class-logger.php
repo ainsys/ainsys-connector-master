@@ -93,7 +93,7 @@ class Logger implements Hooked {
 			$full_response = $value_out;
 		} else {
 			try {
-				$full_response = json_encode( $value_out, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE  );
+				$full_response = json_encode( $value_out, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 			} catch ( \JsonException $exception ) {
 				$full_response = $exception->getMessage();
 			}

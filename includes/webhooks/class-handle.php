@@ -4,6 +4,7 @@ namespace Ainsys\Connector\Master\Webhooks;
 
 use Ainsys\Connector\Master\Core;
 use Ainsys\Connector\Master\Logger;
+use WP_Error;
 
 abstract class Handle {
 
@@ -118,21 +119,25 @@ abstract class Handle {
 
 
 	/**
-	 * @param $data
-	 * @param $result
-	 * @param $message_error
-	 * @param $entity
-	 * @param $action
+	 * @param      $data
+	 * @param      $result
+	 * @param      $message_error
+	 * @param      $entity
+	 * @param      $action
+	 * @param  int $object_id
 	 *
 	 * @return string
 	 */
-	public function handle_error( $data, $result, $message_error, $entity, $action ): string {
+	public function handle_error( $data, $result, $message_error, $entity, $action, int $object_id = 0 ): string {
 
-		$message = $message_error . $result->get_error_message();
+		$error  = new WP_Error;
+		$result = empty( $result ) ? $error->get_error_message() : $result->get_error_message();
+
+		$message = $message_error . $result;
 
 		Logger::save(
 			[
-				'object_id'       => 0,
+				'object_id'       => $object_id,
 				'entity'          => $entity,
 				'request_action'  => $action,
 				'request_type'    => 'incoming',

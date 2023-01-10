@@ -181,25 +181,25 @@ $status_addons = $settings->get_statuses_addons();
 								<li class="ainsys-status">
 									<span class="ainsys-status--title"><?php echo esc_html( $status_item['title'] ); ?></span>
 
-									<?php if ( ! $status_item['install'] ): ?>
-									<span class="ainsys-status--error  ainsys-status--state">
-									<svg class="ainsys-icon ainsys-icon--error" fill="none" viewBox="0 0 24 24"><g fill="#D5031E" clip-path="url(#a)"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/><path
-												stroke="#D5031E"
-												stroke-width=".5"
-												d="m17 8-1-1-4 4-4-4-1 1 4 4-4 4 1 1 4-4 4 4 1-1-4-4 4-4Z"/></g><defs><clipPath id="a"><path fill="#fff"
-									                                                                                                         d="M0 0h24v24H0z"/></clipPath></defs></svg>
-								<?php
+									<?php if ( empty( $status_item['install'] ) ): ?>
+										<span class="ainsys-status--error  ainsys-status--state">
+										<svg class="ainsys-icon ainsys-icon--error" fill="none" viewBox="0 0 24 24"><g fill="#D5031E" clip-path="url(#a)"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/><path
+													stroke="#D5031E"
+													stroke-width=".5"
+													d="m17 8-1-1-4 4-4-4-1 1 4 4-4 4 1 1 4-4 4 4 1-1-4-4 4-4Z"/></g><defs><clipPath id="a"><path fill="#fff"
+										                                                                                                         d="M0 0h24v24H0z"/></clipPath></defs></svg>
+										<?php
 
-								printf(
-									'%s <a href="#">%s</a>',
-									esc_html( __( 'Not installed', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
-									__( 'Install', AINSYS_CONNECTOR_TEXTDOMAIN )
-								);
+										printf(
+											'%s <a href="#">%s</a>',
+											esc_html( __( 'Not installed', AINSYS_CONNECTOR_TEXTDOMAIN ) ),
+											__( 'Install', AINSYS_CONNECTOR_TEXTDOMAIN )
+										);
+										?>
 
-								elseif ( ! $status_item['active'] ):
-
-								?>
-							<span class="ainsys-status--error  ainsys-status--state">
+									<?php elseif ( empty( $status_item['active'] ) ): ?>
+										</span>
+										<span class="ainsys-status--error  ainsys-status--state">
 									<svg class="ainsys-icon ainsys-icon--error" fill="none" viewBox="0 0 24 24"><g fill="#D5031E" clip-path="url(#a)"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/><path
 												stroke="#D5031E"
 												stroke-width=".5"
@@ -212,11 +212,10 @@ $status_addons = $settings->get_statuses_addons();
 									'plugins.php',
 									__( 'Activate', AINSYS_CONNECTOR_TEXTDOMAIN )
 								);
-
-								else :
-
-									?>
-									<span class="ainsys-status--ok ainsys-status--state">
+								?>
+								</span>
+									<?php else : ?>
+										<span class="ainsys-status--ok ainsys-status--state">
 									<svg fill="none" viewBox="0 0 24 24">
 										<g clip-path="url(#a)">
 											<path fill="#37B34A"
@@ -229,7 +228,7 @@ $status_addons = $settings->get_statuses_addons();
 									</svg>
 								<?php echo esc_html( __( 'Active', AINSYS_CONNECTOR_TEXTDOMAIN ) ); ?>
 								</span>
-								<?php endif; ?>
+									<?php endif; ?>
 								</li>
 							<?php endforeach; ?>
 

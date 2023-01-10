@@ -4,6 +4,7 @@ namespace Ainsys\Connector\Master\Webhooks;
 
 use Ainsys\Connector\Master\Core;
 use Ainsys\Connector\Master\Logger;
+use WP_Error;
 
 abstract class Handle {
 
@@ -29,14 +30,17 @@ abstract class Handle {
 	 * @param  array  $data
 	 * @param  int    $object_id
 	 *
-	 * @return string|void
+	 * @return array
 	 */
 	public function handler( string $action, array $data, int $object_id = 0 ) {
 
-		$response = '';
+		$response = [];
 
 		if ( empty( $action ) ) {
-			$response = __( 'Action not registered', AINSYS_CONNECTOR_TEXTDOMAIN );
+			$response = [
+				'id'      => $object_id,
+				'message' => __( 'Action not registered', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			];
 		}
 
 		switch ( $action ) {
@@ -59,9 +63,9 @@ abstract class Handle {
 	 * @param  array  $data
 	 * @param  string $action
 	 *
-	 * @return string
+	 * @return array
 	 */
-	abstract protected function create( array $data, string $action ): string;
+	abstract protected function create( array $data, string $action ): array;
 
 
 	/**
@@ -69,9 +73,9 @@ abstract class Handle {
 	 * @param $action
 	 * @param $object_id
 	 *
-	 * @return string
+	 * @return array
 	 */
-	abstract protected function update( $data, $action, $object_id ): string;
+	abstract protected function update( $data, $action, $object_id ): array;
 
 
 	/**
@@ -79,9 +83,9 @@ abstract class Handle {
 	 * @param $data
 	 * @param $action
 	 *
-	 * @return string
+	 * @return array
 	 */
-	abstract protected function delete( $object_id, $data, $action ): string;
+	abstract protected function delete( $object_id, $data, $action ): array;
 
 
 	/**
@@ -118,21 +122,25 @@ abstract class Handle {
 
 
 	/**
-	 * @param $data
-	 * @param $result
-	 * @param $message_error
-	 * @param $entity
-	 * @param $action
+	 * @param      $data
+	 * @param      $result
+	 * @param      $message_error
+	 * @param      $entity
+	 * @param      $action
+	 * @param  int $object_id
 	 *
 	 * @return string
 	 */
-	public function handle_error( $data, $result, $message_error, $entity, $action ): string {
+	public function handle_error( $data, $result, $message_error, $entity, $action, int $object_id = 0 ): string {
 
-		$message = $message_error . $result->get_error_message();
+		$error  = new WP_Error;
+		$result = empty( $result ) ? $error->get_error_message() : $result->get_error_message();
+
+		$message = $message_error . $result;
 
 		Logger::save(
 			[
-				'object_id'       => 0,
+				'object_id'       => $object_id,
 				'entity'          => $entity,
 				'request_action'  => $action,
 				'request_type'    => 'incoming',

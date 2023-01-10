@@ -30,14 +30,17 @@ abstract class Handle {
 	 * @param  array  $data
 	 * @param  int    $object_id
 	 *
-	 * @return string|void
+	 * @return array
 	 */
 	public function handler( string $action, array $data, int $object_id = 0 ) {
 
-		$response = '';
+		$response = [];
 
 		if ( empty( $action ) ) {
-			$response = __( 'Action not registered', AINSYS_CONNECTOR_TEXTDOMAIN );
+			$response = [
+				'id'      => $object_id,
+				'message' => __( 'Action not registered', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			];
 		}
 
 		switch ( $action ) {
@@ -60,9 +63,9 @@ abstract class Handle {
 	 * @param  array  $data
 	 * @param  string $action
 	 *
-	 * @return string
+	 * @return array
 	 */
-	abstract protected function create( array $data, string $action ): string;
+	abstract protected function create( array $data, string $action ): array;
 
 
 	/**
@@ -70,9 +73,9 @@ abstract class Handle {
 	 * @param $action
 	 * @param $object_id
 	 *
-	 * @return string
+	 * @return array
 	 */
-	abstract protected function update( $data, $action, $object_id ): string;
+	abstract protected function update( $data, $action, $object_id ): array;
 
 
 	/**
@@ -80,9 +83,9 @@ abstract class Handle {
 	 * @param $data
 	 * @param $action
 	 *
-	 * @return string
+	 * @return array
 	 */
-	abstract protected function delete( $object_id, $data, $action ): string;
+	abstract protected function delete( $object_id, $data, $action ): array;
 
 
 	/**

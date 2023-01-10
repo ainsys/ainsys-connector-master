@@ -24,18 +24,30 @@ class Handle_Menu extends Handle implements Hooked, Webhook_Handler {
 	 * @param  array  $data
 	 * @param  string $action
 	 *
-	 * @return string
+	 * @return array
 	 */
-	protected function create( array $data, string $action ): string {
+	protected function create( array $data, string $action ): array {
 
 		if ( Conditions::has_entity_disable( self::$entity, $action, 'incoming' ) ) {
-			return sprintf( __( 'Error: %s creation is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
+			return [
+				'id'      => 0,
+				'message' => $this->handle_error(
+					$data,
+					'',
+					sprintf( __( 'Error: %s creation is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity ),
+					self::$entity,
+					$action
+				),
+			];
 		}
 
 		if ( empty( $data['menu-name'] ) ) {
 			$result = new WP_Error( 'menu-name_missing', __( 'The attribute menu-name is missing.', AINSYS_CONNECTOR_TEXTDOMAIN ), $data );
 
-			return $this->get_message( $result, $data, self::$entity, $action );
+			return [
+				'id'      => 0,
+				'message' => $this->get_message( $result, $data, self::$entity, $action ),
+			];
 		}
 
 		$menu_id = wp_create_nav_menu( $data['menu-name'] );
@@ -46,7 +58,10 @@ class Handle_Menu extends Handle implements Hooked, Webhook_Handler {
 
 		$result = $menu_id;
 
-		return $this->get_message( $result, $data, self::$entity, $action );
+		return [
+			'id'      => is_wp_error( $result ) ? 0 : $result,
+			'message' => $this->get_message( $result, $data, self::$entity, $action ),
+		];
 	}
 
 
@@ -55,12 +70,21 @@ class Handle_Menu extends Handle implements Hooked, Webhook_Handler {
 	 * @param $action
 	 * @param $object_id
 	 *
-	 * @return string
+	 * @return array
 	 */
-	protected function update( $data, $action, $object_id ): string {
+	protected function update( $data, $action, $object_id ): array {
 
 		if ( Conditions::has_entity_disable( self::$entity, $action, 'incoming' ) ) {
-			return sprintf( __( 'Error: %s update is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
+			return [
+				'id'      => 0,
+				'message' => $this->handle_error(
+					$data,
+					'',
+					sprintf( __( 'Error: %s creation is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity ),
+					self::$entity,
+					$action
+				),
+			];
 		}
 
 		$menu_id = wp_update_nav_menu_object( $data['ID'], $data );
@@ -71,7 +95,10 @@ class Handle_Menu extends Handle implements Hooked, Webhook_Handler {
 
 		$result = $menu_id;
 
-		return $this->get_message( $result, $data, self::$entity, $action );
+		return [
+			'id'      => is_wp_error( $result ) ? 0 : $result,
+			'message' => $this->get_message( $result, $data, self::$entity, $action ),
+		];
 	}
 
 
@@ -80,17 +107,29 @@ class Handle_Menu extends Handle implements Hooked, Webhook_Handler {
 	 * @param $data
 	 * @param $action
 	 *
-	 * @return string
+	 * @return array
 	 */
-	protected function delete( $object_id, $data, $action ): string {
+	protected function delete( $object_id, $data, $action ): array {
 
 		if ( Conditions::has_entity_disable( self::$entity, $action, 'incoming' ) ) {
-			return sprintf( __( 'Error: %s delete is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity );
+			return [
+				'id'      => 0,
+				'message' => $this->handle_error(
+					$data,
+					'',
+					sprintf( __( 'Error: %s delete is disabled in settings.', AINSYS_CONNECTOR_TEXTDOMAIN ), self::$entity ),
+					self::$entity,
+					$action
+				),
+			];
 		}
 
 		$result = wp_delete_nav_menu( $object_id );
 
-		return $this->get_message( $result, $data, self::$entity, $action );
+		return [
+			'id'      => $result ? $object_id : 0,
+			'message' => $this->get_message( $result, $data, self::$entity, $action ),
+		];
 	}
 
 

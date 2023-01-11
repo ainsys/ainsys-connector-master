@@ -133,7 +133,12 @@ jQuery( function ( $ ) {
 
 		init: function () {
 
-			$( '#connection_log .ainsys-table' ).DataTable();
+			$( '#connection_log .ainsys-table' ).DataTable( {
+				"sPaginationType": "full_numbers",
+				"aaSorting":       [ [ 0, "asc" ] ],
+				"iDisplayLength":  50,
+				"aLengthMenu":     [ [ 5, 10, 25, 50, 100, -1 ], [ 5, 10, 25, 50, 100, "All" ] ]
+			} );
 
 			this.animationLogo();
 
@@ -439,7 +444,12 @@ jQuery( function ( $ ) {
 
 				if ( msg ) {
 					$( '#connection_log' ).html( msg );
-					$( '#connection_log .ainsys-table' ).DataTable();
+					$( '#connection_log .ainsys-table' ).DataTable( {
+						"sPaginationType": "full_numbers",
+						"aaSorting":       [ [ 0, "asc" ] ],
+						"iDisplayLength":  50,
+						"aLengthMenu": [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "All"]]
+					});
 					//location.reload();
 				}
 			}

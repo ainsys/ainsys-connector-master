@@ -81,9 +81,7 @@ class Admin_UI_General implements Hooked {
 					esc_html( Settings::get_backup_email( $i ) )
 				),
 				'active'        => ! empty( Settings::get_backup_email( $i ) )
-				                   && filter_var(
-					                   Settings::get_backup_email( $i ), FILTER_VALIDATE_EMAIL
-				                   ),
+				                   && filter_var( Settings::get_backup_email( $i ), FILTER_VALIDATE_EMAIL ),
 				'label_success' => __( 'Valid', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'label_error'   => __( 'Invalid', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			];
@@ -131,9 +129,11 @@ class Admin_UI_General implements Hooked {
 	 * Removes ainsys integration information
 	 */
 	public function remove_ainsys_integration(): void {
+
 		Settings::truncate();
 		wp_die();
 	}
+
 
 	/**
 	 * Removes ainsys integration information
@@ -193,7 +193,7 @@ class Admin_UI_General implements Hooked {
 			[
 				'object_id'       => 0,
 				'entity'          => 'settings',
-				'request_action'  => 'Checking Connected',
+				'request_action'  => 'CHECKING CONNECT',
 				'request_type'    => 'outgoing',
 				'request_data'    => '',
 				'server_response' => serialize( $check_response ),
@@ -220,8 +220,7 @@ class Admin_UI_General implements Hooked {
 
 		$result = [
 			'response' => $check_response,
-
-			'time' => current_time( 'mysql' ),
+			'time'     => current_time( 'mysql' ),
 		];
 
 		Settings::set_option( 'check_connection', $result );
@@ -230,7 +229,7 @@ class Admin_UI_General implements Hooked {
 			[
 				'object_id'       => 0,
 				'entity'          => 'settings',
-				'request_action'  => 'Checking Connected',
+				'request_action'  => 'CHECKING CONNECT',
 				'request_type'    => 'outgoing',
 				'request_data'    => '',
 				'server_response' => serialize( $check_response ),

@@ -44,7 +44,8 @@ class Logger implements Hooked {
 
 		return $wpdb->insert(
 			$wpdb->prefix . self::table_name(),
-			$args
+			$args,
+			[ '%d', '%s', '%s', '%s', '%s', '%s', '%d' ]
 		);
 	}
 

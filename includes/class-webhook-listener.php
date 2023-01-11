@@ -40,11 +40,13 @@ class Webhook_Listener implements Hooked {
 
 		} else {
 
-			if ( empty( $_SERVER['QUERY_STRING'] ) ) {
+			$query_string = sanitize_text_field( wp_unslash( $_SERVER['QUERY_STRING'] ) );
+
+			if ( empty( $query_string ) ) {
 				return;
 			}
 
-			parse_str( $_SERVER['QUERY_STRING'], $query_vars );
+			wp_parse_str( $query_string, $query_vars );
 
 			if ( ! isset( $query_vars['ainsys_webhook'] ) ) {
 				return;
@@ -141,7 +143,13 @@ class Webhook_Listener implements Hooked {
 
 	public static function get_request_token(): string {
 
-		return sha1( $_SERVER["REMOTE_ADDR"] . $_SERVER["SERVER_NAME"] );
+		return sha1(
+			sprintf(
+				'%s%s',
+				sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ),
+				sanitize_text_field( wp_unslash( $_SERVER['SERVER_NAME'] ) )
+			)
+		);
 	}
 
 }

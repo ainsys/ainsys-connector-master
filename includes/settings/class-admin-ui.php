@@ -60,6 +60,7 @@ class Admin_UI implements Hooked {
 
 	public function add_admin_menu_separator( $position ): void {
 
+
 		global $menu;
 
 		static $index;
@@ -92,7 +93,7 @@ class Admin_UI implements Hooked {
 	 */
 	public function add_admin_menu() {
 
-		$this->add_admin_menu_separator( 54 );
+		$this->add_admin_menu_separator( 56 );
 
 		add_menu_page(
 			__( 'AINSYS connector integration', AINSYS_CONNECTOR_TEXTDOMAIN ), // phpcs:ignore
@@ -101,7 +102,7 @@ class Admin_UI implements Hooked {
 			'ainsys-connector',
 			[ $this, 'include_setting_page' ],
 			'dashicons-randomize',
-			55
+			57
 		);
 	}
 
@@ -266,14 +267,14 @@ class Admin_UI implements Hooked {
 
 		wp_enqueue_style(
 			'datatables_style_handle',
-			'https://cdn.datatables.net/1.13.1/css/jquery.dataTables.css',
+			plugins_url( 'assets/css/jquery.dataTables.min.css', AINSYS_CONNECTOR_PLUGIN ),
 			[],
 			AINSYS_CONNECTOR_VERSION
 		);
 
 		wp_enqueue_script(
 			'dataTables_script_handle',
-			'https://cdn.datatables.net/1.13.1/js/jquery.dataTables.js',
+			plugins_url( 'assets/js/jquery.dataTables.min.js', AINSYS_CONNECTOR_PLUGIN ),
 			[ 'jquery' ],
 			AINSYS_CONNECTOR_VERSION,
 			true

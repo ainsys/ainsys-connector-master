@@ -26,23 +26,23 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 			<table class="ainsys-table ainsys-table--checking-entities">
 				<thead>
 					<?php foreach ( $columns as $column_id => $column_name ) : ?>
-						<th class="ainsys-table--header ainsys-table--header--<?php echo esc_attr( $column_id ); ?>">
-							<span class="ainsys-table--header--title"><?php echo esc_html( $column_name ); ?></span>
+						<th class="ainsys-table--header ainsys-table--header--<?php esc_attr_e( $column_id ); ?>">
+							<span class="ainsys-table--header--title"><?php esc_html_e( $column_name ); ?></span>
 						</th>
 					<?php endforeach; ?>
 				</thead>
 
 				<?php foreach ( Settings::get_entities() as $entity_id => $entity_label ) : ?>
 
-					<tr class="ainsys-table-table__row ainsys-table__row--id-<?php echo esc_attr( $entity_id ); ?> ">
+					<tr class="ainsys-table-table__row ainsys-table__row--id-<?php esc_attr_e( $entity_id ); ?> ">
 						<?php foreach ( $columns as $column_id => $column_name ) : ?>
-							<td class="ainsys-table-table__cell ainsys-table-table__cell-<?php echo esc_attr( $column_id ); ?>"
-							    data-title="<?php echo esc_attr( $column_name ); ?>">
+							<td class="ainsys-table-table__cell ainsys-table-table__cell-<?php esc_attr_e( $column_id ); ?>"
+							    data-title="<?php esc_attr_e( $column_name ); ?>">
 
 								<?php if ( 'entity' === $column_id ) : ?>
 
-									<div class="ainsys-table-table__cell--<?php echo esc_attr( $column_id ); ?>--inside">
-										<span><?php echo esc_html( $entity_label ); ?></span>
+									<div class="ainsys-table-table__cell--<?php esc_attr_e( $column_id ); ?>--inside">
+										<span><?php esc_html_e( $entity_label ); ?></span>
 										<a href="#setting-section-entities">
 											<svg fill="none" viewBox="0 0 20 20">
 												<g clip-path="url(#a)">
@@ -60,18 +60,23 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 
 								<?php elseif ( 'outgoing' === $column_id ) : ?>
 
-									<div class="ainsys-table-table__cell--<?php echo esc_attr( $column_id ); ?>--inside">
+									<div class="ainsys-table-table__cell--<?php esc_attr_e( $column_id ); ?>--inside">
 										<?php if ( empty( $check_entity[ $entity_id ]['request'] ) ): ?>
 
 											<div class="ainsys-response-short"><?php esc_html_e( 'No data', AINSYS_CONNECTOR_TEXTDOMAIN ) ?></div>
-											<div class="ainsys-response-full"><pre></pre></div>
+											<div class="ainsys-response-full">
+												<pre></pre>
+											</div>
 										<?php else: ?>
 											<div class="ainsys-response-short">
-												<?php echo mb_substr( Logger::convert_response( $check_entity[ $entity_id ]['request'] ), 0, 40 ) . ' ... ' ?>
+												<?php echo sprintf(
+													'%s ...',
+													esc_html( mb_substr( Logger::convert_response( $check_entity[ $entity_id ]['request'] ), 0, 40 ) )
+												) ?>
 											</div>
 											<div class="ainsys-response-full">
 												<pre>
-													<?php echo Logger::convert_response( $check_entity[ $entity_id ]['request'] ); ?>
+													<?php echo esc_html( Logger::convert_response( $check_entity[ $entity_id ]['request'] ) ); ?>
 												</pre>
 											</div>
 										<?php endif; ?>
@@ -80,18 +85,23 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 
 								<?php elseif ( 'server_response' === $column_id ) : ?>
 
-									<div class="ainsys-table-table__cell--<?php echo esc_attr( $column_id ); ?>--inside">
+									<div class="ainsys-table-table__cell--<?php esc_attr_e( $column_id ); ?>--inside">
 										<?php if ( empty( $check_entity[ $entity_id ]['response'] ) ): ?>
 
 											<div class="ainsys-response-short"><?php esc_html_e( 'No data', AINSYS_CONNECTOR_TEXTDOMAIN ) ?></div>
-											<div class="ainsys-response-full"><pre></pre></div>
+											<div class="ainsys-response-full">
+												<pre></pre>
+											</div>
 										<?php else: ?>
 											<div class="ainsys-response-short">
-												<?php echo mb_substr( $check_entity[ $entity_id ]['response'], 0, 40 ) . ' ... ' ?>
+												<?php echo sprintf(
+													'%s ...',
+													esc_html( mb_substr( Logger::convert_response( $check_entity[ $entity_id ]['response'] ), 0, 40 ) )
+												) ?>
 											</div>
 											<div class="ainsys-response-full">
 												<pre>
-													<?php echo Logger::convert_response( $check_entity[ $entity_id ]['response'] ); ?>
+													<?php echo esc_html( Logger::convert_response( $check_entity[ $entity_id ]['response'] ) ); ?>
 												</pre>
 											</div>
 										<?php endif; ?>
@@ -99,11 +109,11 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 
 								<?php elseif ( 'time' === $column_id ) : ?>
 
-									<div class="ainsys-table-table__cell--<?php echo esc_attr( $column_id ); ?>--inside">
+									<div class="ainsys-table-table__cell--<?php esc_attr_e( $column_id ); ?>--inside">
 										<?php if ( empty( $check_entity[ $entity_id ]['time'] ) ): ?>
 											<?php esc_html_e( 'No data', AINSYS_CONNECTOR_TEXTDOMAIN ) ?>
 										<?php else: ?>
-											<?php echo esc_html( $check_entity[ $entity_id ]['time'] ); ?>
+											<?php esc_html_e( $check_entity[ $entity_id ]['time'] ); ?>
 										<?php endif; ?>
 									</div>
 
@@ -111,8 +121,8 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 
 									<button type="button"
 									        class="btn btn-primary ainsys-check"
-									        data-entity-name="<?php echo esc_attr( $entity_id ); ?>">
-										<?php echo esc_html( __( 'Check', AINSYS_CONNECTOR_TEXTDOMAIN ) ); ?>
+									        data-entity-name="<?php esc_attr_e( $entity_id ); ?>">
+										<?php esc_html_e( 'Check', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
 									</button>
 
 								<?php elseif ( 'status' === $column_id ) : ?>
@@ -121,7 +131,7 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 									<?php
 
 									?>
-									<div class="ainsys-table-table__cell--<?php echo esc_attr( $column_id ); ?>--inside">
+									<div class="ainsys-table-table__cell--<?php esc_attr_e( $column_id ); ?>--inside">
 										<?php if ( empty( $check_entity[ $entity_id ]['status'] ) ) : ?>
 											<span class="ainsys-status--error  ainsys-status--state">
 										<svg fill="none" viewBox="0 0 24 24"><g fill="#D5031E" clip-path="url(#a)"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/><path
@@ -129,14 +139,13 @@ $check_entity = Settings::get_option( 'check_connection_entity' );
 													stroke-width=".5"
 													d="m17 8-1-1-4 4-4-4-1 1 4 4-4 4 1 1 4-4 4 4 1-1-4-4 4-4Z"/></g><defs><clipPath id="a"><path fill="#fff"
 										                                                                                                         d="M0 0h24v24H0z"/></clipPath></defs></svg>
-										<?php echo esc_html( __( 'No connection', AINSYS_CONNECTOR_TEXTDOMAIN ) ); ?>
+										<?php esc_html_e( 'No connection', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
 									</span>
 										<?php else: ?>
 											<span class="ainsys-status--ok ainsys-status--state"><svg fill="none" viewBox="0 0 24 24"><g clip-path="url(#a)"><path fill="#37B34A"
 											                                                                                                                       d="M16.59 7.58 10 14.17l-3.59-3.58L5 12l5 5 8-8-1.41-1.42ZM12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"/></g><defs><clipPath
-															id="a"><path fill="#fff" d="M0 0h24v24H0z"/></clipPath></defs></svg><?php echo esc_html(
-													__( 'Connection', AINSYS_CONNECTOR_TEXTDOMAIN )
-												); ?></span>
+															id="a"><path fill="#fff" d="M0 0h24v24H0z"/></clipPath></defs></svg>
+												<?php esc_html_e( 'Connection', AINSYS_CONNECTOR_TEXTDOMAIN ); ?></span>
 										<?php endif; ?>
 									</div>
 								<?php endif; ?>

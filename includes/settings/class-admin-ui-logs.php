@@ -87,7 +87,7 @@ class Admin_UI_Logs implements Hooked {
 
 		$command  = sanitize_text_field( $_POST['command'] );
 		$time     = sanitize_text_field( $_POST['time'] );
-		$start_at = htmlspecialchars( strip_tags( $_POST['startat'] ) );
+		$start_at = sanitize_text_field( $_POST['startat'] );
 
 		$logging_time = 0;
 
@@ -137,7 +137,7 @@ class Admin_UI_Logs implements Hooked {
 	public static function generate_log_html( string $where = '' ): string {
 
 
-		$log_html        = '<table class="ainsys-table display"style="width:100%">';
+		$log_html        = '<table class="ainsys-table display" style="width:100%">';
 		$log_html_body   = '';
 		$log_html_header = '';
 
@@ -165,7 +165,7 @@ class Admin_UI_Logs implements Hooked {
 					if ( empty( $value ) ) {
 						$log_html_body .= __( 'EMPTY', AINSYS_CONNECTOR_TEXTDOMAIN );
 					} else {
-						$log_html_body .= sprintf( '<div class="ainsys-response-short">%s ... </div>', mb_substr( Logger::convert_response( $value ), 0, 40 ) );
+						$log_html_body .= sprintf( '<div class="ainsys-response-short">%s...</div>', mb_substr( Logger::convert_response( $value ), 0, 40 ) );
 						$log_html_body .= sprintf( '<div class="ainsys-response-full"><pre>%s</pre></div>', Logger::convert_response( $value ) );
 					}
 

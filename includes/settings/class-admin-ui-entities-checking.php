@@ -284,7 +284,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 		if ( ! empty( $result_test['request'] ) ) {
 			$result_request = $result_test['request'];
 		} else {
-			$result_request = 'Error: Data transfer is disabled. Check the Entities export settings tab';
+			$result_request = __( 'Error: Data transfer is disabled. Check the Entities export settings tab', AINSYS_CONNECTOR_TEXTDOMAIN );
 		}
 
 		if ( ! empty( $result_test['response'] ) ) {

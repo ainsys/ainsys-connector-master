@@ -99,7 +99,9 @@ $option      = Settings::get_option( 'check_controlling_entity' );
 												       $option_name_item
 											       ); ?>"
 											       id="checkbox-<?php echo esc_attr( $option_name_item ); ?>"
-											       name="<?php echo esc_attr( $option_name ); ?>[<?php echo esc_attr( $entity_id ); ?>][general][<?php echo esc_attr( $column_id ); ?>]"
+											       name="<?php echo esc_attr( $option_name ); ?>[<?php echo esc_attr( $entity_id ); ?>][general][<?php echo esc_attr(
+												       $column_id
+											       ); ?>]"
 											       value="<?php echo esc_attr( $option_on_off ); ?>"
 											       data-toggle-checkbox-entity-id="<?php echo esc_attr( $entity_id ); ?>"
 											       data-toggle-checkbox-column-id="<?php echo esc_attr( $column_id ); ?>"
@@ -120,16 +122,15 @@ $option      = Settings::get_option( 'check_controlling_entity' );
 									<div class="ainsys-form-group group-checkbox--toggle group-checkbox--toggle-<?php echo esc_attr( $option_name_item ); ?>">
 										<label class="toggle toggle-<?php echo esc_attr( $option_name_column ); ?> toggle-<?php echo esc_attr( $option_name_item ); ?>">
 											<input type="checkbox"
-											       class="toggle-checkbox toggle-checkbox-<?php echo esc_attr( $option_name_column ); ?> toggle-checkbox-<?php echo esc_attr(
-												       $option_name_item
-											       ); ?>"
+											       class="toggle-checkbox toggle-checkbox-<?php echo esc_attr( $option_name_column ); ?> toggle-checkbox-<?php echo esc_attr( $option_name_item ); ?>"
 											       id="checkbox-<?php echo esc_attr( $option_name_item ); ?>"
-											       name="<?php echo esc_attr( $option_name ); ?>[<?php echo esc_attr( $entity_id ); ?>][general][<?php echo esc_attr( $column_id ); ?>]"
+											       name="<?php echo esc_attr( $option_name ); ?>[<?php echo esc_attr( $entity_id ); ?>][general][<?php echo esc_attr(
+												       $column_id ); ?>]"
 											       value="<?php echo esc_attr( $option_item ); ?>"
 											       data-toggle-checkbox-entity-id="<?php echo esc_attr( $entity_id ); ?>"
 											       data-toggle-checkbox-column-id="<?php echo esc_attr( $column_id ); ?>"
-												<?php checked( 1, esc_html( $option_item ) ); ?>
-												<?php disabled( 0, $option_on_off ); ?>
+												<?php checked( 1, esc_attr( $option_item ) ); ?>
+												<?php disabled( 0, esc_attr( $option_on_off ) ); ?>
 											>
 											<span class="toggle-switch"></span>
 											<span class="toggle-label"><?php echo esc_attr( $column_name ); ?></span>

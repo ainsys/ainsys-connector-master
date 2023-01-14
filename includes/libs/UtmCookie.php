@@ -1,11 +1,4 @@
 <?php
-/******************************************************************************
- * Author: Petr Suchy (xsuchy09) <suchy@wamos.cz> <http://www.wamos.cz>
- * Subject: WAMOS <http://www.wamos.cz>
- * Project: utmcookie
- * Copyright: (c) Petr Suchy (xsuchy09) <suchy@wamos.cz> <http://www.wamos.cz>
- *****************************************************************************/
-
 namespace UtmCookie;
 
 use DateInterval;

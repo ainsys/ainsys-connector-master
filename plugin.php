@@ -11,7 +11,7 @@ namespace Ainsys\Connector\Master;
  * Author URI:        https://ainsys.com/
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:     ainsys_connector
+ * Text Domain:     ainsys-integrations-framework-connector
  * Domain Path:     /languages
  *
  * @link              https://github.com/ainsys/ainsys-connector-master
@@ -22,7 +22,7 @@ namespace Ainsys\Connector\Master;
  */
 
 defined( 'ABSPATH' ) || die();
-define( 'AINSYS_CONNECTOR_TEXTDOMAIN', 'ainsys_connector' );
+define( 'AINSYS_CONNECTOR_TEXTDOMAIN', 'ainsys-integrations-framework-connector' );
 
 if ( version_compare( PHP_VERSION, '7.2.0' ) < 0 ) {
 

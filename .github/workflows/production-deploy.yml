@@ -19,19 +19,19 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          filename: ${{ github.workflow }}.zip
+          filename: ${{ github.event.repository.name }}.zip
           exclusions: '*.git* /*node_modules/* .editorconfig /*src/* .eslintrc.json .prettierrc.json gulpfile.js .stylelintrc.json package.json package-lock.json'
 
       - name: Store artifact for distribution
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ github.workflow }}
-          path: ${{ github.workflow }}.zip
+          name: ${{ github.event.repository.name }}
+          path: ${{ github.event.repository.name }}.zip
 
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
-          name: ${{ github.workflow }}
+          name: ${{ github.event.repository.name }}
 
       - name: Get Changelog Entry
         id: changelog-reader

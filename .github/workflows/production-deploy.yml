@@ -27,7 +27,6 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}
           path: ${{ github.event.repository.name }}.zip
-
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:

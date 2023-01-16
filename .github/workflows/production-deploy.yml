@@ -11,6 +11,7 @@ jobs:
     name: Create Release
     if: ${{ github.event.pull_request.merged }}
     runs-on: "ubuntu-latest"
+    using: 'node16'
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -37,6 +38,7 @@ jobs:
         uses: mindsers/changelog-reader-action@v2
         with:
           path: CHANGELOG.md
+          version: ${{ steps.tag_name.outputs.current_version }}
 
       - name: Create Release
         id: create-release

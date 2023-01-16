@@ -6,7 +6,7 @@ namespace Ainsys\Connector\Master;
  * Plugin Name:       AINSYS Integrations framework connector
  * Plugin URI: https://app.ainsys.com/
  * Description: AINSYS connector master.
- * Version:           4.3.6.1
+ * Version:           4.3.7
  * Author:            AINSYS
  * Author URI:        https://ainsys.com/
  * License: GPLv2 or later

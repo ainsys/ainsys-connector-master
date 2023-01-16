@@ -30,13 +30,12 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}
       - name: Get Changelog Entry
-        id: changelog-reader
+        id: changelog_reader
         uses: mindsers/changelog-reader-action@v2
         with:
           path: CHANGELOG.md
-          version: ${{ steps.tag_name.outputs.current_version }}
       - name: Create Release
-        id: create-release
+        id: create_release
         uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}

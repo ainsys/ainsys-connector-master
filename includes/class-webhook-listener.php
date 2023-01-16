@@ -13,16 +13,19 @@ class Webhook_Listener implements Hooked {
 
 	use Is_Singleton;
 
+
 	public function init_hooks() {
 
 		add_action( 'init', [ $this, 'webhook_listener' ] );
 	}
 
 
+
 	/**
 	 * Listens WebHooks using a specific param 'ainsys_webhook'.
 	 *
 	 */
+
 	public function webhook_listener(): void {
 
 		if ( ! empty( $_GET['ainsys_webhook'] ) && 'development' === wp_get_environment_type() ) {
@@ -151,5 +154,6 @@ class Webhook_Listener implements Hooked {
 			)
 		);
 	}
+
 
 }

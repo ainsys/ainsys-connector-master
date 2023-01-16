@@ -53,10 +53,12 @@ trait Plugin_Common {
 	public $text_domain;
 
 	/**
+
 	 * Inits plugin's metadata for class based plugin.
 	 *
 	 * @param string $plugin_file_path Path of plugin's file.
 	 */
+
 	private function init_plugin_metadata( $plugin_file_path = '' ) {
 
 		if ( empty( $plugin_file_path ) ) {
@@ -73,6 +75,7 @@ trait Plugin_Common {
 		$this->plugin_file_name_path = $plugin_file_path;
 		$this->plugin_dir_path       = plugin_dir_path( $this->plugin_file_name_path );
 		$this->plugin_dir_url        = plugin_dir_url( $this->plugin_file_name_path );
+
 		$plugin_data                 = get_file_data( $this->plugin_file_name_path,
 			array(
 				'Version'     => 'Version',
@@ -85,6 +88,7 @@ trait Plugin_Common {
 		$this->version          = $plugin_data['Version'] ?? '1.0';
 		$this->text_domain_path = $plugin_data['Domain Path'] ?? '/languages';
 		$this->text_domain      = $plugin_data['Text Domain'] ?? '';
+
 
 	}
 
@@ -124,6 +128,7 @@ trait Plugin_Common {
 	public function is_plugin_install( string $plugin ): bool {
 
 		return array_key_exists( $plugin, get_plugins() );
+
 	}
 
 }

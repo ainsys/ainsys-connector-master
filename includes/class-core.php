@@ -2,7 +2,9 @@
 
 namespace Ainsys\Connector\Master;
 
+
 use Ainsys\Connector\Master\Settings\Settings;
+
 
 /**
  * AINSYS connector core.

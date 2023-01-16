@@ -10,6 +10,7 @@
 /.editorconfig
 /.eslintrc.json
 /.gitignore
+/.gitattributes
 /.phpcs.cache
 /.phpunit.result.cache
 /CHANGELOG.md

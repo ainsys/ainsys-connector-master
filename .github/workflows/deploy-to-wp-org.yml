@@ -1,15 +1,11 @@
 name: Deploy to WordPress.org
 on:
-  pull_request:
-    branches:
-      - master
-    types: [ closed ]
   release:
     types: [published]
 jobs:
   tag:
     name: New release
-    if: ${{ github.event.pull_request.merged }}
+
     runs-on: ubuntu-latest
 
     steps:

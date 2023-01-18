@@ -22,7 +22,7 @@ jobs:
         server: 70.32.23.102
         username: ${{ secrets.FTP_USER_STAGE }}
         password: ${{ secrets.FTP_PASS_STAGE }}
-        server-dir: /wp-content/plugins/ainsys-connector-content/
+        server-dir: /wp-content/plugins/ainsys-connector-master/
         exclude: |
           **/.git*
           **/.git*/**
@@ -32,3 +32,4 @@ jobs:
           CHANGELOG.md
           README.md
           readme.txt
+          .distignore

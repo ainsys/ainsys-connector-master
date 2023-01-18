@@ -9,3 +9,4 @@ _config.yml export-ignore
 *latest.tar.bz2 export-ignore
 *latest.zip export-ignore
 *.idea/ export-ignore
+.distignore export-ignore

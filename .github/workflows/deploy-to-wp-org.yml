@@ -1,15 +1,11 @@
 name: Deploy to WordPress.org
 on:
-  pull_request:
-    branches:
-      - master
-    types: [ closed ]
   release:
     types: [published]
 jobs:
   tag:
     name: New release
-    if: ${{ github.event.pull_request.merged }}
+
     runs-on: ubuntu-latest
 
     steps:
@@ -25,3 +21,10 @@ jobs:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           SLUG: ainsys-integrations-framework-connector
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{github.workspace}}/${{ github.event.repository.name }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

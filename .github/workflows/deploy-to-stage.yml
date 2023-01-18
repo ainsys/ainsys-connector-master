@@ -32,3 +32,4 @@ jobs:
           CHANGELOG.md
           README.md
           readme.txt
+          .distignore

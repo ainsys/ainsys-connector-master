@@ -3,6 +3,7 @@ node_modules/
 .tmb/
 .well-known/
 .wp-cli/
+.wordpress-org/
 cgi-bin/
 public/
 test/

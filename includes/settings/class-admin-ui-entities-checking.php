@@ -14,6 +14,12 @@ use Ainsys\Connector\Master\WP\Process_Users;
 class Admin_UI_Entities_Checking implements Hooked {
 
 	/**
+	 * @var mixed|void
+	 */
+	public $make_request;
+
+
+	/**
 	 * Init plugin hooks.
 	 */
 	public function init_hooks() {
@@ -39,7 +45,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 			);
 		}
 
-		$make_request = apply_filters( 'ainsys_before_check_connection_make_request', false );
+		$this->make_request = apply_filters( 'ainsys_before_check_connection_make_request', false );
 
 		$entity = sanitize_text_field( $_POST['entity'] );
 
@@ -52,46 +58,46 @@ class Admin_UI_Entities_Checking implements Hooked {
 
 		switch ( $entity ) {
 			case 'user':
-				$make_request  = true;
-				$result_test   = $this->get_user();
-				$result_entity = Settings::get_option( 'check_connection_entity' );
-				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
+				$this->make_request = true;
+				$result_test        = $this->get_user();
+				$result_entity      = Settings::get_option( 'check_connection_entity' );
+				$result_entity      = $this->get_result_entity( $result_test, $result_entity, $entity );
 				break;
 			case 'comment':
-				$make_request  = true;
-				$result_test   = $this->get_comment();
-				$result_entity = Settings::get_option( 'check_connection_entity' );
-				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
+				$this->make_request = true;
+				$result_test        = $this->get_comment();
+				$result_entity      = Settings::get_option( 'check_connection_entity' );
+				$result_entity      = $this->get_result_entity( $result_test, $result_entity, $entity );
 				break;
 			case 'attachment':
-				$make_request  = true;
-				$result_test   = $this->get_attachment();
-				$result_entity = Settings::get_option( 'check_connection_entity' );
-				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
+				$this->make_request = true;
+				$result_test        = $this->get_attachment();
+				$result_entity      = Settings::get_option( 'check_connection_entity' );
+				$result_entity      = $this->get_result_entity( $result_test, $result_entity, $entity );
 				break;
 			case 'post':
-				$make_request  = true;
-				$result_test   = $this->get_post();
-				$result_entity = Settings::get_option( 'check_connection_entity' );
-				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
+				$this->make_request = true;
+				$result_test        = $this->get_post();
+				$result_entity      = Settings::get_option( 'check_connection_entity' );
+				$result_entity      = $this->get_result_entity( $result_test, $result_entity, $entity );
 				break;
 			case 'page':
-				$make_request  = true;
-				$result_test   = $this->get_page();
-				$result_entity = Settings::get_option( 'check_connection_entity' );
-				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
+				$this->make_request = true;
+				$result_test        = $this->get_page();
+				$result_entity      = Settings::get_option( 'check_connection_entity' );
+				$result_entity      = $this->get_result_entity( $result_test, $result_entity, $entity );
 				break;
 			case 'menu':
-				$make_request  = true;
-				$result_test   = $this->get_menu();
-				$result_entity = Settings::get_option( 'check_connection_entity' );
-				$result_entity = $this->get_result_entity( $result_test, $result_entity, $entity );
+				$this->make_request = true;
+				$result_test        = $this->get_menu();
+				$result_entity      = Settings::get_option( 'check_connection_entity' );
+				$result_entity      = $this->get_result_entity( $result_test, $result_entity, $entity );
 				break;
 		}
 
-		$result_entity = apply_filters( 'ainsys_check_connection_request', $result_entity, $entity, $make_request );
+		$result_entity = apply_filters( 'ainsys_check_connection_request', $result_entity, $entity, $this );
 
-		if ( $make_request ) {
+		if ( $this->make_request ) {
 
 			wp_send_json_success(
 				[
@@ -104,7 +110,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 
 		wp_send_json_error(
 			[
-				'result'  => [],
+				'result'  => $result_entity,
 				'message' => __( 'An error occurred while checking the connection', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			],
 		);
@@ -160,7 +166,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 
 		if ( empty( $comments ) ) {
 			return [
-				'request'  => '',
+				'request'  => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'response' => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			];
 		}
@@ -187,7 +193,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 
 		if ( empty( $attachments ) ) {
 			return [
-				'request'  => '',
+				'request'  => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'response' => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			];
 		}
@@ -213,7 +219,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 
 		if ( empty( $posts ) ) {
 			return [
-				'request'  => '',
+				'request'  => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'response' => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			];
 		}
@@ -239,7 +245,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 
 		if ( empty( $posts ) ) {
 			return [
-				'request'  => '',
+				'request'  => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'response' => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			];
 		}
@@ -260,7 +266,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 
 		if ( empty( $menus ) ) {
 			return [
-				'request'  => '',
+				'request'  => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'response' => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			];
 		}
@@ -279,7 +285,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 	 *
 	 * @return mixed|void
 	 */
-	protected function get_result_entity( array $result_test, $result_entity, $entity ) {
+	public function get_result_entity( array $result_test, $result_entity, $entity ) {
 
 		if ( ! empty( $result_test['request'] ) ) {
 			$result_request = $result_test['request'];
@@ -304,7 +310,7 @@ class Admin_UI_Entities_Checking implements Hooked {
 			'status'         => false === strpos( $result_response, 'Error:' ),
 		];
 
-		Settings::set_option( 'check_connection_entity', $result_entity );
+		Settings::set_option( 'check_connection_entity', apply_filters( 'ainsys_check_connection_request_result_entity', $result_entity ) );
 
 		return $result_entity;
 	}

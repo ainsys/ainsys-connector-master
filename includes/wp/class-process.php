@@ -8,6 +8,7 @@ use Ainsys\Connector\Master\Logger;
 class Process {
 
 	protected static string $entity = '';
+
 	protected static string $action = '';
 
 
@@ -26,7 +27,7 @@ class Process {
 				'id'   => $object_id,
 				'name' => $object_name,
 			],
-			'action'  => $request_action,
+			'action'  => 'CHECKING' === $request_action ? 'UPDATE' : 'CHECKING',
 			'payload' => $fields,
 		];
 
@@ -114,6 +115,7 @@ class Process {
 		return true;
 	}
 
+
 	/**
 	 * @param  bool $checking_connected
 	 *
@@ -123,4 +125,5 @@ class Process {
 
 		return $checking_connected ? 'CHECKING' : 'UPDATE';
 	}
+
 }

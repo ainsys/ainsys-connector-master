@@ -199,7 +199,8 @@ jQuery( function ( $ ) {
 		if ( $( this ).hasClass( 'ainsys-loading' ) ) {
 			return;
 		}
-		const entity          = $( this ).data( 'entity-name' );
+
+		let entity          = $( this ).data( 'entity-name' );
 		const requestTdShort  = $( this ).closest( 'tr' ).find( '.ainsys-table-table__cell-outgoing' ).find( '.ainsys-response-short' );
 		const requestTdFull   = $( this ).closest( 'tr' ).find( '.ainsys-table-table__cell-outgoing' ).find( '.ainsys-response-full pre' );
 		const responseTdShort = $( this ).closest( 'tr' ).find( '.ainsys-table-table__cell-server_response' ).find( '.ainsys-response-short' );
@@ -209,7 +210,7 @@ jQuery( function ( $ ) {
 
 		$( this ).addClass( 'ainsys-loading' );
 
-		var data = {
+		const data = {
 			action: 'test_entity_connection',
 			entity: entity,
 			nonce:  ainsys_connector_params.nonce
@@ -243,10 +244,27 @@ jQuery( function ( $ ) {
 
 
 			},
-			error:   function () {
+			error:   function (e, exception) {
+				let msg = '';
+				if ( e.status === 0 ) {
+					msg = 'Not connect.\n Verify Network.';
+				} else if ( e.status === 404 ) {
+					msg = 'Requested page not found. [404]';
+				} else if ( e.status === 500 ) {
+					msg = 'Internal Server Error [500].';
+				} else if ( exception === 'parsererror' ) {
+					msg = 'Requested JSON parse failed.';
+				} else if ( exception === 'timeout' ) {
+					msg = 'Time out error.';
+				} else if ( exception === 'abort' ) {
+					msg = 'Ajax request aborted.';
+				} else {
+					msg = 'Uncaught Error.\n' + e.responseText;
+				}
+
 				$( '.ainsys-check' ).removeClass( 'ainsys-loading' );
-				requestTdShort.text( 'Error!' );
-				responseTdShort.text( 'Error!' );
+				requestTdShort.text( 'Error! ' + msg );
+				responseTdShort.text( 'Error! ' + msg );
 			}
 		} );
 	} );

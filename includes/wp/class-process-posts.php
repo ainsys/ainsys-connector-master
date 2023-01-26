@@ -174,12 +174,12 @@ class Process_Posts extends Process implements Hooked {
 
 		return [
 			'ID'             => $post->ID,
-			'post_author'    => $post->post_author,
-			'post_content'   => $post->post_content,
 			'post_title'     => $post->post_title,
+			'post_content'   => $post->post_content,
 			'post_excerpt'   => $post->post_excerpt,
 			'post_status'    => $post->post_status,
 			'post_type'      => $post->post_type,
+			'post_author'    => $post->post_author,
 			'post_date'      => $post->post_date,
 			'post_modified'  => $post->post_modified,
 			'post_password'  => $post->post_password,

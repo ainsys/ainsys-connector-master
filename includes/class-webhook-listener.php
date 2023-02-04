@@ -2,6 +2,8 @@
 
 namespace Ainsys\Connector\Master;
 
+use WP_REST_Request;
+
 /**
  * AINSYS webhook listener.
  *
@@ -13,12 +15,52 @@ class Webhook_Listener implements Hooked {
 
 	use Is_Singleton;
 
-
 	public function init_hooks() {
 
 		add_action( 'init', [ $this, 'webhook_listener' ] );
+
+		add_action( 'rest_api_init', [ $this, 'rest_route_webhook_listener' ] );
 	}
 
+
+	public function rest_route_webhook_listener(): void {
+
+		register_rest_route(
+			'ainsys/v1',
+			'/webhook', [
+				/*[
+					'methods'  => 'GET',
+					'callback' => 'my_awesome_func',
+				],*/
+				[
+					'methods'             => 'POST',
+					'callback'            => [ $this, 'rest_route_webhook_callback' ],
+					'args'                => [
+						/*'arg_str' => [
+							'type'     => 'string', // значение параметра должно быть строкой
+							'required' => true,     // параметр обязательный
+						],
+						'arg_int' => [
+							'type'    => 'integer', // значение параметра должно быть числом
+							'default' => 10,        // значение по умолчанию = 10
+						],*/
+					],
+					'permission_callback' => function ( $request ) {
+
+						return true;
+					},
+
+				],
+			]
+		);
+
+	}
+
+
+	public function rest_route_webhook_callback(WP_REST_Request $request) {
+
+		error_log( print_r( $request, 1 ) );
+	}
 
 
 	/**
@@ -154,6 +196,5 @@ class Webhook_Listener implements Hooked {
 			)
 		);
 	}
-
 
 }

@@ -43,6 +43,7 @@ $status_addons = $settings->get_statuses_addons();
 						       name="<?php echo esc_attr( Settings::get_option_name( 'ansys_api_key' ) ); ?>"
 						       placeholder="XXXXXXXXXXXXXXXXXXXXX"
 						       value="<?php echo esc_attr( Settings::get_option( 'ansys_api_key' ) ); ?>"/>
+
 					</div>
 				</div>
 				<div class="ainsys-form-group">
@@ -55,8 +56,17 @@ $status_addons = $settings->get_statuses_addons();
 						       size="50"
 						       name="<?php echo esc_attr( Settings::get_option_name( 'webhook_url' ) ); ?>"
 						       value="<?php echo esc_attr( Settings::get_option( 'webhook_url' ) ); ?>"
-						       disabled/>
+						       readonly/>
+						<button class="ainsys-clipboard-hook-url"
+						        tabindex="0"
+						        type="button"
+						        data-clipboard-target="#hook-url">
+							<svg class="ainsys-clipboard-hook-url--icon" focusable="false" viewBox="0 0 24 24" aria-hidden="true">
+								<path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path>
+							</svg>
+							<span class="ainsys-clipboard-hook-url--label">Copy to clipboard</span></button>
 					</div>
+
 				</div>
 
 				<div class="ainsys-form-group ainsys-email ainsys-email-main">

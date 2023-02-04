@@ -41,7 +41,6 @@ class Webhook_Listener implements Hooked {
 
 	}
 
-
 	public function rest_route_webhook_permission_callback( WP_REST_Request $request ): bool {
 		error_log( print_r( $request->get_param( 'token' ), 1 ) );
 		error_log( print_r( self::get_request_token(), 1 ) );

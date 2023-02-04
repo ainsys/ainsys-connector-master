@@ -53,6 +53,7 @@ body.toplevel_page_ainsys-connector pre {
 
 .toplevel_page_ainsys-connector div {
 	box-sizing: border-box;
+	position: relative;
 }
 
 .toplevel_page_ainsys-connector .btn {

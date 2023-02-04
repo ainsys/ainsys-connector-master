@@ -69,6 +69,20 @@ $status_addons = $settings->get_statuses_addons();
 
 				</div>
 
+				<div class="ainsys-form-group">
+					<label for="ainsys-token" class="ainsys-form-label">
+						<?php esc_html_e( 'Token', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
+					</label>
+					<div class="ainsys-form-input">
+						<input id="ainsys-token"
+						       type="text"
+						       size="50"
+						       name="<?php echo esc_attr( Settings::get_option_name( 'token' ) ); ?>"
+						       value="<?php echo esc_attr( Settings::get_option( 'token' ) ); ?>"
+						       readonly/>
+					</div>
+				</div>
+
 				<div class="ainsys-form-group ainsys-email ainsys-email-main">
 					<label for="backup-email" class="ainsys-form-label">
 						<?php esc_html_e( 'E-mail for error reports', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
@@ -102,20 +116,6 @@ $status_addons = $settings->get_statuses_addons();
 						</div>
 					</div>
 				<?php } ?>
-
-
-				<div class="ainsys-form-group">
-					<label for="connector-id" class="ainsys-form-label">
-						<?php esc_html_e( 'Connector Id', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>
-					</label>
-					<div class="ainsys-form-input">
-						<input id="connector-id"
-						       type="text"
-						       size="50"
-						       name="<?php echo esc_attr( Settings::get_option_name( 'connector_id' ) ); ?>"
-						       value="<?php echo esc_attr( Settings::get_option( 'connector_id' ) ); ?>"/>
-					</div>
-				</div>
 
 				<div class="submit">
 					<input type="submit" class="btn btn-primary" value="<?php esc_html_e( 'Save', AINSYS_CONNECTOR_TEXTDOMAIN ); ?>"/>

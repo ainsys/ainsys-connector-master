@@ -111,6 +111,10 @@ body.toplevel_page_ainsys-connector pre {
 	cursor: default;
 }
 
+.toplevel_page_ainsys-connector .ainsys-form-input {
+	position: relative;
+}
+
 /* Tabs */
 .ainsys-tabs-nav-wrapper {
 	margin: 0;

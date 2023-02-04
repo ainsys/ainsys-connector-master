@@ -2,6 +2,7 @@
 
 namespace Ainsys\Connector\Master;
 
+use Ainsys\Connector\Master\Settings\Settings;
 use WP_REST_Request;
 use WP_REST_Server;
 
@@ -28,7 +29,7 @@ class Webhook_Listener implements Hooked {
 
 		register_rest_route(
 			'ainsys/v1',
-			'/webhook', [
+			'/webhook/(?P<token>[a-zA-Z0-9_-]+)', [
 				[
 					'methods'             => WP_REST_Server::EDITABLE,
 					'callback'            => [ $this, 'rest_route_webhook_callback' ],
@@ -40,10 +41,11 @@ class Webhook_Listener implements Hooked {
 
 	}
 
-
-	public function rest_route_webhook_permission_callback( WP_REST_Request $request ) {
-
-		return $request->get_param( 'token' ) === self::get_request_token();
+	public function rest_route_webhook_permission_callback( WP_REST_Request $request ): bool {
+		error_log( print_r( $request->get_param( 'token' ), 1 ) );
+		error_log( print_r( self::get_request_token(), 1 ) );
+		error_log( print_r( Settings::get_option( 'token' ), 1 ) );
+		return true;//$request->get_param( 'token' ) === Settings::get_option( 'token' );
 	}
 
 
@@ -271,7 +273,7 @@ class Webhook_Listener implements Hooked {
 		return sha1(
 			sprintf(
 				'%s%s',
-				sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ),
+				sanitize_text_field( wp_unslash( $_SERVER['SERVER_ADDR'] ) ),
 				sanitize_text_field( wp_unslash( $_SERVER['SERVER_NAME'] ) )
 			)
 		);

@@ -53,7 +53,6 @@ body.toplevel_page_ainsys-connector pre {
 
 .toplevel_page_ainsys-connector div {
 	box-sizing: border-box;
-	position: relative;
 }
 
 .toplevel_page_ainsys-connector .btn {
@@ -109,6 +108,10 @@ body.toplevel_page_ainsys-connector pre {
 	background: #e2e2e2;
 	color: #666;
 	cursor: default;
+}
+
+.toplevel_page_ainsys-connector .ainsys-form-input {
+	position: relative;
 }
 
 /* Tabs */

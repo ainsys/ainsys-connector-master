@@ -63,7 +63,7 @@ class Settings implements Hooked {
 			'log_until_certain_time'   => 0,
 			'log_select_value'         => 1,
 			'full_uninstall'           => 0,
-			'connector_id'             => '',
+			'token'             => '',
 			'client_full_name'         => '',
 			'client_company_name'      => '',
 			'client_tin'               => '',
@@ -226,7 +226,16 @@ class Settings implements Hooked {
 			self::get_option_name( 'webhook_url' ),
 			[
 				'default'           => self::get_option( 'webhook_url' ),
-				'sanitize_callback' => [ Webhook_Listener::class, 'get_webhook_url' ],
+				'sanitize_callback' => [ Webhook_Listener::class, 'get_rest_webhook_url' ],
+			]
+		);
+
+		register_setting(
+			self::get_option_name( 'group' ),
+			self::get_option_name( 'token' ),
+			[
+				'default'           => self::get_option( 'token' ),
+				'sanitize_callback' => [ Webhook_Listener::class, 'get_request_token' ],
 			]
 		);
 

@@ -131,7 +131,17 @@ jQuery( function ( $ ) {
 			} );
 		},
 
-		init: function () {
+		clipboardHookUrl: function () {
+			new ClipboardJS( '.ainsys-clipboard-hook-url' ).on( 'success', function ( e ) {
+				$( e.trigger ).find( '.ainsys-clipboard-hook-url--label' ).text( 'Copied!' );
+				setTimeout( function () {
+					$( e.trigger ).find( '.ainsys-clipboard-hook-url--label' ).text( 'Copy to Clipboard' );
+				}, 1000 );
+				e.clearSelection();
+			} );
+		},
+
+		init:          function () {
 
 			$( '#connection_log .ainsys-table' ).DataTable( {
 				"sPaginationType": "full_numbers",
@@ -145,6 +155,8 @@ jQuery( function ( $ ) {
 			this.activeLastTab();
 
 			this.buttonsEach();
+
+			this.clipboardHookUrl();
 
 			this.$settingsWrap
 				.on(

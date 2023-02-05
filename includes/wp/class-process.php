@@ -4,6 +4,7 @@ namespace Ainsys\Connector\Master\WP;
 
 use Ainsys\Connector\Master\Core;
 use Ainsys\Connector\Master\Logger;
+use WP_Post;
 
 class Process {
 
@@ -22,12 +23,18 @@ class Process {
 	 */
 	public function send_data( int $object_id, string $object_name, string $request_action, $fields ): array {
 
+		if ( 'CHECKING' === $request_action ) {
+			$action = 'UPDATE';
+		} else {
+			$action = $request_action;
+		}
+
 		$request_data = [
 			'entity'  => [
 				'id'   => $object_id,
 				'name' => $object_name,
 			],
-			'action'  => 'CHECKING' === $request_action ? 'UPDATE' : 'CHECKING',
+			'action'  => $action,
 			'payload' => $fields,
 		];
 
@@ -71,11 +78,11 @@ class Process {
 
 
 	/**
-	 * @param $post
+	 * @param  WP_Post $post Post object.
 	 *
 	 * @return array
 	 */
-	public function get_taxonomies( $post ): array {
+	public function get_taxonomies( WP_Post $post ): array {
 
 		$taxonomies     = [];
 		$taxonomy_names = get_object_taxonomies( $post );
@@ -84,7 +91,7 @@ class Process {
 
 			$terms = get_the_terms( $post, (string) $taxonomy_name );
 
-			$taxonomies[ $taxonomy_name ] = $terms;
+			$taxonomies[ (string) $taxonomy_name ] = $terms;
 
 		}
 
@@ -92,7 +99,14 @@ class Process {
 	}
 
 
-	public function is_updated( $post_id, $update ): bool {
+	/**
+	 * @param  int      $post_id
+	 * @param  WP_Post $post Post object
+	 * @param  bool     $update
+	 *
+	 * @return bool
+	 */
+	public function is_updated( int $post_id, WP_Post $post, bool $update ): bool {
 
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return false;

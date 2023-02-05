@@ -19,7 +19,7 @@ class Webhook_Listener implements Hooked {
 
 	public function init_hooks() {
 
-		//add_action( 'init', [ $this, 'webhook_listener' ] );
+		add_action( 'init', [ $this, 'webhook_listener' ] );
 
 		add_action( 'rest_api_init', [ $this, 'rest_route_webhook_listener' ] );
 	}
@@ -42,32 +42,17 @@ class Webhook_Listener implements Hooked {
 	}
 
 	public function rest_route_webhook_permission_callback( WP_REST_Request $request ): bool {
-		error_log( print_r( $request->get_param( 'token' ), 1 ) );
-		error_log( print_r( self::get_request_token(), 1 ) );
-		error_log( print_r( Settings::get_option( 'token' ), 1 ) );
-		return true;//$request->get_param( 'token' ) === Settings::get_option( 'token' );
+
+		return $request->get_param( 'token' ) === Settings::get_option( 'token' );
 	}
 
 
 	public function rest_route_webhook_callback( WP_REST_Request $request ): void {
 
 		if ( ! empty( $_GET['ainsys_webhook'] ) && 'development' === wp_get_environment_type() ) {
-
-			$options = [
-				'ssl' => [
-					'verify_peer'      => false,
-					'verify_peer_name' => false,
-				],
-			];
-
-			$json_file = ABSPATH . 'testings-development.json';
-
-			$entityBody = file_exists( $json_file ) ? file_get_contents( $json_file, false, stream_context_create( $options ) ) : '';
-
+			$entityBody = $this->get_development_data();
 		} else {
-
 			$entityBody = $request->get_body();
-
 		}
 
 		$response_code = 400;
@@ -76,7 +61,7 @@ class Webhook_Listener implements Hooked {
 		try {
 			$request = json_decode( $entityBody, true, 512, JSON_THROW_ON_ERROR );
 		} catch ( \Exception $exception ) {
-			$response      = $exception->getMessage();
+			$response      = 'Error: ' . $exception->getMessage();
 			$response_code = 500;
 
 			Logger::save(
@@ -111,7 +96,7 @@ class Webhook_Listener implements Hooked {
 			try {
 				$response = $handler( $entityAction, $data, $object_id );
 			} catch ( \Exception $exception ) {
-				$response      = $exception->getMessage();
+				$response      = 'Error: ' . $exception->getMessage();
 				$response_code = 500;
 
 				Logger::save(
@@ -131,11 +116,7 @@ class Webhook_Listener implements Hooked {
 			$response_code = 404;
 		}
 
-		$payload = array_merge( $data, $response );
-
-		if ( 'development' !== wp_get_environment_type() ) {
-			wp_send_json( $payload, $response_code );
-		}
+		$this->send_json( $response, $data, $response_code );
 	}
 
 
@@ -146,19 +127,10 @@ class Webhook_Listener implements Hooked {
 
 	public function webhook_listener(): void {
 
+		_deprecated_function( __METHOD__ . '()', '4.4.0', 'rest_api_init' );
+
 		if ( ! empty( $_GET['ainsys_webhook'] ) && 'development' === wp_get_environment_type() ) {
-
-			$options = [
-				'ssl' => [
-					'verify_peer'      => false,
-					'verify_peer_name' => false,
-				],
-			];
-
-			$json_file = ABSPATH . 'testings-development.json';
-
-			$entityBody = file_exists( $json_file ) ? file_get_contents( $json_file, false, stream_context_create( $options ) ) : '';
-
+			$entityBody = $this->get_development_data();
 		} else {
 
 			$query_string = sanitize_text_field( wp_unslash( $_SERVER['QUERY_STRING'] ) );
@@ -183,7 +155,7 @@ class Webhook_Listener implements Hooked {
 		try {
 			$request = json_decode( $entityBody, true, 512, JSON_THROW_ON_ERROR );
 		} catch ( \Exception $exception ) {
-			$response      = $exception->getMessage();
+			$response      = 'Error: ' . $exception->getMessage();
 			$response_code = 500;
 
 			Logger::save(
@@ -218,7 +190,7 @@ class Webhook_Listener implements Hooked {
 			try {
 				$response = $handler( $entityAction, $data, $object_id );
 			} catch ( \Exception $exception ) {
-				$response      = $exception->getMessage();
+				$response      = 'Error: ' . $exception->getMessage();
 				$response_code = 500;
 
 				Logger::save(
@@ -238,16 +210,7 @@ class Webhook_Listener implements Hooked {
 			$response_code = 404;
 		}
 
-		if ( 'development' !== wp_get_environment_type() ) {
-			wp_send_json(
-				[
-					'entityType'   => $entityType,
-					'request_data' => $data,
-					'response'     => $response,
-				],
-				$response_code
-			);
-		}
+		$this->send_json( $response, $data, $response_code );
 	}
 
 
@@ -277,6 +240,41 @@ class Webhook_Listener implements Hooked {
 				sanitize_text_field( wp_unslash( $_SERVER['SERVER_NAME'] ) )
 			)
 		);
+	}
+
+
+	/**
+	 * @return false|string
+	 */
+	protected function get_development_data() {
+
+		$options = [
+			'ssl' => [
+				'verify_peer'      => false,
+				'verify_peer_name' => false,
+			],
+		];
+
+		$json_file = ABSPATH . 'testings-development.json';
+
+		return file_exists( $json_file ) ? file_get_contents( $json_file, false, stream_context_create( $options ) ) : '';
+	}
+
+
+	/**
+	 * @param      $response
+	 * @param      $data
+	 * @param  int $response_code
+	 *
+	 * @return void
+	 */
+	protected function send_json( $response, $data, int $response_code ): void {
+
+		$payload = array_merge( $response, $data );
+
+		if ( 'development' !== wp_get_environment_type() ) {
+			wp_send_json( $payload, $response_code );
+		}
 	}
 
 }

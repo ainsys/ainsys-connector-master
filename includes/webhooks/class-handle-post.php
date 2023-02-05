@@ -123,7 +123,7 @@ class Handle_Post extends Handle implements Hooked, Webhook_Handler {
 
 		return [
 			'id'      => $result ? $object_id : 0,
-			'message' => $this->get_message( $result, $data, self::$entity, $action ),
+			'message' => $this->get_message( $result->ID, $data, self::$entity, $action ),
 		];
 
 	}

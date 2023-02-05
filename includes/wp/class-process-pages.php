@@ -4,37 +4,46 @@ namespace Ainsys\Connector\Master\WP;
 
 use Ainsys\Connector\Master\Conditions;
 use Ainsys\Connector\Master\Hooked;
+use WP_Post;
 
 class Process_Pages extends Process implements Hooked {
 
 	protected static string $entity = 'page';
 
+	/**
+	 * @var false
+	 */
+	protected bool $has_update = true;
+
 
 	/**
 	 * Initializes WordPress hooks for plugin/components.
+	 *save_post_page
 	 *
 	 * @return void
 	 */
 	public function init_hooks() {
 
-		add_action( 'wp_after_insert_post', [ $this, 'process_create' ], 10, 4 );
-		add_action( 'save_post_page', [ $this, 'process_update' ], 10, 4 );
+		add_action( 'wp_after_insert_post', [ $this, 'process_create' ], 1000, 4 );
+		add_action( 'wp_after_insert_post', [ $this, 'process_update' ], 1010, 4 );
 		add_action( 'deleted_post', [ $this, 'process_delete' ], 10, 2 );
 
 	}
 
 
 	/**
-	 * Sends new attachment details to AINSYS
+	 * Sends new page details to AINSYS
 	 *
-	 * @param  int $post_id
-	 * @param      $post
-	 * @param      $update
-	 * @param      $post_before
+	 * @param  int          $post_id     Post ID.
+	 * @param  WP_Post      $post        Post object.
+	 * @param  bool         $update      Whether this is an existing post being updated.
+	 * @param  WP_Post|null $post_before Null for new posts, the WP_Post object prior
+	 *                                   to the update for updated posts.
 	 *
 	 * @return void
 	 */
-	public function process_create( int $post_id, $post, $update, $post_before ): void {
+	public function process_create( int $post_id, WP_Post $post, bool $update, ?WP_Post $post_before ): void {
+
 
 		self::$action = 'CREATE';
 
@@ -42,7 +51,11 @@ class Process_Pages extends Process implements Hooked {
 			return;
 		}
 
-		if ( ! is_null( $post_before ) || true === $update ) {
+		if ( 'auto-draft' === $post->post_status ) {
+			return;
+		}
+
+		if ( $post_before && 'publish' === $post_before->post_status ) {
 			return;
 		}
 
@@ -62,13 +75,16 @@ class Process_Pages extends Process implements Hooked {
 
 
 	/**
-	 * Sends updated post details to AINSYS.
+	 * Sends updated page details to AINSYS.
 	 *
-	 * @param       $post_id
-	 * @param       $post
-	 * @param       $update
+	 * @param  int          $post_id     Post ID.
+	 * @param  WP_Post      $post        Post object.
+	 * @param  bool         $update      Whether this is an existing post being updated.
+	 * @param  WP_Post|null $post_before Null for new posts, the WP_Post object prior
+	 *                                   to the update for updated posts.
 	 */
-	public function process_update( $post_id, $post, $update ): void {
+	public function process_update( int $post_id, WP_Post $post, bool $update, ?WP_Post $post_before ): void {
+
 
 		self::$action = 'UPDATE';
 
@@ -76,7 +92,15 @@ class Process_Pages extends Process implements Hooked {
 			return;
 		}
 
-		if ( ! $this->is_updated( $post_id, $update ) ) {
+		if ( 'auto-draft' === $post->post_status ) {
+			return;
+		}
+
+		if ( ( $post && $post_before ) && ( $post->post_modified > $post_before->post_modified ) ) {
+			return;
+		}
+
+		if ( ! $this->is_updated( $post_id, $post, $update ) ) {
 			return;
 		}
 
@@ -95,14 +119,14 @@ class Process_Pages extends Process implements Hooked {
 
 
 	/**
-	 * Sends delete post details to AINSYS
+	 * Sends delete page details to AINSYS
 	 *
-	 * @param  int $post_id
-	 * @param      $post
+	 * @param  int     $post_id
+	 * @param  WP_Post $post Post object.
 	 *
 	 * @return void
 	 */
-	public function process_delete( int $post_id, $post ): void {
+	public function process_delete( int $post_id, WP_Post $post ): void {
 
 		self::$action = 'DELETE';
 
@@ -122,15 +146,15 @@ class Process_Pages extends Process implements Hooked {
 
 
 	/**
-	 * Sends updated post details to AINSYS.
+	 * Sends checking page details to AINSYS.
 	 *
-	 * @param       $post_id
-	 * @param       $post
-	 * @param       $update
+	 * @param  int     $post_id Post ID.
+	 * @param  WP_Post $post    Post object.
+	 * @param  bool    $update  Whether this is an existing post being updated.
 	 *
 	 * @return array
 	 */
-	public function process_checking( $post_id, $post, $update ): array {
+	public function process_checking( int $post_id, WP_Post $post, bool $update ): array {
 
 		self::$action = 'CHECKING';
 
@@ -138,7 +162,7 @@ class Process_Pages extends Process implements Hooked {
 			return [];
 		}
 
-		if ( ! $this->is_updated( $post_id, $update ) ) {
+		if ( ! $this->is_updated( $post_id, $post, $update ) ) {
 			return [];
 		}
 
@@ -159,27 +183,23 @@ class Process_Pages extends Process implements Hooked {
 	/**
 	 * Function for `add_attachment` action-hook.
 	 *
-	 * @param  int $post_ID Post ID.
-	 * @param      $post
+	 * @param  int     $post_ID Post ID.
+	 * @param  WP_Post $post    Post object.
 	 *
 	 * @return array
 	 */
-	protected function prepare_data( int $post_ID, $post ): array {
-
-		if ( ! $post ) {
-			$post = get_post( $post_ID );
-		}
+	protected function prepare_data( int $post_ID, WP_Post $post ): array {
 
 		if ( $post->post_type !== self::$entity ) {
 			return [];
 		}
 
 		return [
-			'ID'             => $post->ID,
-			'post_author'    => $post->post_author,
-			'post_content'   => $post->post_content,
+			'post_id'        => $post->ID,
 			'post_title'     => $post->post_title,
+			'post_content'   => $post->post_content,
 			'post_excerpt'   => $post->post_excerpt,
+			'post_author'    => (int) $post->post_author,
 			'post_status'    => $post->post_status,
 			'post_type'      => $post->post_type,
 			'post_date'      => $post->post_date,
@@ -187,10 +207,11 @@ class Process_Pages extends Process implements Hooked {
 			'post_password'  => $post->post_password,
 			'post_parent'    => $post->post_parent,
 			'menu_order'     => $post->menu_order,
-			'guid'           => $post->guid,
+			'post_slug'      => $post->post_name,
+			'post_link'      => $post->guid,
 			'comment_status' => $post->comment_status,
-			'comment_count'  => $post->comment_count,
-			'meta_input'     => get_post_meta( $post->ID ),
+			'comment_count'  => (int) $post->comment_count,
+			'custom_fields'  => get_post_meta( $post->ID ),
 		];
 	}
 

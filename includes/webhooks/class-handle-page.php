@@ -44,11 +44,11 @@ class Handle_Page extends Handle implements Hooked, Webhook_Handler {
 			$data['post_type'] = self::$entity;
 		}
 
-		if ( empty( $data['post_status'] ) && ! in_array( $data['post_status'], $this->statuses(), true ) ) {
+		if ( ! isset( $data['post_status'] ) && ! in_array( $data['post_status'], $this->statuses(), true ) ) {
 			$data['post_status'] = 'publish';
 		}
 
-		$result = wp_insert_post( $data, true );
+		$result = wp_insert_post( $data, true, true );
 
 		return [
 			'id'      => is_wp_error( $result ) ? 0 : $result,
@@ -87,6 +87,10 @@ class Handle_Page extends Handle implements Hooked, Webhook_Handler {
 			$data['post_status'] = 'publish';
 		}
 
+		if ( empty( $data['ID'] ) ) {
+			$data['ID'] = $object_id;
+		}
+
 		$result = wp_update_post( $data, true );
 
 		return [
@@ -123,7 +127,7 @@ class Handle_Page extends Handle implements Hooked, Webhook_Handler {
 
 		return [
 			'id'      => $result ? $object_id : 0,
-			'message' => $this->get_message( $result, $data, self::$entity, $action ),
+			'message' => $this->get_message( $result->ID, $data, self::$entity, $action ),
 		];
 
 	}

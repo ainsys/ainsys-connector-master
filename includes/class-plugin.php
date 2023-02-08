@@ -67,6 +67,7 @@ class Plugin implements Hooked {
 		$this->components['core']        = $this->di_container->resolve( Core::class );
 		$this->components['conditions']  = $this->di_container->resolve( Conditions::class );
 		$this->components['utm_handler'] = $this->di_container->resolve( UTM_Handler::class );
+		$this->components['helper']      = $this->di_container->resolve( Helper::class );
 
 		$this->components['process_users']       = $this->di_container->resolve( Process_Users::class );
 		$this->components['process_comments']    = $this->di_container->resolve( Process_Comments::class );

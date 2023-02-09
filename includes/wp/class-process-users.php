@@ -20,6 +20,9 @@ class Process_Users extends Process implements Hooked {
 
 		add_action( 'user_register', [ $this, 'process_create' ], 10, 1 );
 		add_action( 'profile_update', [ $this, 'process_update' ], 10, 1 );
+		add_action( 'delete_user', [ $this, 'process_delete' ], 10, 1 );
+		add_action( 'wpmu_delete_user', [ $this, 'process_delete' ], 10, 1 );
+
 	}
 
 
@@ -68,6 +71,32 @@ class Process_Users extends Process implements Hooked {
 
 		$fields = apply_filters(
 			'ainsys_process_update_fields_' . self::$entity,
+			$this->prepare_data( $user_id ),
+			$user_id
+		);
+
+		$this->send_data( $user_id, self::$entity, self::$action, $fields );
+
+	}
+
+
+	/**
+	 * Sends delete user details to AINSYS
+	 *
+	 * @param  int $user_id
+	 *
+	 * @return void
+	 */
+	public function process_delete( int $user_id ): void {
+
+		self::$action = 'DELETE';
+
+		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
+			return;
+		}
+
+		$fields = apply_filters(
+			'ainsys_process_delete_fields_' . self::$entity,
 			$this->prepare_data( $user_id ),
 			$user_id
 		);

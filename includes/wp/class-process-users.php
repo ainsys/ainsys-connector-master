@@ -112,6 +112,7 @@ class Process_Users extends Process implements Hooked {
 	 *
 	 * @return array
 	 */
+
 	public function process_checking( int $user_id ): array {
 
 		self::$action = 'CHECKING';

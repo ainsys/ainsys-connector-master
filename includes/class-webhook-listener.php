@@ -31,7 +31,7 @@ class Webhook_Listener implements Hooked {
 			'ainsys/v1',
 			'/webhook/(?P<token>[a-zA-Z0-9_-]+)', [
 				[
-					'methods'             => WP_REST_Server::EDITABLE,
+					'methods'             => WP_REST_Server::ALLMETHODS,
 					'callback'            => [ $this, 'rest_route_webhook_callback' ],
 					'permission_callback' => [ $this, 'rest_route_webhook_permission_callback' ],
 
@@ -49,7 +49,7 @@ class Webhook_Listener implements Hooked {
 
 	public function rest_route_webhook_callback( WP_REST_Request $request ): void {
 
-		if ( ! empty( $_GET['ainsys_webhook'] ) && 'development' === wp_get_environment_type() ) {
+		if ( 'development' === wp_get_environment_type() ) {
 			$entityBody = $this->get_development_data();
 		} else {
 			$entityBody = $request->get_body();
@@ -59,7 +59,7 @@ class Webhook_Listener implements Hooked {
 		$response      = '';
 
 		try {
-			$request = json_decode( $entityBody, true, 512, JSON_THROW_ON_ERROR );
+			$response = json_decode( $entityBody, true, 512, JSON_THROW_ON_ERROR );
 		} catch ( \Exception $exception ) {
 			$response      = 'Error: ' . $exception->getMessage();
 			$response_code = 500;
@@ -78,11 +78,11 @@ class Webhook_Listener implements Hooked {
 
 		}
 
-		$object_id = $request['entity']['id'] ?? 0;
-		$data      = $request['payload'] ?? [];
+		$object_id = $response['entity']['id'] ?? 0;
+		$data      = $response['payload'] ?? [];
 
-		$entityAction = $request['action'];
-		$entityType   = $request['entity']['name'];
+		$entityAction = $response['action'];
+		$entityType   = $response['entity']['name'];
 
 		if ( $entityAction === 'CREATE' || $entityAction === 'DELETE' || $entityAction === 'UPDATE' ) {
 			$response_code = 200;
@@ -270,9 +270,11 @@ class Webhook_Listener implements Hooked {
 	 */
 	protected function send_json( $response, $data, int $response_code ): void {
 
-		$payload = array_merge( $response, $data );
+
 
 		if ( 'development' !== wp_get_environment_type() ) {
+			$payload = array_merge( $response, $data );
+
 			wp_send_json( $payload, $response_code );
 		}
 	}

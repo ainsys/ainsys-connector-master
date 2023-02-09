@@ -144,10 +144,18 @@ class Admin_UI_Entities_Checking implements Hooked {
 		];
 
 		if ( is_multisite() ) {
-			$users_args['blog_id'] = get_current_blog_id();
+			$users_args['blog_id'] = 0;
 		}
 
-		$users     = get_users( $users_args );
+		$users = get_users( $users_args );
+
+		if ( empty( $users ) ) {
+			return [
+				'request'  => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
+				'response' => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
+			];
+		}
+
 		$user_test = end( $users );
 
 		return ( new Process_Users )->process_checking( (int) $user_test->ID, (array) $user_test->data, (array) $user_test->data );

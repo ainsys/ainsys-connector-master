@@ -100,13 +100,13 @@ class Process {
 
 
 	/**
-	 * @param  int      $post_id
-	 * @param  WP_Post $post Post object
-	 * @param  bool     $update
+	 * @param  int    $post_id
+	 * @param  object $post Post object
+	 * @param  bool   $update
 	 *
 	 * @return bool
 	 */
-	public function is_updated( int $post_id, WP_Post $post, bool $update ): bool {
+	public function is_updated( int $post_id, object $post, bool $update ): bool {
 
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return false;

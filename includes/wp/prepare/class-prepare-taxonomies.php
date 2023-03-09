@@ -37,18 +37,18 @@ class Prepare_Taxonomies extends Process {
 	/**
 	 * Get product data for AINSYS
 	 *
-	 * @param $entity
-	 * @param $process
+	 * @param  string $entity
+	 * @param  object $process
 	 *
 	 * @return array
 	 */
-	protected function get_tax( $entity, $process ): array {
+	public function get_tax_to_check( string $entity, object $process ): array {
 
 		$taxes = get_terms( [
 			'taxonomy'   => $entity,
 			'hide_empty' => false,
 		] );
-		error_log( print_r( $taxes, 1 ) );
+
 		if ( empty( $taxes ) ) {
 			return [
 				'request'  => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),

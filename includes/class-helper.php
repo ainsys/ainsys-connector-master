@@ -58,4 +58,13 @@ class Helper {
 		return (array) array_rand( array_flip( $posts ), $count );
 	}
 
+
+	public static function random_int(){
+
+		try {
+			return random_int( 0, 999999999999999 );
+		} catch ( \Exception $e ) {
+			return  $e->getMessage();
+		}
+	}
 }

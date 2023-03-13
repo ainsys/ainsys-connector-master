@@ -58,4 +58,37 @@ class Helper {
 		return (array) array_rand( array_flip( $posts ), $count );
 	}
 
+
+	/**
+	 * @param      $array
+	 * @param  int $count_output
+	 *
+	 * @return array
+	 */
+	public static function get_rand_array( $array, int $count_output = 1 ): array {
+
+
+		$count = $count_output;
+
+		if ( count( $array ) < $count_output ) {
+			$count = count( $array );
+		}
+
+		if ( $count === count( $array ) ) {
+			-- $count;
+		}
+
+		return (array) array_rand( array_flip( $array ), $count );
+	}
+
+
+	public static function random_int($start_int = 0, $finish_int = 999999999999999){
+
+		try {
+			return random_int( $start_int, $finish_int );
+		} catch ( \Exception $e ) {
+			return  $e->getMessage();
+		}
+	}
+
 }

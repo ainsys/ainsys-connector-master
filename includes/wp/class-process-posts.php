@@ -128,7 +128,6 @@ class Process_Posts extends Process implements Hooked {
 	 */
 	public function process_bulk_update( int $post_id, WP_Post $post ): void {
 
-		error_log( print_r( $_REQUEST, 1 ) );
 		if ( ! isset( $_REQUEST['post_view'] ) ) {
 			return;
 		}

@@ -24,9 +24,16 @@ class Process_Pages extends Process implements Hooked {
 	 */
 	public function init_hooks() {
 
-		add_action( 'wp_after_insert_post', [ $this, 'process_create' ], 1000, 4 );
+		/*add_action( 'wp_after_insert_post', [ $this, 'process_create' ], 1000, 4 );
 		add_action( 'wp_after_insert_post', [ $this, 'process_update' ], 1010, 4 );
+		add_action( 'deleted_post', [ $this, 'process_delete' ], 10, 2 );*/
+
+		add_action( 'wp_after_insert_post', [ $this, 'process_create' ], PHP_INT_MAX, 4 );
+		add_action( 'wp_after_insert_post', [ $this, 'process_update' ], PHP_INT_MAX, 4 );
+		add_action( 'edit_post_post', [ $this, 'process_bulk_update' ], 1000, 2 );
+
 		add_action( 'deleted_post', [ $this, 'process_delete' ], 10, 2 );
+		add_action( 'trashed_post', [ $this, 'process_trash' ], 10, 1 );
 
 	}
 
@@ -44,14 +51,13 @@ class Process_Pages extends Process implements Hooked {
 	 */
 	public function process_create( int $post_id, WP_Post $post, bool $update, ?WP_Post $post_before ): void {
 
-
 		self::$action = 'CREATE';
 
 		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
 			return;
 		}
 
-		if ( 'auto-draft' === $post->post_status ) {
+		if ( 'auto-draft' === $post->post_status || is_int( wp_is_post_revision( $post ) ) || is_int( wp_is_post_autosave( $post ) ) ) {
 			return;
 		}
 
@@ -71,6 +77,8 @@ class Process_Pages extends Process implements Hooked {
 
 		$this->send_data( $post_id, self::$entity, self::$action, $fields );
 
+		clean_post_cache( $post_id );
+
 	}
 
 
@@ -85,14 +93,13 @@ class Process_Pages extends Process implements Hooked {
 	 */
 	public function process_update( int $post_id, WP_Post $post, bool $update, ?WP_Post $post_before ): void {
 
-
 		self::$action = 'UPDATE';
 
 		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
 			return;
 		}
 
-		if ( 'auto-draft' === $post->post_status ) {
+		if ( 'auto-draft' === $post->post_status || is_int( wp_is_post_revision( $post ) ) || is_int( wp_is_post_autosave( $post ) ) ) {
 			return;
 		}
 
@@ -100,7 +107,7 @@ class Process_Pages extends Process implements Hooked {
 			return;
 		}
 
-		if ( ! $this->is_updated( $post_id, $post, $update ) ) {
+		if ( false === $update ) {
 			return;
 		}
 
@@ -115,11 +122,55 @@ class Process_Pages extends Process implements Hooked {
 		);
 
 		$this->send_data( $post_id, self::$entity, self::$action, $fields );
+
+		clean_post_cache( $post_id );
 	}
 
 
 	/**
-	 * Sends delete page details to AINSYS
+	 * Sends updated post details to AINSYS.
+	 *
+	 * @param  int     $post_id Post ID.
+	 * @param  WP_Post $post    Post object.
+	 */
+	public function process_bulk_update( int $post_id, WP_Post $post ): void {
+
+		if ( ! isset( $_REQUEST['post_view'] ) ) {
+			return;
+		}
+
+		if ( 'list' !== $_REQUEST['post_view'] ) {
+			return;
+		}
+
+		if ( $_REQUEST['action'] === 'editpost' ) {
+			return;
+		}
+
+		if ( 'auto-draft' === $post->post_status || is_int( wp_is_post_revision( $post ) ) || is_int( wp_is_post_autosave( $post ) ) ) {
+			return;
+		}
+
+		self::$action = 'UPDATE';
+
+		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
+			return;
+		}
+
+		$fields = apply_filters(
+			'ainsys_process_update_fields_' . self::$entity,
+			$this->prepare_data( $post_id, $post ),
+			$post_id
+		);
+
+		$this->send_data( $post_id, self::$entity, self::$action, $fields );
+
+		clean_post_cache( $post_id );
+	}
+
+
+	/**
+	 * Sends delete post details to AINSYS
 	 *
 	 * @param  int     $post_id
 	 * @param  WP_Post $post Post object.
@@ -131,6 +182,42 @@ class Process_Pages extends Process implements Hooked {
 		self::$action = 'DELETE';
 
 		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
+			return;
+		}
+
+		if ( $post->post_type !== self::$entity ) {
+			return;
+		}
+
+		$fields = apply_filters(
+			'ainsys_process_delete_fields_' . self::$entity,
+			$this->prepare_data( $post_id, $post ),
+			$post_id
+		);
+
+		$this->send_data( $post_id, self::$entity, self::$action, $fields );
+
+	}
+
+
+	/**
+	 * Sends delete post details to AINSYS
+	 *
+	 * @param  int $post_id
+	 *
+	 * @return void
+	 */
+	public function process_trash( int $post_id ): void {
+
+		self::$action = 'DELETE';
+
+		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
+			return;
+		}
+
+		$post = get_post( $post_id );
+
+		if ( $post->post_type !== self::$entity ) {
 			return;
 		}
 

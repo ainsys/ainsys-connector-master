@@ -19,7 +19,7 @@ class Webhook_Listener implements Hooked {
 
 	public function init_hooks() {
 
-		add_action( 'init', [ $this, 'webhook_listener' ] );
+		//add_action( 'init', [ $this, 'webhook_listener' ] );
 
 		add_action( 'rest_api_init', [ $this, 'rest_route_webhook_listener' ] );
 	}

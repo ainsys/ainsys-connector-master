@@ -24,13 +24,9 @@ class Process_Pages extends Process implements Hooked {
 	 */
 	public function init_hooks() {
 
-		/*add_action( 'wp_after_insert_post', [ $this, 'process_create' ], 1000, 4 );
-		add_action( 'wp_after_insert_post', [ $this, 'process_update' ], 1010, 4 );
-		add_action( 'deleted_post', [ $this, 'process_delete' ], 10, 2 );*/
-
 		add_action( 'wp_after_insert_post', [ $this, 'process_create' ], PHP_INT_MAX, 4 );
 		add_action( 'wp_after_insert_post', [ $this, 'process_update' ], PHP_INT_MAX, 4 );
-		add_action( 'edit_post_post', [ $this, 'process_bulk_update' ], 1000, 2 );
+		add_action( 'edit_post_page', [ $this, 'process_bulk_update' ], 1000, 2 );
 
 		add_action( 'deleted_post', [ $this, 'process_delete' ], 10, 2 );
 		add_action( 'trashed_post', [ $this, 'process_trash' ], 10, 1 );
@@ -124,11 +120,12 @@ class Process_Pages extends Process implements Hooked {
 		$this->send_data( $post_id, self::$entity, self::$action, $fields );
 
 		clean_post_cache( $post_id );
+
 	}
 
 
 	/**
-	 * Sends updated post details to AINSYS.
+  * Sends updated post details to AINSYS.
 	 *
 	 * @param  int     $post_id Post ID.
 	 * @param  WP_Post $post    Post object.

@@ -120,11 +120,12 @@ class Process_Pages extends Process implements Hooked {
 		$this->send_data( $post_id, self::$entity, self::$action, $fields );
 
 		clean_post_cache( $post_id );
+
 	}
 
 
 	/**
-	 * Sends updated post details to AINSYS.
+  * Sends updated post details to AINSYS.
 	 *
 	 * @param  int     $post_id Post ID.
 	 * @param  WP_Post $post    Post object.

@@ -35,6 +35,10 @@ class Process_Users extends Process implements Hooked {
 	 */
 	public function process_create( int $user_id ): void {
 
+		if ( did_action( 'ainsys_webhook_action_handlers' ) >= 0 && false === is_admin() ) {
+			return;
+		}
+
 		self::$action = 'CREATE';
 
 		if ( Conditions::has_entity_disable( self::$entity, self::$action ) ) {
@@ -88,6 +92,10 @@ class Process_Users extends Process implements Hooked {
 	 * @return void
 	 */
 	public function process_delete( int $user_id ): void {
+
+		if ( did_action( 'ainsys_webhook_action_handlers' ) >= 0 && false === is_admin() ) {
+			return;
+		}
 
 		self::$action = 'DELETE';
 

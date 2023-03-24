@@ -2,8 +2,6 @@
 
 namespace Ainsys\Connector\Master\Webhooks\Setup;
 
-use WP_User;
-
 class Setup_User {
 
 	protected array $data;
@@ -16,7 +14,7 @@ class Setup_User {
 	public function __construct( $data ) {
 
 		$this->data    = $data;
-		$this->user_id = isset( $data['user_id'] ) ? (int) $data['user_id'] : 0;
+		$this->user_id = isset( $data['ID'] ) ? (int) $data['ID'] : 0;
 		$this->user    = get_userdata( $this->user_id );
 	}
 
@@ -120,182 +118,14 @@ class Setup_User {
 	 */
 	public function has_update(): bool {
 
-
 		$data = [];
 
 		foreach ( $this->data as $key => $val ) {
-			if ( 'user_login' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data );
+			if ( 'ID' === $key ) {
+				continue;
 			}
 
-			if ( 'user_email' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data );
-			}
-
-			if ( 'user_pass' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data );
-			}
-
-			if ( 'user_nicename' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data );
-			}
-
-			if ( 'nickname' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data );
-			}
-
-			if ( 'display_name' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data );
-			}
-
-			if ( 'user_registered' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data );
-			}
-
-			if ( 'first_name' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data );
-			}
-
-			if ( 'last_name' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data );
-			}
-
-			if ( 'description' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data );
-			}
-
-			if ( 'user_url' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data );
-			}
-
-			if ( 'role' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data );
-			}
-
-			if ( 'facebook' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'instagram' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'linkedin' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'myspace' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'pinterest' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'youtube' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'twitter' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'tumblr' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'soundcloud' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'wikipedia' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'billing_first_name' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'billing_last_name' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'billing_company' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'billing_address_1' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'billing_address_2' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'billing_city' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'billing_postcode' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'billing_country' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'billing_state' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'billing_phone' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'billing_email' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'shipping_first_name' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'shipping_last_name' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'shipping_company' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'shipping_address_1' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'shipping_address_2' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'shipping_city' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'shipping_postcode' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'shipping_country' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'shipping_state' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
-			if ( 'shipping_phone' === $key ) {
-				$data = $this->set_update_user_data( $key, $val, $data, true );
-			}
-
+			$data = $this->set_update_user_data( $key, $val, $data );
 		}
 
 		return in_array( 'yes', $data, true );

@@ -152,7 +152,7 @@ class Process_Users extends Process implements Hooked {
 		$user = get_userdata( $user_id );
 
 		return [
-			'user_id'                  => $user->ID,
+			'ID'                  => $user->ID,
 			'user_login'               => $user->get( 'user_login' ),
 			'user_pass'                => $user->get( 'user_pass' ),
 			'user_email'               => $user->get( 'user_email' ),

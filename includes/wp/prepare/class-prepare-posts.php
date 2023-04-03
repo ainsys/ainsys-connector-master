@@ -164,7 +164,7 @@ class Prepare_Posts extends Process {
 	public function get_prepare_data( $post ): array {
 
 		return [
-			'post_id'           => $post->ID,
+			'ID'                => $post->ID,
 			'post_title'        => $post->post_title,
 			'post_content'      => $post->post_content,
 			'post_excerpt'      => $post->post_excerpt,
@@ -178,10 +178,9 @@ class Prepare_Posts extends Process {
 			'post_password'     => $post->post_password,
 			'post_parent'       => $post->post_parent,
 			'menu_order'        => $post->menu_order,
-			'post_slug'         => $post->post_name,
+			'post_name'         => $post->post_name,
 			'post_link'         => $post->guid,
 			'comment_status'    => $post->comment_status,
-			'comment_count'     => (int) $post->comment_count,
 			'custom_fields'     => get_post_meta( $post->ID ),
 		];
 	}

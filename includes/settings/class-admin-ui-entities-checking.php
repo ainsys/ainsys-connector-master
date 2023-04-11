@@ -2,6 +2,7 @@
 
 namespace Ainsys\Connector\Master\Settings;
 
+use Ainsys\Connector\Master\Helper;
 use Ainsys\Connector\Master\Hooked;
 use Ainsys\Connector\Master\Logger;
 use Ainsys\Connector\Master\WP\Process_Attachments;
@@ -218,24 +219,19 @@ class Admin_UI_Entities_Checking implements Hooked {
 	 */
 	protected function get_post(): array {
 
-		$posts = get_posts( [
-			'post_type'      => 'post',
-			'posts_per_page' => 50,
-			'post_status'    => 'public',
-			'post_parent'    => null,
-		] );
+		$post_ids = Helper::get_rand_posts( 'post' );
 
-		if ( empty( $posts ) ) {
+		if ( empty( $post_ids ) ) {
 			return [
 				'request'  => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'response' => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			];
 		}
 
-		$post    = end( $posts );
-		$post_id = (int) $post->ID;
+		$post_id = reset( $post_ids );
 
-		return ( new Process_Posts )->process_checking( $post_id, $post, true );
+		return ( new Process_Posts )->process_checking( (int) $post_id );
+
 	}
 
 
@@ -244,24 +240,18 @@ class Admin_UI_Entities_Checking implements Hooked {
 	 */
 	protected function get_page(): array {
 
-		$posts = get_posts( [
-			'post_type'      => 'page',
-			'posts_per_page' => 50,
-			'post_status'    => 'public',
-			'post_parent'    => null,
-		] );
+		$post_ids = Helper::get_rand_posts( 'page' );
 
-		if ( empty( $posts ) ) {
+		if ( empty( $post_ids ) ) {
 			return [
 				'request'  => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
 				'response' => __( 'Error: There is no data to check.', AINSYS_CONNECTOR_TEXTDOMAIN ),
 			];
 		}
 
-		$post    = end( $posts );
-		$post_id = (int) $post->ID;
+		$post_id = reset( $post_ids );
 
-		return ( new Process_Pages )->process_checking( $post_id, $post, true );
+		return ( new Process_Pages )->process_checking( (int) $post_id );
 	}
 
 

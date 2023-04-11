@@ -5,6 +5,7 @@ namespace Ainsys\Connector\Master\Webhooks;
 use Ainsys\Connector\Master\Conditions;
 use Ainsys\Connector\Master\Hooked;
 use Ainsys\Connector\Master\Webhook_Handler;
+use Ainsys\Connector\Master\Webhooks\Setup\Setup_Posts;
 
 class Handle_Page extends Handle implements Hooked, Webhook_Handler {
 
@@ -44,11 +45,11 @@ class Handle_Page extends Handle implements Hooked, Webhook_Handler {
 			$data['post_type'] = self::$entity;
 		}
 
-		if ( ! isset( $data['post_status'] ) && ! in_array( $data['post_status'], $this->statuses(), true ) ) {
+		if ( empty( $data['post_status'] ) && ! in_array( $data['post_status'], $this->statuses(), true ) ) {
 			$data['post_status'] = 'publish';
 		}
 
-		$result = wp_insert_post( $data, true, true );
+		$result = ( new Setup_Posts( $data ) )->setup();
 
 		return [
 			'id'      => is_wp_error( $result ) ? 0 : $result,
@@ -79,19 +80,19 @@ class Handle_Page extends Handle implements Hooked, Webhook_Handler {
 			];
 		}
 
+		if ( empty( $data['ID'] ) || $data['post_type'] !== self::$entity ) {
+			$data['ID'] = $object_id;
+		}
+
 		if ( empty( $data['post_type'] ) || $data['post_type'] !== self::$entity ) {
 			$data['post_type'] = self::$entity;
 		}
 
-		if ( empty( $data['post_status'] ) && ! in_array( $data['post_status'], $this->statuses(), true ) ) {
+		if ( empty( $data['post_status'] ) || ! in_array( $data['post_status'], $this->statuses(), true ) ) {
 			$data['post_status'] = 'publish';
 		}
 
-		if ( empty( $data['ID'] ) ) {
-			$data['ID'] = $object_id;
-		}
-
-		$result = wp_update_post( $data, true );
+		$result = ( new Setup_Posts( $data ) )->setup();
 
 		return [
 			'id'      => is_wp_error( $result ) ? 0 : $result,

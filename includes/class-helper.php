@@ -16,10 +16,12 @@ class Helper {
 		return $str;
 	}
 
+
 	public static function is_localhost( $whitelist = [ '127.0.0.1', '::1' ] ): bool {
 
 		return in_array( $_SERVER['REMOTE_ADDR'], $whitelist, true );
 	}
+
 
 	/**
 	 * @param      $post_type
@@ -82,13 +84,19 @@ class Helper {
 	}
 
 
-	public static function random_int($start_int = 0, $finish_int = 999999999999999){
+	public static function random_int( $start_int = 0, $finish_int = 999999999999999 ) {
 
 		try {
 			return random_int( $start_int, $finish_int );
 		} catch ( \Exception $e ) {
-			return  $e->getMessage();
+			return $e->getMessage();
 		}
+	}
+
+
+	public static function generate_hash( $value ) {
+
+		return hexdec( crc32( $value ) );
 	}
 
 }

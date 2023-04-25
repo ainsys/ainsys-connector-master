@@ -49,6 +49,8 @@ class Prepare_Posts extends Process {
 			$post_id
 		);
 
+		do_action( "ainsys_process_create_$entity", $post_id );
+
 		$this->send_data( $post_id, $entity, $action, $fields );
 	}
 
@@ -96,6 +98,8 @@ class Prepare_Posts extends Process {
 			$post_id
 		);
 
+		do_action( "ainsys_process_update_$entity", $post_id );
+
 		$this->send_data( $post_id, $entity, $action, $fields );
 	}
 
@@ -124,6 +128,8 @@ class Prepare_Posts extends Process {
 			$this->prepare_data( $post_id ),
 			$post_id
 		);
+
+		do_action( "ainsys_process_delete_$entity", $post_id );
 
 		$this->send_data( $post_id, $entity, $action, $fields );
 	}
